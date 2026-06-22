@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downloadify.AI - Universal Media Downloader</title>
+    <meta name="description" content="Download YouTube 4K videos, MP3, Instagram Reels, and more easily.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css?v=6">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <h1 class="logo-title">Downloadify<span>.AI</span></h1>
+            <p class="subtitle">Universal Downloader for YouTube, Instagram & More</p>
+        </header>
+
+        <section class="downloader-section">
+            <div class="input-glass">
+                <form id="fetchForm">
+                    <div class="input-wrapper">
+                        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        <input type="url" id="videoUrl" placeholder="Paste your link here (e.g. YouTube, Instagram Reel...)" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="glow-button" id="fetchBtn">
+                        <span class="btn-text">Analyze Link</span>
+                        <div class="loader-spinner hidden" id="fetchLoader"></div>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Analysis Loader (Animated state) -->
+        <section class="loader-section hidden" id="analysisLoader">
+            <div class="glass-card loading-card">
+                <div class="scanner-container">
+                    <div class="orbit-spinner">
+                        <div class="orbit"></div>
+                        <div class="orbit"></div>
+                        <div class="orbit"></div>
+                        <div class="center-glow">AI</div>
+                    </div>
+                    <div class="scanner-bar"></div>
+                </div>
+                <div class="loading-status">
+                    <h3 class="status-heading">AI Engine Analyzing Link</h3>
+                    <div class="status-steps">
+                        <div class="step" id="step1">
+                            <span class="dot"></span>
+                            <span class="step-text">Parsing URL metadata...</span>
+                        </div>
+                        <div class="step" id="step2">
+                            <span class="dot"></span>
+                            <span class="step-text">Connecting to streaming servers...</span>
+                        </div>
+                        <div class="step" id="step3">
+                            <span class="dot"></span>
+                            <span class="step-text">Extracting video and audio formats...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="result-section hidden" id="resultCard">
+            <div class="glass-card">
+                <div class="media-preview">
+                    <div class="img-wrapper">
+                        <img id="mediaThumbnail" src="" alt="Video Thumbnail">
+                        <span class="duration-badge" id="mediaDuration">00:00</span>
+                    </div>
+                    <div class="media-info">
+                        <h2 id="mediaTitle">Video Title Loading...</h2>
+                        <p id="mediaAuthor">Channel Name</p>
+                    </div>
+                </div>
+
+                <div class="download-options">
+                    <h3>Select Quality / Format</h3>
+                    
+                    <div class="format-grid">
+                        <div class="format-column">
+                            <h4>🎬 Video</h4>
+                            <div class="btn-group" id="videoFormats">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
+                        <div class="format-column">
+                            <h4>🎵 Audio</h4>
+                            <div class="btn-group" id="audioFormats">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="status-box hidden" id="downloadStatus">
+                        <canvas id="downloadCanvas" class="download-canvas"></canvas>
+                        <div class="download-animation-container">
+                            <!-- Video Animation Wrapper -->
+                            <div class="video-anim-wrapper">
+                                <div class="video-shutter">
+                                    <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                                    <div class="pulse-ring"></div>
+                                    <div class="pulse-ring delay-1"></div>
+                                </div>
+                                <div class="film-reel-container">
+                                    <div class="reel-dot"></div>
+                                    <div class="reel-dot"></div>
+                                    <div class="reel-dot"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Audio Animation Wrapper -->
+                            <div class="audio-anim-wrapper">
+                                <div class="vinyl-disc">
+                                    <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                                    <div class="pulse-ring"></div>
+                                    <div class="pulse-ring delay-1"></div>
+                                </div>
+                                <div class="download-waves">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="terminal-log-wrapper">
+                            <span class="terminal-prompt">></span> <span id="statusText">Starting download...</span>
+                        </div>
+                        <div class="download-stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-label">SPEED</span>
+                                <span class="stat-value" id="downloadSpeed">0.0 MB/s</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">PROCESSED</span>
+                                <span class="stat-value" id="downloadProcessed">0.0 MB</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">TIME LEFT</span>
+                                <span class="stat-value" id="downloadETA">--s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Instagram Downloader Result Card -->
+        <section class="instagram-section hidden" id="instagramCard">
+            <div class="glass-card instagram-glass-card">
+                <!-- Instagram Post Header -->
+                <div class="instagram-post-header">
+                    <div class="instagram-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ig-avatar-icon"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="instagram-meta">
+                        <h3 id="igUploader">instagram_user</h3>
+                        <p id="igTitle">Instagram Media Downloader</p>
+                    </div>
+                    <!-- Stats badge metrics -->
+                    <div class="instagram-stats-badge">
+                        <span class="ig-stat-pill"><span class="stat-icon">❤️</span> <span id="igLikesVal">0</span></span>
+                        <span class="ig-stat-pill"><span class="stat-icon">💬</span> <span id="igCommentsVal">0</span></span>
+                        <span class="ig-stat-pill"><span class="stat-icon">✈️</span> <span id="igSharesVal">0</span></span>
+                    </div>
+                    <!-- Brand Instagram SVG Logo -->
+                    <div class="instagram-brand-logo-wrapper">
+                        <svg class="ig-brand-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </div>
+                </div>
+
+                <div class="ig-divider"></div>
+
+                <!-- Instagram Main Image/Video Preview -->
+                <div class="instagram-media-preview" id="igPreviewContainer">
+                    <img id="igMainPreview" src="" alt="Instagram Preview">
+                    <span class="media-type-badge" id="igMediaTypeBadge">Reel</span>
+                </div>
+
+                <div class="ig-divider"></div>
+
+                <!-- Download Options / Items Grid -->
+                <div class="instagram-download-options">
+                    <h3 class="ig-options-title">Available Media Downloads</h3>
+                    
+                    <!-- Single video / Reel / Image options -->
+                    <div class="ig-single-options" id="igSingleOptions">
+                        <div class="ig-download-grid">
+                            <div class="ig-download-item" id="igVideoItem">
+                                <span class="ig-item-label">🎬 High Resolution Video (MP4)</span>
+                                <button class="glow-button ig-btn" id="igVideoBtn">Download Video</button>
+                            </div>
+                            <div class="ig-download-item" id="igImageItem">
+                                <span class="ig-item-label">🖼️ High Resolution Image (JPG)</span>
+                                <button class="glow-button ig-btn" id="igImageBtn">Download Image</button>
+                            </div>
+                            <div class="ig-download-item" id="igAudioItem">
+                                <span class="ig-item-label">🎵 Extract Audio Track (MP3)</span>
+                                <button class="glow-button ig-btn" id="igAudioBtn">Download Audio</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carousel items (multi-image/video post) -->
+                    <div class="ig-carousel-options hidden" id="igCarouselOptions">
+                        <div class="ig-carousel-grid" id="igCarouselGrid">
+                            <!-- Dynamically populated carousel items -->
+                        </div>
+                    </div>
+
+                    <!-- Instagram Download Status Box -->
+                    <div class="status-box hidden" id="igDownloadStatus">
+                        <canvas id="igDownloadCanvas" class="download-canvas"></canvas>
+                        <div class="download-animation-container">
+                            <div class="video-anim-wrapper">
+                                <div class="video-shutter">
+                                    <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                                    <div class="pulse-ring"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="igProgressFill"></div>
+                        </div>
+                        <div class="terminal-log-wrapper">
+                            <span class="terminal-prompt">></span> <span id="igStatusText">Downloading media...</span>
+                        </div>
+                        <div class="download-stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-label">SPEED</span>
+                                <span class="stat-value" id="igDownloadSpeed">0.0 MB/s</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">PROCESSED</span>
+                                <span class="stat-value" id="igDownloadProcessed">0.0 MB</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">TIME LEFT</span>
+                                <span class="stat-value" id="igDownloadETA">--s</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="playlist-section hidden" id="playlistCard">
+            <div class="glass-card">
+                <div class="playlist-header">
+                    <h2 id="playlistTitle">Playlist Title Loading...</h2>
+                    <p id="playlistCount">0 videos found</p>
+                    <div class="playlist-actions">
+                        <button class="glow-button small-btn" id="downloadAllBtn">Download All</button>
+                    </div>
+                </div>
+
+                <div class="playlist-items" id="playlistItems">
+                    <!-- Playlist items will be populated here -->
+                </div>
+
+                <div class="status-box hidden" id="playlistStatus">
+                    <canvas id="playlistDownloadCanvas" class="download-canvas"></canvas>
+                    <div class="download-animation-container">
+                        <!-- Video Animation Wrapper -->
+                        <div class="video-anim-wrapper">
+                            <div class="video-shutter">
+                                <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring delay-1"></div>
+                            </div>
+                            <div class="film-reel-container">
+                                <div class="reel-dot"></div>
+                                <div class="reel-dot"></div>
+                                <div class="reel-dot"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Audio Animation Wrapper -->
+                        <div class="audio-anim-wrapper">
+                            <div class="vinyl-disc">
+                                <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring delay-1"></div>
+                            </div>
+                            <div class="download-waves">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="playlistProgressFill"></div>
+                    </div>
+                    <div class="terminal-log-wrapper">
+                        <span class="terminal-prompt">></span> <span id="playlistStatusText">Downloading playlist...</span>
+                    </div>
+                    <div class="download-stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">SPEED</span>
+                            <span class="stat-value" id="playlistDownloadSpeed">0.0 MB/s</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">PROCESSED</span>
+                            <span class="stat-value" id="playlistDownloadProcessed">0.0 MB</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">TIME LEFT</span>
+                            <span class="stat-value" id="playlistDownloadETA">--s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div id="errorToast" class="toast hidden">
+            <p id="errorMsg">Something went wrong. Please try again.</p>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

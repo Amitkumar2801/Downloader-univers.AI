@@ -1,0 +1,24 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+env/
+venv/
+.venv/
+ENV/
+
+# Project specific downloads & cookies
+downloads/
+backend/downloads/
+backend/yt_cookies.txt
+*.part
+*.temp
+
+# IDE configurations
+.vscode/
+.idea/
+.gemini/
+.DS_Store
