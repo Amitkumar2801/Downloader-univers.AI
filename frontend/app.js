@@ -565,8 +565,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 logo.innerHTML = 'InstaSave<span>.AI</span>';
                 subtitle.textContent = 'Premium Downloader for Instagram Reels, Posts & Stories';
             } else {
-                logo.innerHTML = 'Downloadify<span>.AI</span>';
-                subtitle.textContent = 'Universal Downloader for YouTube, Instagram & More';
+                logo.innerHTML = 'CUDA<span>.AI</span>';
+                subtitle.textContent = 'Chamgadar Universal Downloader AI';
             }
         }
     }
