@@ -1,81 +1,73 @@
-# CUDA.AI – Chamgadar Universal Downloader AI
+# CUDA.AI – Universal Downloader Web App
 
-**A sleek, glass‑morphic web app that lets you download YouTube videos, Instagram reels, Spotify tracks/playlists, and other media with lightning‑fast speed, premium UI, and built‑in audio extraction.**
-
----
-
-## 🚀 Why doesn't `npm run dev` work?
-
-This project is built using a **Vanilla HTML/CSS/JavaScript** frontend and a **Python Flask** backend. 
-- It does **NOT** use Node.js or `npm`.
-- There are no `npm` packages to install and no `package.json` file.
-- It runs entirely using Python, making the setup extremely lightweight and fast!
+**A simple, beautiful website to download YouTube videos, Instagram reels, and Spotify songs/playlists in high-quality (320kbps MP3) with cover art.**
 
 ---
 
-## 🛠️ How to Setup & Run locally
+## 🚀 NOTE: No Node.js / NPM needed!
+This project is built using simple **HTML/CSS/JS (Frontend)** and **Python (Backend)**. 
+- You do **NOT** need to install `node` or run `npm run dev`.
+- It runs purely on **Python**.
 
-### 1. Prerequisites
-Ensure you have **Python 3.8+** installed on your system. You can verify it by running:
-```bash
-python --version
-```
+---
 
-### 2. Clone the Repository
-```bash
-git clone https://github.com/Amitkumar2801/Downloader-univers.AI.git
-cd Downloader-univers.AI
-```
+## 🛠️ Step-by-Step Guide for Beginners
 
-### 3. Install Dependencies
-Install the required Python packages (such as `yt-dlp`, `Flask`, `mutagen` for audio tagging, and `beautifulsoup4` for scraping):
-```bash
-pip install -r backend/requirements.txt
-```
+If you are new to GitHub or coding, follow these simple steps to run this project on your computer:
 
-### 4. Start the Application
-You need to run **two simple commands** to start both the backend and frontend:
+### Step 1: Install Python (Must do)
+1. Go to [python.org/downloads](https://www.python.org/downloads/) and download the installer for your computer.
+2. Open the installer.
+3. **IMPORTANT**: Make sure to check the box that says **"Add python.exe to PATH"** before clicking Install.
 
-#### Step A: Start the Backend (Flask Server)
-The backend handles the scraping, downloading, and MP3 metadata tagging. It runs on `http://127.0.0.1:5000`.
-```bash
-python backend/app.py
-```
+### Step 2: Download this Project
+* **Option A (Easy)**: Click the green **Code** button on top of this GitHub page, click **Download ZIP**, and extract (unzip) it on your computer.
+* **Option B (Using Git)**: Open your terminal and run:
+  ```bash
+  git clone https://github.com/Amitkumar2801/Downloader-univers.AI.git
+  cd Downloader-univers.AI
+  ```
 
-#### Step B: Start the Frontend (HTTP Server)
-Open a new terminal window/tab and serve the static files:
-```bash
-python -m http.server 8000 --directory frontend
-```
-*(Alternatively, you can just double-click the `frontend/index.html` file in your file explorer to open it, or use any local live server extension in VS Code!)*
+### Step 3: Install Required Packages
+1. Open the project folder on your computer.
+2. In the folder path bar (at the top of the file explorer window), type `cmd` and press Enter to open the Command Prompt directly inside the folder.
+3. Run this command to install the download tools:
+   ```bash
+   pip install -r backend/requirements.txt
+   ```
 
-Now, open your browser and navigate to:
+### Step 4: Run the Project
+To run the app, you need to open **two terminal windows**:
+
+#### Window 1: Start the Backend (Flask Server)
+1. In your first Command Prompt window, run:
+   ```bash
+   python backend/app.py
+   ```
+2. You will see a message: `* Running on http://127.0.0.1:5000`. 
+3. **Do not close this window!** Leave it running.
+
+#### Window 2: Start the Frontend (Web Server)
+1. Open a **new, separate Command Prompt window** inside the same project folder.
+2. Run this command:
+   ```bash
+   python -m http.server 8000 --directory frontend
+   ```
+3. You will see a message: `Serving HTTP on :: port 8000`.
+4. **Do not close this window!** Leave it running.
+
+---
+
+## 🎈 Step 5: Open the Web App
+Open your web browser (Chrome, Edge, Safari, etc.) and type this address:
 👉 **[http://localhost:8000](http://localhost:8000)**
 
----
-
-## 🎵 Premium Spotify Downloader Features
-
-We've added a highly requested **Spotify Downloader** feature! Paste any Spotify track, playlist, or album link (e.g., `https://open.spotify.com/track/...` or `https://open.spotify.com/playlist/...`):
-
-1. **Auto UI Theme Detection**: The site automatically detects Spotify URLs, dynamically transitioning to a gorgeous green Spotify brand design with matching glowing ambient particles.
-2. **Metadata Tagging**: All downloaded Spotify tracks are converted to high-quality MP3s and automatically embedded with:
-   - Track Title
-   - Artist Name(s)
-   - High-Resolution Cover Art
-3. **Playlist / Album Parsing**: Inputting a playlist/album extracts all individual tracks. The UI updates to show a custom track list where you can choose specific bitrates (320kbps, 256kbps, 128kbps) to download individual tracks or download the entire playlist in one click.
+Now paste your YouTube, Instagram, or Spotify URL and click **Fetch** to download!
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Files
+* `frontend/` - Contains the website styling and visual components.
+* `backend/` - Contains the server logic that parses URLs and processes audio/video downloads.
 
-- `frontend/` - Static files containing `index.html` (the premium UI), `styles.css` (glassmorphism themes), and `app.js` (frontend downloading & polling client).
-- `backend/` - Python server containing `app.py` (API endpoints) and `spotify_scraper.py` (unauthenticated Spotify embed scraper).
-- `index.html` - Root redirect file pointing to the frontend folder (required to prevent 404s when deploying to platforms like GitHub Pages).
-
----
-
-## 📝 License
-
-This project is released under the MIT License – you are free to use, modify, and distribute it.
 
