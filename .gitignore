@@ -22,3 +22,9 @@ backend/yt_cookies.txt
 .idea/
 .gemini/
 .DS_Store
+
+# Test and mock data files
+next_data*.json
+playlist_direct.html
+test_*.py
+

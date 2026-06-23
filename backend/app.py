@@ -10,8 +10,43 @@ except ModuleNotFoundError:
     from quality_options import VideoQuality, AudioBitrate, map_video_quality_to_format, map_audio_bitrate_to_format
 import imageio_ffmpeg
 import re as _re
+import requests
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, TIT2, TPE1, APIC, error
+
+try:
+    from backend.spotify_scraper import parse_spotify_url, get_spotify_track_info, get_spotify_playlist_info, get_spotify_album_info
+except ModuleNotFoundError:
+    from spotify_scraper import parse_spotify_url, get_spotify_track_info, get_spotify_playlist_info, get_spotify_album_info
 
 COOKIES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'yt_cookies.txt')
+
+def tag_mp3_metadata(file_path, title, artists, cover_url):
+    try:
+        try:
+            tags = ID3(file_path)
+        except error:
+            tags = ID3()
+        tags.add(TIT2(encoding=3, text=title))
+        tags.add(TPE1(encoding=3, text=artists))
+        if cover_url:
+            try:
+                response = requests.get(cover_url, timeout=10)
+                if response.status_code == 200:
+                    tags.add(APIC(
+                        encoding=3,
+                        mime='image/jpeg',
+                        type=3,
+                        desc=u'Cover',
+                        data=response.content
+                    ))
+            except Exception as e:
+                print(f"[METADATA] Failed to fetch cover art: {e}")
+        tags.save(file_path)
+        print(f"[METADATA] Successfully tagged {file_path}")
+    except Exception as e:
+        print(f"[METADATA] Error tagging MP3: {e}")
+
 
 def get_cookie_args():
     """Get cookies for yt-dlp. Prioritizes cookies.txt file, then browser extraction."""
@@ -85,6 +120,64 @@ def get_video_info():
     url = data.get('url')
     if not url:
         return jsonify({'error': 'URL is required'}), 400
+
+    sp_type, sp_id = parse_spotify_url(url)
+    if sp_type and sp_id:
+        try:
+            if sp_type == 'track':
+                track_info = get_spotify_track_info(sp_id)
+                if not track_info:
+                    return jsonify({'error': 'Failed to fetch Spotify track details'}), 404
+                
+                duration = track_info['duration']
+                estimated_size = int(duration * 40000)
+                
+                return jsonify({
+                    'title': f"{track_info['artists']} - {track_info['title']}",
+                    'thumbnail': track_info['thumbnail'],
+                    'uploader': track_info['artists'],
+                    'duration': int(duration),
+                    'url': track_info['url'],
+                    'formats': {
+                        'video': [],
+                        'audio': [
+                            {
+                                'format_id': 'spotify_320k',
+                                'ext': 'mp3',
+                                'format_note': '320kbps MP3 (Ultra HQ)',
+                                'filesize': estimated_size
+                            },
+                            {
+                                'format_id': 'spotify_256k',
+                                'ext': 'mp3',
+                                'format_note': '256kbps MP3 (HQ)',
+                                'filesize': int(duration * 32000)
+                            },
+                            {
+                                'format_id': 'spotify_128k',
+                                'ext': 'mp3',
+                                'format_note': '128kbps MP3 (Medium)',
+                                'filesize': int(duration * 16000)
+                            }
+                        ]
+                    }
+                })
+            elif sp_type in ('playlist', 'album'):
+                if sp_type == 'playlist':
+                    playlist_info = get_spotify_playlist_info(sp_id)
+                else:
+                    playlist_info = get_spotify_album_info(sp_id)
+                
+                if not playlist_info:
+                    return jsonify({'error': 'Failed to fetch Spotify details'}), 404
+                
+                return jsonify({
+                    'type': 'playlist',
+                    'title': playlist_info['title'],
+                    'entries': playlist_info['entries']
+                })
+        except Exception as e:
+            return jsonify({'error': f'Spotify parser error: {str(e)}'}), 500
 
     cookie_opts = get_cookie_args()
     ydl_opts = {
@@ -480,33 +573,34 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             ydl.download([url])
 
         filepath = f"{filepath_without_ext}.{ext}"
+        final_path = None
         if os.path.exists(filepath):
+            final_path = filepath
+        else:
+            # Fallback check
+            base_filename = os.path.basename(filepath_without_ext)
+            for f in os.listdir(DOWNLOADS_DIR):
+                if f.startswith(base_filename):
+                    final_path = os.path.join(DOWNLOADS_DIR, f)
+                    ext = f.split('.')[-1]
+                    break
+        
+        if final_path and os.path.exists(final_path):
+            # Check and write Spotify metadata
+            job = download_jobs.get(job_id)
+            if job and 'spotify_metadata' in job:
+                meta = job['spotify_metadata']
+                tag_mp3_metadata(final_path, meta['title'], meta['artists'], meta['cover_url'])
+                
             download_jobs[job_id].update({
                 'status': 'completed',
                 'progress': 100,
                 'status_text': 'Download complete!',
-                'filepath': filepath,
+                'filepath': final_path,
                 'filename': f"{safe_title}.{ext}"
             })
         else:
-            # Fallback check
-            base_filename = os.path.basename(filepath_without_ext)
-            found = False
-            for f in os.listdir(DOWNLOADS_DIR):
-                if f.startswith(base_filename):
-                    found_path = os.path.join(DOWNLOADS_DIR, f)
-                    found_ext = f.split('.')[-1]
-                    download_jobs[job_id].update({
-                        'status': 'completed',
-                        'progress': 100,
-                        'status_text': 'Download complete!',
-                        'filepath': found_path,
-                        'filename': f"{safe_title}.{found_ext}"
-                    })
-                    found = True
-                    break
-            if not found:
-                raise Exception("Failed to locate downloaded file on server.")
+            raise Exception("Failed to locate downloaded file on server.")
     except Exception as e:
         import traceback
         import glob
@@ -568,6 +662,25 @@ def download_video():
 
     if not url:
         return jsonify({'error': 'URL is required'}), 400
+
+    sp_type, sp_id = parse_spotify_url(url)
+    if sp_type and sp_id and sp_type == 'track':
+        track_info = get_spotify_track_info(sp_id)
+        if track_info:
+            title = f"{track_info['artists']} - {track_info['title']}"
+            media_type = 'audio'
+            ext = 'mp3'
+            
+            bitrate_suffix = '320k'
+            if format_id and format_id.startswith('spotify_'):
+                part = format_id[8:]
+                if part.endswith('k') and part[:-1].isdigit():
+                    bitrate_suffix = part
+                elif part.isdigit():
+                    bitrate_suffix = f"{part}k"
+            format_id = f"bestaudio/{bitrate_suffix}"
+            
+            url = f"ytsearch:{track_info['artists']} - {track_info['title']}"
 
     try:
         height = int(height_val) if height_val else 0
@@ -715,6 +828,11 @@ def download_video():
         else:
             return jsonify({'error': 'Downloaded file not found on server.'}), 500
 
+    if sp_type and sp_id and sp_type == 'track' and ext == 'mp3':
+        track_info = get_spotify_track_info(sp_id)
+        if track_info:
+            tag_mp3_metadata(filepath, track_info['title'], track_info['artists'], track_info['thumbnail'])
+
     download_name = f"{safe_title}.{ext}"
 
     # Stream file to client, then clean up
@@ -780,6 +898,31 @@ def start_download():
 
     if not url:
         return jsonify({'error': 'URL is required'}), 400
+
+    sp_type, sp_id = parse_spotify_url(url)
+    spotify_meta = None
+    if sp_type and sp_id and sp_type == 'track':
+        track_info = get_spotify_track_info(sp_id)
+        if track_info:
+            title = f"{track_info['artists']} - {track_info['title']}"
+            media_type = 'audio'
+            ext = 'mp3'
+            
+            bitrate_suffix = '320k'
+            if format_id and format_id.startswith('spotify_'):
+                part = format_id[8:]
+                if part.endswith('k') and part[:-1].isdigit():
+                    bitrate_suffix = part
+                elif part.isdigit():
+                    bitrate_suffix = f"{part}k"
+            format_id = f"bestaudio/{bitrate_suffix}"
+            
+            url = f"ytsearch:{track_info['artists']} - {track_info['title']}"
+            spotify_meta = {
+                'title': track_info['title'],
+                'artists': track_info['artists'],
+                'cover_url': track_info['thumbnail']
+            }
 
     try:
         height = int(height_val) if height_val else 0
@@ -853,6 +996,9 @@ def start_download():
         'last_filename': None,
         'status_text': 'Preparing download...'
     }
+
+    if spotify_meta:
+        download_jobs[job_id]['spotify_metadata'] = spotify_meta
 
     t = threading.Thread(
         target=run_download_thread,

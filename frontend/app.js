@@ -285,7 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populatePlaylistCard(data) {
         document.getElementById('playlistTitle').textContent = data.title || 'Unknown Playlist';
-        document.getElementById('playlistCount').textContent = `${data.entries.length} videos found`;
+        
+        const isSpotifyPlaylist = data.entries.length > 0 && data.entries[0].url && data.entries[0].url.includes('spotify.com');
+        document.getElementById('playlistCount').textContent = `${data.entries.length} ${isSpotifyPlaylist ? 'tracks' : 'videos'} found`;
         
         const playlistItems = document.getElementById('playlistItems');
         playlistItems.innerHTML = '';
@@ -294,18 +296,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'playlist-item';
             
+            let optionsHTML = '';
+            if (isSpotifyPlaylist) {
+                optionsHTML = `
+                    <option value="spotify_320k" selected>320kbps MP3 (Ultra HQ)</option>
+                    <option value="spotify_256k">256kbps MP3 (HQ)</option>
+                    <option value="spotify_128k">128kbps MP3 (Medium)</option>
+                `;
+            } else {
+                optionsHTML = `
+                    <option value="bestvideo[height<=2160]+bestaudio/best">4K Video</option>
+                    <option value="bestvideo[height<=1080]+bestaudio/best" selected>1080p Video</option>
+                    <option value="bestvideo[height<=720]+bestaudio/best">720p Video</option>
+                    <option value="bestaudio/best">Audio Only (MP3)</option>
+                `;
+            }
+            
             itemDiv.innerHTML = `
                 <img src="${entry.thumbnail || 'https://via.placeholder.com/120x68?text=Video'}" alt="Thumbnail">
                 <div class="playlist-item-info">
-                    <h4>${entry.title || 'Unknown Video'}</h4>
+                    <h4>${entry.title || 'Unknown Track'}</h4>
                     <p class="text-muted">ID: ${entry.id}</p>
                 </div>
                 <div class="playlist-item-actions">
                     <select class="quality-select" id="quality-${index}">
-                        <option value="bestvideo[height<=2160]+bestaudio/best">4K Video</option>
-                        <option value="bestvideo[height<=1080]+bestaudio/best" selected>1080p Video</option>
-                        <option value="bestvideo[height<=720]+bestaudio/best">720p Video</option>
-                        <option value="bestaudio/best">Audio Only (MP3)</option>
+                        ${optionsHTML}
                     </select>
                     <button class="glow-button small-btn download-single-btn" data-url="${entry.url}" data-title="${entry.title}" data-index="${index}">Download</button>
                 </div>
@@ -319,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const title = e.target.getAttribute('data-title');
                 const index = e.target.getAttribute('data-index');
                 const format_id = document.getElementById(`quality-${index}`).value;
-                const type = format_id.includes('video') ? 'video' : 'audio';
+                const type = (format_id.includes('video') && !format_id.startsWith('spotify_')) ? 'video' : 'audio';
                 const ext = type === 'video' ? 'mp4' : 'mp3';
                 
                 initiateDownload(url, format_id, ext, title, type, null);
@@ -497,14 +512,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const particles = [];
         const particleCount = 35;
         
+        const isSpotify = document.body.classList.contains('theme-spotify');
+        const isInstagram = document.body.classList.contains('theme-instagram');
         for (let i = 0; i < particleCount; i++) {
+            let pColor = Math.random() > 0.5 ? '#2dd4bf' : '#6d28d9';
+            if (isSpotify) {
+                pColor = Math.random() > 0.5 ? '#1db954' : '#1ed760';
+            } else if (isInstagram) {
+                pColor = Math.random() > 0.5 ? '#e1306c' : '#fd1d1d';
+            }
             particles.push({
                 x: Math.random() * canvas.width,
                 y: canvas.height + Math.random() * 20,
                 radius: 1 + Math.random() * 2,
                 speed: 0.4 + Math.random() * 1.2,
                 opacity: 0.1 + Math.random() * 0.4,
-                color: Math.random() > 0.5 ? '#2dd4bf' : '#6d28d9'
+                color: pColor
             });
         }
         
@@ -552,11 +575,14 @@ document.addEventListener('DOMContentLoaded', () => {
         errorToast.classList.add('hidden');
     }
 
-    // === Instagram Theme and Rendering Functions ===
+    // === Instagram & Spotify Theme and Rendering Functions ===
     function checkUrlTheme() {
         const url = urlInput.value.trim().toLowerCase();
         const isInstagram = url.includes('instagram.com');
+        const isSpotify = url.includes('spotify.com');
+        
         document.body.classList.toggle('theme-instagram', isInstagram);
+        document.body.classList.toggle('theme-spotify', isSpotify && !isInstagram);
 
         const logo = document.querySelector('.logo-title');
         const subtitle = document.querySelector('.subtitle');
@@ -564,6 +590,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isInstagram) {
                 logo.innerHTML = 'InstaSave<span>.AI</span>';
                 subtitle.textContent = 'Premium Downloader for Instagram Reels, Posts & Stories';
+            } else if (isSpotify) {
+                logo.innerHTML = 'SpotifySave<span>.AI</span>';
+                subtitle.textContent = 'Premium Downloader for Spotify Songs & Playlists';
             } else {
                 logo.innerHTML = 'CUDA<span>.AI</span>';
                 subtitle.textContent = 'Chamgadar Universal Downloader AI';
