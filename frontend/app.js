@@ -98,6 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const playlistCard = document.getElementById('playlistCard');
     const errorToast = document.getElementById('errorToast');
     const errorMsg = document.getElementById('errorMsg');
+    const playlistItems = document.getElementById('playlistItems');
+
+    // Auto-apply selected quality to all other tracks in the list
+    if (playlistItems) {
+        playlistItems.addEventListener('change', (e) => {
+            if (e.target && e.target.classList.contains('quality-select')) {
+                const selectedValue = e.target.value;
+                playlistItems.querySelectorAll('.quality-select').forEach(select => {
+                    select.value = selectedValue;
+                });
+            }
+        });
+    }
 
     let currentVideoData = null;
 
@@ -276,8 +289,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="format-size">${sizeText}</span>
         `;
 
-        btn.addEventListener('click', () => {
-            initiateDownload(url, format.format_id, format.ext, currentVideoData.title, type, format.filesize, format.height);
+        btn.addEventListener('click', async () => {
+            try {
+                await initiateDownload(url, format.format_id, format.ext, currentVideoData.title, type, format.filesize, format.height);
+            } catch (err) {
+                console.error("Single track download error:", err);
+            }
         });
 
         return btn;
@@ -299,6 +316,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let optionsHTML = '';
             if (isSpotifyPlaylist) {
                 optionsHTML = `
+                    <option value="spotify_flac">Lossless FLAC (Super High Quality)</option>
+                    <option value="spotify_wav">Uncompressed WAV (Lossless)</option>
+                    <option value="spotify_m4a">320kbps M4A/AAC (Best Quality)</option>
                     <option value="spotify_320k" selected>320kbps MP3 (Ultra HQ)</option>
                     <option value="spotify_256k">256kbps MP3 (HQ)</option>
                     <option value="spotify_128k">128kbps MP3 (Medium)</option>
@@ -317,27 +337,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="playlist-item-info">
                     <h4>${entry.title || 'Unknown Track'}</h4>
                     <p class="text-muted">ID: ${entry.id}</p>
+                    <div class="item-progress-bar hidden" id="progress-bar-${index}">
+                        <div class="item-progress-fill" id="progress-fill-${index}"></div>
+                    </div>
                 </div>
                 <div class="playlist-item-actions">
                     <select class="quality-select" id="quality-${index}">
                         ${optionsHTML}
                     </select>
-                    <button class="glow-button small-btn download-single-btn" data-url="${entry.url}" data-title="${entry.title}" data-index="${index}">Download</button>
+                    <button class="glow-button small-btn download-single-btn" data-url="${entry.url}" data-title="${entry.title}" data-index="${index}" id="btn-${index}">Download</button>
                 </div>
             `;
             playlistItems.appendChild(itemDiv);
         });
 
         document.querySelectorAll('.download-single-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const url = e.target.getAttribute('data-url');
-                const title = e.target.getAttribute('data-title');
-                const index = e.target.getAttribute('data-index');
+            btn.addEventListener('click', async (e) => {
+                const url = btn.getAttribute('data-url');
+                const title = btn.getAttribute('data-title');
+                const index = btn.getAttribute('data-index');
                 const format_id = document.getElementById(`quality-${index}`).value;
                 const type = (format_id.includes('video') && !format_id.startsWith('spotify_')) ? 'video' : 'audio';
-                const ext = type === 'video' ? 'mp4' : 'mp3';
                 
-                initiateDownload(url, format_id, ext, title, type, null);
+                let ext = 'mp3';
+                if (format_id === 'spotify_flac') {
+                    ext = 'flac';
+                } else if (format_id === 'spotify_wav') {
+                    ext = 'wav';
+                } else if (format_id === 'spotify_m4a') {
+                    ext = 'm4a';
+                } else if (type === 'video') {
+                    ext = 'mp4';
+                }
+                
+                try {
+                    await initiateDownload(url, format_id, ext, title, type, null, null, index);
+                } catch (err) {
+                    console.error("Playlist item download error:", err);
+                }
             });
         });
 
@@ -349,150 +386,267 @@ document.addEventListener('DOMContentLoaded', () => {
             statusBox.classList.remove('hidden');
             
             const btns = document.querySelectorAll('.download-single-btn');
-            for(let i=0; i<btns.length; i++) {
-                const btn = btns[i];
-                progressFill.style.width = `${((i) / btns.length) * 100}%`;
-                statusText.textContent = `Downloading ${i+1} of ${btns.length}... please wait`;
-                
-                // Trigger download
-                btn.click();
-                
-                // Wait for 3 seconds before triggering next to prevent browser blocking
-                await new Promise(r => setTimeout(r, 3000));
+            statusText.textContent = `Starting download playlist (0/${btns.length})...`;
+            
+            const concurrencyLimit = 3;
+            let completedCount = 0;
+            let failedCount = 0;
+
+            async function runWithConcurrency(tasks, limit) {
+                const results = [];
+                const executing = new Set();
+                for (const task of tasks) {
+                    const p = Promise.resolve().then(() => task());
+                    results.push(p);
+                    executing.add(p);
+                    const clean = () => executing.delete(p);
+                    p.then(clean, clean);
+                    if (executing.size >= limit) {
+                        await Promise.race(executing);
+                    }
+                }
+                return Promise.all(results);
             }
+
+            const tasks = Array.from(btns).map((btn) => {
+                return async () => {
+                    const url = btn.getAttribute('data-url');
+                    const title = btn.getAttribute('data-title');
+                    const index = btn.getAttribute('data-index');
+                    const format_id = document.getElementById(`quality-${index}`).value;
+                    const type = (format_id.includes('video') && !format_id.startsWith('spotify_')) ? 'video' : 'audio';
+                    
+                    let ext = 'mp3';
+                    if (format_id === 'spotify_flac') {
+                        ext = 'flac';
+                    } else if (format_id === 'spotify_wav') {
+                        ext = 'wav';
+                    } else if (format_id === 'spotify_m4a') {
+                        ext = 'm4a';
+                    } else if (type === 'video') {
+                        ext = 'mp4';
+                    }
+                    
+                    try {
+                        await initiateDownload(url, format_id, ext, title, type, null, null, index);
+                        completedCount++;
+                    } catch (err) {
+                        console.error(`Failed to download track:`, err);
+                        failedCount++;
+                    }
+
+                    const processed = completedCount + failedCount;
+                    progressFill.style.width = `${(processed / btns.length) * 100}%`;
+                    statusText.textContent = `Downloading... Processed ${processed} of ${btns.length} tracks (${failedCount} failed).`;
+                    
+                    await new Promise(r => setTimeout(r, 500));
+                };
+            });
+
+            await runWithConcurrency(tasks, concurrencyLimit);
             
             progressFill.style.width = '100%';
-            statusText.textContent = 'All downloads initiated!';
-            setTimeout(() => statusBox.classList.add('hidden'), 4000);
+            if (failedCount > 0) {
+                statusText.textContent = `Completed with errors! Downloaded ${completedCount} successfully, ${failedCount} failed.`;
+            } else {
+                statusText.textContent = 'All downloads completed successfully!';
+            }
+            setTimeout(() => statusBox.classList.add('hidden'), 5000);
         };
     }
 
-    async function initiateDownload(url, format_id, ext, title, type, filesize, height) {
-        const isPlaylist = !playlistCard.classList.contains('hidden');
-        const statusBox = isPlaylist ? document.getElementById('playlistStatus') : document.getElementById('downloadStatus');
-        const progressFill = isPlaylist ? document.getElementById('playlistProgressFill') : document.getElementById('progressFill');
-        const statusText = isPlaylist ? document.getElementById('playlistStatusText') : document.getElementById('statusText');
-        const speedEl = isPlaylist ? document.getElementById('playlistDownloadSpeed') : document.getElementById('downloadSpeed');
-        const processedEl = isPlaylist ? document.getElementById('playlistDownloadProcessed') : document.getElementById('downloadProcessed');
-        const etaEl = isPlaylist ? document.getElementById('playlistDownloadETA') : document.getElementById('downloadETA');
-        const canvasId = isPlaylist ? 'playlistDownloadCanvas' : 'downloadCanvas';
+    function initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex = null) {
+        return new Promise(async (resolve, reject) => {
+            const isPlaylist = !playlistCard.classList.contains('hidden');
+            const statusBox = isPlaylist ? document.getElementById('playlistStatus') : document.getElementById('downloadStatus');
+            const progressFill = isPlaylist ? document.getElementById('playlistProgressFill') : document.getElementById('progressFill');
+            const statusText = isPlaylist ? document.getElementById('playlistStatusText') : document.getElementById('statusText');
+            const speedEl = isPlaylist ? document.getElementById('playlistDownloadSpeed') : document.getElementById('downloadSpeed');
+            const processedEl = isPlaylist ? document.getElementById('playlistDownloadProcessed') : document.getElementById('downloadProcessed');
+            const etaEl = isPlaylist ? document.getElementById('playlistDownloadETA') : document.getElementById('downloadETA');
+            const canvasId = isPlaylist ? 'playlistDownloadCanvas' : 'downloadCanvas';
 
-        // Show status panel
-        statusBox.classList.remove('completed', 'failed', 'hidden');
-        progressFill.style.width = '0%';
-
-        // Set animation mode
-        const animContainer = statusBox.querySelector('.download-animation-container');
-        if (animContainer) {
-            animContainer.classList.remove('video-mode', 'audio-mode');
-            animContainer.classList.add(type === 'video' ? 'video-mode' : 'audio-mode');
-        }
-
-        // Start particles
-        stopCanvasParticles();
-        setTimeout(() => startCanvasParticles(canvasId), 50);
-
-        statusText.textContent = '🚀 Preparing download request...';
-        if (speedEl) speedEl.textContent = 'Connecting...';
-        if (processedEl) processedEl.textContent = '--';
-        if (etaEl) etaEl.textContent = '--';
-
-        try {
-            // Start background download job
-            const startRes = await fetch(`${API_URL}/start_download`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, format_id, ext, title, type, height })
-            });
-
-            if (!startRes.ok) {
-                const errData = await startRes.json().catch(() => ({ error: 'Could not connect to backend.' }));
-                throw new Error(errData.error || `Server error ${startRes.status}`);
+            // Check if we have individual playlist item indices
+            let itemBtn = null;
+            let itemProgress = null;
+            let itemProgressFill = null;
+            
+            if (itemIndex !== null) {
+                itemBtn = document.getElementById(`btn-${itemIndex}`);
+                itemProgress = document.getElementById(`progress-bar-${itemIndex}`);
+                itemProgressFill = document.getElementById(`progress-fill-${itemIndex}`);
+                
+                if (itemProgress) itemProgress.classList.remove('hidden');
+                if (itemBtn) {
+                    itemBtn.disabled = true;
+                    itemBtn.textContent = '0%';
+                }
             }
 
-            const startData = await startRes.json();
-            const jobId = startData.job_id;
+            // Show status panel
+            statusBox.classList.remove('completed', 'failed', 'hidden');
+            progressFill.style.width = '0%';
 
-            // Poll download status
-            const pollInterval = setInterval(async () => {
-                try {
-                    const statusRes = await fetch(`${API_URL}/download_status/${jobId}`);
-                    if (!statusRes.ok) return; // skip this frame if server error
+            // Set animation mode
+            const animContainer = statusBox.querySelector('.download-animation-container');
+            if (animContainer) {
+                animContainer.classList.remove('video-mode', 'audio-mode');
+                animContainer.classList.add(type === 'video' ? 'video-mode' : 'audio-mode');
+            }
 
-                    const job = await statusRes.json();
+            // Start particles
+            stopCanvasParticles();
+            setTimeout(() => startCanvasParticles(canvasId), 50);
 
-                    if (job.status === 'downloading') {
-                        // Update progress bar
-                        progressFill.style.width = `${job.progress}%`;
+            statusText.textContent = '🚀 Preparing download request...';
+            if (speedEl) speedEl.textContent = 'Connecting...';
+            if (processedEl) processedEl.textContent = '--';
+            if (etaEl) etaEl.textContent = '--';
 
-                        // Update stats
-                        if (speedEl) speedEl.textContent = job.speed;
-                        if (processedEl) processedEl.textContent = job.processed;
-                        if (etaEl) etaEl.textContent = job.eta;
+            try {
+                // Start background download job
+                const startRes = await fetch(`${API_URL}/start_download`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, format_id, ext, title, type, height })
+                });
 
-                        // Calculate network speed quality message
-                        let speedVal = 0; // in MB/s
-                        if (job.speed && job.speed.includes('MB/s')) {
-                            speedVal = parseFloat(job.speed);
-                        } else if (job.speed && job.speed.includes('KB/s')) {
-                            speedVal = parseFloat(job.speed) / 1024;
-                        }
-
-                        let speedMsg = '';
-                        if (speedVal > 5.0) {
-                            speedMsg = '⚡ High-speed connection';
-                        } else if (speedVal > 1.2) {
-                            speedMsg = '📶 Stable connection';
-                        } else if (speedVal > 0.0) {
-                            speedMsg = '🐢 Slower connection';
-                        } else {
-                            speedMsg = '🔗 Connecting';
-                        }
-
-                        const detailMsg = job.status_text || 'Processing download';
-                        statusText.textContent = `${speedMsg} | ${detailMsg}`;
-
-                    } else if (job.status === 'completed') {
-                        clearInterval(pollInterval);
-                        progressFill.style.width = '100%';
-                        statusBox.classList.add('completed');
-                        statusText.textContent = '🎉 Download complete! Sending file to your browser...';
-                        stopCanvasParticles();
-                        
-                        // Play success chime
-                        SoundFX.playSuccess();
-
-                        // Redirect to file download url
-                        window.location.href = `${API_URL}/download_file/${jobId}`;
-
-                        setTimeout(() => {
-                            statusBox.classList.add('hidden');
-                            statusBox.classList.remove('completed');
-                            progressFill.style.width = '0%';
-                        }, 5000);
-
-                    } else if (job.status === 'failed') {
-                        clearInterval(pollInterval);
-                        throw new Error(job.error || 'Server reported download failure.');
-                    }
-                } catch (pollErr) {
-                    clearInterval(pollInterval);
-                    handleDownloadFailure(statusBox, progressFill, statusText, pollErr.message);
+                if (!startRes.ok) {
+                    const errData = await startRes.json().catch(() => ({ error: 'Could not connect to backend.' }));
+                    throw new Error(errData.error || `Server error ${startRes.status}`);
                 }
-            }, 1000);
 
-        } catch (err) {
-            handleDownloadFailure(statusBox, progressFill, statusText, err.message);
-        }
+                const startData = await startRes.json();
+                const jobId = startData.job_id;
+
+                // Poll download status
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const statusRes = await fetch(`${API_URL}/download_status/${jobId}`);
+                        if (!statusRes.ok) return; // skip this frame if server error
+
+                        const job = await statusRes.json();
+
+                        if (job.status === 'downloading') {
+                            // Update progress bar
+                            if (itemProgressFill) {
+                                itemProgressFill.style.width = `${job.progress}%`;
+                            } else {
+                                progressFill.style.width = `${job.progress}%`;
+                            }
+                            
+                            if (itemBtn) {
+                                itemBtn.textContent = `${job.progress}%`;
+                            }
+
+                            // Update stats
+                            if (speedEl) speedEl.textContent = job.speed;
+                            if (processedEl) processedEl.textContent = job.processed;
+                            if (etaEl) etaEl.textContent = job.eta;
+
+                            // Calculate network speed quality message
+                            let speedVal = 0; // in MB/s
+                            if (job.speed && job.speed.includes('MB/s')) {
+                                speedVal = parseFloat(job.speed);
+                            } else if (job.speed && job.speed.includes('KB/s')) {
+                                speedVal = parseFloat(job.speed) / 1024;
+                            }
+
+                            let speedMsg = '';
+                            if (speedVal > 5.0) {
+                                speedMsg = '⚡ High-speed connection';
+                            } else if (speedVal > 1.2) {
+                                speedMsg = '📶 Stable connection';
+                            } else if (speedVal > 0.0) {
+                                speedMsg = '🐢 Slower connection';
+                            } else {
+                                speedMsg = '🔗 Connecting';
+                            }
+
+                            const detailMsg = job.status_text || 'Processing download';
+                            statusText.textContent = `${speedMsg} | ${detailMsg}`;
+
+                        } else if (job.status === 'completed') {
+                            clearInterval(pollInterval);
+                            if (itemProgressFill) {
+                                itemProgressFill.style.width = '100%';
+                            } else {
+                                progressFill.style.width = '100%';
+                            }
+                            
+                            if (itemBtn) {
+                                itemBtn.textContent = 'Done!';
+                                itemBtn.classList.add('success-btn');
+                            }
+                            
+                            statusBox.classList.add('completed');
+                            statusText.textContent = '🎉 Download complete! Sending file to your browser...';
+                            stopCanvasParticles();
+                            
+                            // Play success chime
+                            SoundFX.playSuccess();
+
+                            // Trigger client-side download by creating a temporary link (concurrency safe)
+                            const downloadLink = document.createElement('a');
+                            downloadLink.href = `${API_URL}/download_file/${jobId}`;
+                            downloadLink.setAttribute('download', job.filename || '');
+                            downloadLink.style.display = 'none';
+                            document.body.appendChild(downloadLink);
+                            downloadLink.click();
+                            document.body.removeChild(downloadLink);
+
+                            setTimeout(() => {
+                                if (itemProgress) itemProgress.classList.add('hidden');
+                                if (itemBtn) {
+                                    itemBtn.disabled = false;
+                                    itemBtn.textContent = 'Download';
+                                    itemBtn.classList.remove('success-btn');
+                                }
+                                statusBox.classList.add('hidden');
+                                statusBox.classList.remove('completed');
+                                progressFill.style.width = '0%';
+                            }, 5000);
+
+                            resolve(job);
+
+                        } else if (job.status === 'failed') {
+                            clearInterval(pollInterval);
+                            if (itemBtn) {
+                                itemBtn.disabled = false;
+                                itemBtn.textContent = 'Retry';
+                            }
+                            throw new Error(job.error || 'Server reported download failure.');
+                        }
+                    } catch (pollErr) {
+                        clearInterval(pollInterval);
+                        handleDownloadFailure(statusBox, progressFill, statusText, pollErr.message, itemBtn, itemProgress);
+                        reject(pollErr);
+                    }
+                }, 1000);
+
+            } catch (err) {
+                handleDownloadFailure(statusBox, progressFill, statusText, err.message, itemBtn, itemProgress);
+                reject(err);
+            }
+        });
     }
 
-    function handleDownloadFailure(statusBox, progressFill, statusText, errMsg) {
+    function handleDownloadFailure(statusBox, progressFill, statusText, errMsg, itemBtn = null, itemProgress = null) {
         stopCanvasParticles();
         statusBox.classList.add('failed');
         progressFill.style.width = '100%';
         statusText.textContent = `❌ Download failed: ${errMsg}`;
+        
+        if (itemBtn) {
+            itemBtn.disabled = false;
+            itemBtn.textContent = 'Fail';
+        }
 
         setTimeout(() => {
+            if (itemProgress) itemProgress.classList.add('hidden');
+            if (itemBtn) {
+                itemBtn.textContent = 'Download';
+            }
             statusBox.classList.add('hidden');
             statusBox.classList.remove('failed');
             progressFill.style.width = '0%';

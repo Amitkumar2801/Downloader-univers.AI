@@ -13,6 +13,8 @@ import re as _re
 import requests
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, TIT2, TPE1, APIC, error
+from mutagen.flac import FLAC, Picture
+from mutagen.mp4 import MP4, MP4Cover
 
 try:
     from backend.spotify_scraper import parse_spotify_url, get_spotify_track_info, get_spotify_playlist_info, get_spotify_album_info
@@ -46,6 +48,46 @@ def tag_mp3_metadata(file_path, title, artists, cover_url):
         print(f"[METADATA] Successfully tagged {file_path}")
     except Exception as e:
         print(f"[METADATA] Error tagging MP3: {e}")
+
+
+def tag_audio_metadata(file_path, title, artists, cover_url, ext):
+    try:
+        if ext == 'mp3':
+            tag_mp3_metadata(file_path, title, artists, cover_url)
+        elif ext == 'flac':
+            audio = FLAC(file_path)
+            audio['title'] = title
+            audio['artist'] = artists
+            if cover_url:
+                try:
+                    response = requests.get(cover_url, timeout=10)
+                    if response.status_code == 200:
+                        pic = Picture()
+                        pic.data = response.content
+                        pic.type = 3 # Front Cover
+                        pic.mime = 'image/jpeg'
+                        pic.description = u'Cover'
+                        audio.add_picture(pic)
+                except Exception as e:
+                    print(f"[METADATA] Failed to fetch FLAC cover art: {e}")
+            audio.save()
+            print(f"[METADATA] Successfully tagged FLAC {file_path}")
+        elif ext == 'm4a':
+            audio = MP4(file_path)
+            audio['\xa9nam'] = [title]
+            audio['\xa9ART'] = [artists]
+            if cover_url:
+                try:
+                    response = requests.get(cover_url, timeout=10)
+                    if response.status_code == 200:
+                        cover_format = MP4Cover.FORMAT_JPEG
+                        audio['covr'] = [MP4Cover(response.content, imageformat=cover_format)]
+                except Exception as e:
+                    print(f"[METADATA] Failed to fetch M4A cover art: {e}")
+            audio.save()
+            print(f"[METADATA] Successfully tagged M4A {file_path}")
+    except Exception as e:
+        print(f"[METADATA] Error tagging metadata for extension {ext}: {e}")
 
 
 def get_cookie_args():
@@ -141,6 +183,24 @@ def get_video_info():
                     'formats': {
                         'video': [],
                         'audio': [
+                            {
+                                'format_id': 'spotify_flac',
+                                'ext': 'flac',
+                                'format_note': 'Lossless FLAC (Super High Quality)',
+                                'filesize': int(duration * 100000)
+                            },
+                            {
+                                'format_id': 'spotify_wav',
+                                'ext': 'wav',
+                                'format_note': 'Uncompressed WAV (Lossless)',
+                                'filesize': int(duration * 176400)
+                            },
+                            {
+                                'format_id': 'spotify_m4a',
+                                'ext': 'm4a',
+                                'format_note': '320kbps M4A/AAC (Best Quality)',
+                                'filesize': int(duration * 40000)
+                            },
                             {
                                 'format_id': 'spotify_320k',
                                 'ext': 'mp3',
@@ -553,8 +613,9 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             **cookie_opts
         }
 
-        # Add postprocessor for MP3 audio conversion with selected bitrate
-        if media_type == 'audio' and (format_id.startswith('bestaudio/') or ext == 'mp3'):
+        # Add postprocessor for MP3/FLAC/WAV/M4A audio conversion with selected bitrate
+        if media_type == 'audio' and (format_id.startswith('bestaudio/') or ext in ('mp3', 'flac', 'wav', 'm4a')):
+            codec = ext
             bitrate = '320'
             if format_id.startswith('bestaudio/'):
                 part = format_id.split('/')[-1]
@@ -565,7 +626,7 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
                 bitrate = '320'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
+                'preferredcodec': codec,
                 'preferredquality': bitrate,
             }]
 
@@ -590,7 +651,7 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             job = download_jobs.get(job_id)
             if job and 'spotify_metadata' in job:
                 meta = job['spotify_metadata']
-                tag_mp3_metadata(final_path, meta['title'], meta['artists'], meta['cover_url'])
+                tag_audio_metadata(final_path, meta['title'], meta['artists'], meta['cover_url'], ext)
                 
             download_jobs[job_id].update({
                 'status': 'completed',
@@ -669,7 +730,14 @@ def download_video():
         if track_info:
             title = f"{track_info['artists']} - {track_info['title']}"
             media_type = 'audio'
+            
             ext = 'mp3'
+            if format_id == 'spotify_flac':
+                ext = 'flac'
+            elif format_id == 'spotify_wav':
+                ext = 'wav'
+            elif format_id == 'spotify_m4a':
+                ext = 'm4a'
             
             bitrate_suffix = '320k'
             if format_id and format_id.startswith('spotify_'):
@@ -726,12 +794,14 @@ def download_video():
             try:
                 b_enum = AudioBitrate['K' + audio_bitrate.rstrip('k')]
                 target_format = map_audio_bitrate_to_format(b_enum)
-                ext = 'mp3'
+                if ext not in ('flac', 'wav', 'm4a'):
+                    ext = 'mp3'
             except Exception:
                 target_format = format_id
         elif format_id.startswith('bestaudio/'):
             target_format = 'bestaudio/best'
-            ext = 'mp3'
+            if ext not in ('flac', 'wav', 'm4a'):
+                ext = 'mp3'
         else:
             target_format = format_id
 
@@ -761,8 +831,9 @@ def download_video():
         **cookie_opts
     }
 
-    # Add postprocessor for MP3 audio conversion with selected bitrate
-    if media_type == 'audio' and (format_id.startswith('bestaudio/') or ext == 'mp3'):
+    # Add postprocessor for MP3/FLAC/WAV/M4A audio conversion with selected bitrate
+    if media_type == 'audio' and (format_id.startswith('bestaudio/') or ext in ('mp3', 'flac', 'wav', 'm4a')):
+        codec = ext
         bitrate = '320'
         if format_id.startswith('bestaudio/'):
             part = format_id.split('/')[-1]
@@ -772,7 +843,7 @@ def download_video():
             bitrate = audio_bitrate[:-1]
         ydl_opts['postprocessors'] = [{
             'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
+            'preferredcodec': codec,
             'preferredquality': bitrate,
         }]
 
@@ -828,10 +899,10 @@ def download_video():
         else:
             return jsonify({'error': 'Downloaded file not found on server.'}), 500
 
-    if sp_type and sp_id and sp_type == 'track' and ext == 'mp3':
+    if sp_type and sp_id and sp_type == 'track' and ext in ('mp3', 'flac', 'm4a'):
         track_info = get_spotify_track_info(sp_id)
         if track_info:
-            tag_mp3_metadata(filepath, track_info['title'], track_info['artists'], track_info['thumbnail'])
+            tag_audio_metadata(filepath, track_info['title'], track_info['artists'], track_info['thumbnail'], ext)
 
     download_name = f"{safe_title}.{ext}"
 
@@ -906,7 +977,14 @@ def start_download():
         if track_info:
             title = f"{track_info['artists']} - {track_info['title']}"
             media_type = 'audio'
+            
             ext = 'mp3'
+            if format_id == 'spotify_flac':
+                ext = 'flac'
+            elif format_id == 'spotify_wav':
+                ext = 'wav'
+            elif format_id == 'spotify_m4a':
+                ext = 'm4a'
             
             bitrate_suffix = '320k'
             if format_id and format_id.startswith('spotify_'):
@@ -969,12 +1047,14 @@ def start_download():
             try:
                 b_enum = AudioBitrate['K' + audio_bitrate.rstrip('k')]
                 target_format = map_audio_bitrate_to_format(b_enum)
-                ext = 'mp3'
+                if ext not in ('flac', 'wav', 'm4a'):
+                    ext = 'mp3'
             except Exception:
                 target_format = format_id
         elif format_id.startswith('bestaudio/'):
             target_format = 'bestaudio/best'
-            ext = 'mp3'
+            if ext not in ('flac', 'wav', 'm4a'):
+                ext = 'mp3'
         else:
             target_format = format_id
 
