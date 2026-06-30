@@ -37,6 +37,18 @@ body.light-theme {
     --secondary: var(--accent-lime);
 }
 
+/* Google Translate styling overrides to look 100% native */
+.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame {
+    display: none !important;
+}
+body {
+    top: 0px !important;
+}
+.goog-text-highlight {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
 * {
     margin: 0;
     padding: 0;

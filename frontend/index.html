@@ -267,18 +267,43 @@
                         appearance: none;
                         -webkit-appearance: none;
                         transition: all 0.2s ease;
+                        max-width: 180px;
                     ">
-                        <option value="en">🇺🇸 EN (US / UK)</option>
-                        <option value="hi">🇮🇳 HI (हिंदी)</option>
-                        <option value="ja">🇯🇵 JP (日本語)</option>
-                        <option value="ur">🇵🇰 PK (اردو)</option>
-                        <option value="ne">🇳🇵 NP (नेपाली)</option>
-                        <option value="lb">🇱🇺 LU (Lëtzebuergesch)</option>
-                        <option value="es">🇪🇸 ES</option>
-                        <option value="pt">🇵🇹 PT</option>
-                        <option value="fr">🇫🇷 FR</option>
-                        <option value="de">🇩🇪 DE</option>
-                        <option value="ru">🇷🇺 RU</option>
+                        <!-- Popular/User requested -->
+                        <option value="en">🇺🇸 US / 🇬🇧 UK (English)</option>
+                        <option value="hi">🇮🇳 India (हिंदी)</option>
+                        <option value="ne">🇳🇵 Nepal (नेपाली)</option>
+                        <option value="ur">🇵🇰 Pakistan (اردو)</option>
+                        <option value="ja">🇯🇵 Japan (日本語)</option>
+                        <option value="lb">🇱🇺 Luxembourg (Lëtzebuergesch)</option>
+
+                        <!-- Afghanistan to Burkina Faso -->
+                        <option value="ps">🇦🇫 Afghanistan (Pashto)</option>
+                        <option value="sq">🇦🇱 Albania (Shqip)</option>
+                        <option value="ar">🇩🇿 Algeria / Bahrain (العربية)</option>
+                        <option value="ca">🇦🇩 Andorra (Català)</option>
+                        <option value="pt">🇦🇴 Angola / Brazil (Português)</option>
+                        <option value="es">🇦🇷 Argentina / Bolivia (Español)</option>
+                        <option value="hy">🇦🇲 Armenia (Հայերեն)</option>
+                        <option value="de">🇦🇹 Austria / Germany (Deutsch)</option>
+                        <option value="az">🇦🇿 Azerbaijan (Azərbaycanca)</option>
+                        <option value="en">🇧🇸 Bahamas / Belize / Barbados (English)</option>
+                        <option value="bn">🇧🇩 Bangladesh (বাংলা)</option>
+                        <option value="be">🇧🇾 Belarus (Беларуская)</option>
+                        <option value="nl">🇧🇪 Belgium / Netherlands (Nederlands)</option>
+                        <option value="fr">🇧🇯 Benin / France / Burkina Faso (Français)</option>
+                        <option value="dz">🇧🇹 Bhutan (རྫོང་ཁ)</option>
+                        <option value="bs">🇧🇦 Bosnia (Bosanski)</option>
+                        <option value="ms">🇧🇳 Brunei (Melayu)</option>
+                        <option value="bg">🇧🇬 Bulgaria (Български)</option>
+
+                        <!-- Other major world languages -->
+                        <option value="it">🇮🇹 Italy (Italiano)</option>
+                        <option value="ko">🇰🇷 Korea (한국어)</option>
+                        <option value="ru">🇷🇺 Russia (Русский)</option>
+                        <option value="zh-CN">🇨🇳 China (简体中文)</option>
+                        <option value="tr">🇹🇷 Turkey (Türkçe)</option>
+                        <option value="vi">🇻🇳 Vietnam (Tiếng Việt)</option>
                     </select>
                     <span class="select-arrow" style="
                         position: absolute;
@@ -797,6 +822,10 @@
         </div>
     </div>
 
+    <!-- Hidden Google Translate Element -->
+    <div id="google_translate_element" style="display:none"></div>
+
     <script src="app.js?v=10"></script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
