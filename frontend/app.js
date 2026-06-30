@@ -101,6 +101,242 @@ document.addEventListener('DOMContentLoaded', () => {
     const playlistItems = document.getElementById('playlistItems');
     const demoSection = document.getElementById('demoSection');
 
+    // Premium active state, ads toggle and upgrade modals
+    const premiumModal = document.getElementById('premiumModal');
+    const closePremiumModalBtn = document.getElementById('closePremiumModalBtn');
+    const premiumStatusBtn = document.getElementById('premiumStatusBtn');
+    const checkoutForm = document.getElementById('checkoutForm');
+    const payBtn = document.getElementById('payBtn');
+    const payLoader = document.getElementById('payLoader');
+    const adBanner = document.getElementById('adBanner');
+    const closeAdBtn = document.getElementById('closeAdBtn');
+    const adUpgradeLink = document.getElementById('adUpgradeLink');
+    
+    // Legal Modal
+    const legalModal = document.getElementById('legalModal');
+    const closeLegalModalBtn = document.getElementById('closeLegalModalBtn');
+    const openTermsBtn = document.getElementById('openTermsBtn');
+    const openPrivacyBtn = document.getElementById('openPrivacyBtn');
+
+    function updatePremiumUI() {
+        const isPremium = localStorage.getItem('premiumActive') === 'true';
+        
+        if (premiumStatusBtn) {
+            if (isPremium) {
+                premiumStatusBtn.className = 'premium-status-pill premium';
+                premiumStatusBtn.innerHTML = '<span class="status-dot"></span><span class="status-text">⭐ Premium Active</span>';
+            } else {
+                premiumStatusBtn.className = 'premium-status-pill free';
+                premiumStatusBtn.innerHTML = '<span class="status-dot"></span><span class="status-text">Free Tier</span><span class="upgrade-action">[Upgrade]</span>';
+            }
+        }
+        
+        if (adBanner) {
+            if (isPremium) {
+                adBanner.classList.add('hidden');
+            } else {
+                if (sessionStorage.getItem('adClosed') !== 'true') {
+                    adBanner.classList.remove('hidden');
+                } else {
+                    adBanner.classList.add('hidden');
+                }
+            }
+        }
+    }
+
+    function showPremiumUpgradeModal(reasonText) {
+        if (premiumModal) {
+            premiumModal.classList.remove('hidden');
+            const headerP = premiumModal.querySelector('.modal-header p');
+            if (headerP) {
+                headerP.innerHTML = `<strong style="color:var(--accent-orange);">${reasonText}</strong><br>Upgrade to get unlimited features for study & work`;
+            }
+        }
+    }
+
+    // Modal click listeners
+    if (premiumStatusBtn) {
+        premiumStatusBtn.addEventListener('click', () => {
+            const isPremium = localStorage.getItem('premiumActive') === 'true';
+            if (isPremium) {
+                if (confirm("You currently have an Active Premium Subscription. Would you like to reset your status back to Free Tier for testing?")) {
+                    localStorage.removeItem('premiumActive');
+                    updatePremiumUI();
+                    showError("Status reset to Free Tier.");
+                }
+            } else {
+                showPremiumUpgradeModal("Premium Upgrade Option");
+            }
+        });
+    }
+
+    if (closePremiumModalBtn) {
+        closePremiumModalBtn.addEventListener('click', () => {
+            if (premiumModal) premiumModal.classList.add('hidden');
+        });
+    }
+
+    if (adUpgradeLink) {
+        adUpgradeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPremiumUpgradeModal("Premium Upgrade Option");
+        });
+    }
+
+    if (closeAdBtn) {
+        closeAdBtn.addEventListener('click', () => {
+            if (adBanner) adBanner.classList.add('hidden');
+            sessionStorage.setItem('adClosed', 'true');
+        });
+    }
+
+    // Checkout card inputs auto-formatter
+    const cardInput = document.getElementById('checkoutCard');
+    if (cardInput) {
+        cardInput.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formatted = '';
+            for (let i = 0; i < val.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += val[i];
+            }
+            e.target.value = formatted.substring(0, 19);
+        });
+    }
+
+    const expiryInput = document.getElementById('checkoutExpiry');
+    if (expiryInput) {
+        expiryInput.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            if (val.length >= 2) {
+                e.target.value = val.substring(0, 2) + '/' + val.substring(2, 4);
+            } else {
+                e.target.value = val;
+            }
+        });
+    }
+
+    // Checkout Form processing simulation
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (payBtn) payBtn.disabled = true;
+            if (payLoader) payLoader.classList.remove('hidden');
+            const payText = document.querySelector('.pay-btn-text');
+            if (payText) payText.textContent = 'Processing Secure Payment...';
+            
+            setTimeout(() => {
+                localStorage.setItem('premiumActive', 'true');
+                updatePremiumUI();
+                
+                if (premiumModal) premiumModal.classList.add('hidden');
+                checkoutForm.reset();
+                
+                if (payBtn) payBtn.disabled = false;
+                if (payLoader) payLoader.classList.add('hidden');
+                if (payText) payText.textContent = 'Pay & Activate Premium';
+                
+                SoundFX.playSuccess();
+                showError("🎉 Welcome to Premium Active! All features unlocked.");
+            }, 2000);
+        });
+    }
+
+    // Pricing plan card selection
+    const planCards = document.querySelectorAll('.plan-card');
+    planCards.forEach(card => {
+        card.addEventListener('click', () => {
+            planCards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+        });
+    });
+
+    // Legal modal terms & policies texts
+    const termsText = `
+        <h3>1. Personal and Educational Purpose</h3>
+        <p>Downloadyfy.AI is designed and developed to enable students, researchers, and creative professionals to manage and store content for offline academic review, personal archiving, and instructional projects. You represent and warrant that you will not use this tool for commercial piracy or unauthorized distributions.</p>
+        
+        <h3>2. Copyright and DRM Protection</h3>
+        <p>In accordance with platform terms of service and copyright laws, Downloadyfy.AI does not facilitate downloads of DRM-protected content, paywalled media, or private content. Attempting to bypass technical locks is strictly prohibited by our system architecture.</p>
+        
+        <h3>3. Platform Restrictions</h3>
+        <p>Downloading content is limited to public uploads and your own files. The user is entirely responsible for verifying licensing requirements (e.g. Creative Commons metadata) before repurposing downloaded media.</p>
+        
+        <h3>4. Premium Terms</h3>
+        <p>Premium features are provided to support continuous developer updates. Subscription fees are simulated on this deployment and do not involve actual legal currency transactions.</p>
+    `;
+    
+    const privacyText = `
+        <h3>1. Transient Processing (No Storage)</h3>
+        <p>Downloadyfy.AI respects user confidentiality. Downloaded video and audio files are held temporarily on a transient server disk buffer solely to facilitate browser transmission. Files are fully deleted from the server 120 seconds after processing.</p>
+        
+        <h3>2. No Logging Policy</h3>
+        <p>We do not log user IP addresses, submitted links, metadata payloads, or session history. Your search queries remain entirely private.</p>
+        
+        <h3>3. Local Browser Storage</h3>
+        <p>We use standard client-side browser storage (localStorage and sessionStorage) to retain your selected theme (dark/light) and membership tier (Free/Premium). No trackers, marketing cookies, or tracking beacons are loaded.</p>
+        
+        <h3>4. Security of Data</h3>
+        <p>Our server enforces HTTPS transit encryption. As billing details are part of a simulated payment gateway, no real credit card numbers are transmitted or stored.</p>
+    `;
+
+    if (openTermsBtn) {
+        openTermsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('legalModalTitle').textContent = "Terms & Conditions";
+            document.getElementById('legalContentBody').innerHTML = termsText;
+            if (legalModal) legalModal.classList.remove('hidden');
+        });
+    }
+    
+    if (openPrivacyBtn) {
+        openPrivacyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('legalModalTitle').textContent = "Privacy Policy";
+            document.getElementById('legalContentBody').innerHTML = privacyText;
+            if (legalModal) legalModal.classList.remove('hidden');
+        });
+    }
+    
+    if (closeLegalModalBtn) {
+        closeLegalModalBtn.addEventListener('click', () => {
+            if (legalModal) legalModal.classList.add('hidden');
+        });
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === premiumModal) {
+            premiumModal.classList.add('hidden');
+        }
+        if (e.target === legalModal) {
+            legalModal.classList.add('hidden');
+        }
+    });
+
+    // Scroll trigger animations reveal initialization
+    function initScrollReveal() {
+        const reveals = document.querySelectorAll('.reveal');
+        function checkReveal() {
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 120;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('active');
+                } else {
+                    reveals[i].classList.remove('active');
+                }
+            }
+        }
+        window.addEventListener('scroll', checkReveal);
+        checkReveal();
+    }
+
+    // Call state initializers
+    updatePremiumUI();
+    initScrollReveal();
+
     // Theme toggle logic
     const themeToggle = document.getElementById('themeToggle');
     const body = document.body;
@@ -312,7 +548,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'video') {
             const label = getQualityLabel(resText);
             if (label) {
-                // Formatting like: 1080p FHD (1920x1080)
                 resText = `<strong style="color:var(--secondary);">${label}</strong> <span style="font-size:0.85em; opacity:0.8;">(${resText})</span>`;
             }
         }
@@ -508,7 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex = null) {
+    function initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex = null, token = null) {
         return new Promise(async (resolve, reject) => {
             const isPlaylist = !playlistCard.classList.contains('hidden');
             const statusBox = isPlaylist ? document.getElementById('playlistStatus') : document.getElementById('downloadStatus');
@@ -561,8 +796,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const startRes = await fetch(`${API_URL}/start_download`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, format_id, ext, title, type, height })
+                    body: JSON.stringify({ url, format_id, ext, title, type, height, device_id: deviceId, ad_token: token })
                 });
+
+                if (startRes.status === 402) {
+                    // Intercept and watch ad
+                    if (itemBtn) {
+                        itemBtn.disabled = false;
+                        itemBtn.textContent = 'Download';
+                    }
+                    if (itemProgress) itemProgress.classList.add('hidden');
+                    statusBox.classList.add('hidden');
+                    stopCanvasParticles();
+                    
+                    showAdModalFlow((newToken) => {
+                        initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex, newToken)
+                            .then(resolve)
+                            .catch(reject);
+                    });
+                    return;
+                }
 
                 if (!startRes.ok) {
                     const errData = await startRes.json().catch(() => ({ error: 'Could not connect to backend.' }));
@@ -795,8 +1048,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('theme-instagram', isInstagram);
         document.body.classList.toggle('theme-spotify', isSpotify && !isInstagram);
 
-        const logo = document.querySelector('.logo-title');
-        const subtitle = document.querySelector('.subtitle');
+        const logo = document.querySelector('.navbar .logo');
+        const subtitle = document.querySelector('.hero-subtitle');
         if (logo && subtitle) {
             if (isInstagram) {
                 logo.innerHTML = 'InstaSave<span>.AI</span>';
@@ -805,8 +1058,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 logo.innerHTML = 'SpotifySave<span>.AI</span>';
                 subtitle.textContent = 'Premium Downloader for Spotify Songs & Playlists';
             } else {
-                logo.innerHTML = 'CUDA<span>.AI</span>';
-                subtitle.textContent = 'Chamgadar Universal Downloader AI';
+                logo.innerHTML = 'Downloadyfy<span>.AI</span>';
+                subtitle.textContent = 'Downloadyfy.AI – Smart AI Downloads Made Simple';
             }
         }
     }
@@ -937,7 +1190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function initiateInstagramDownload(url, format_id, ext, title, type) {
+    async function initiateInstagramDownload(url, format_id, ext, title, type, token = null) {
         const statusBox = document.getElementById('igDownloadStatus');
         const progressFill = document.getElementById('igProgressFill');
         const statusText = document.getElementById('igStatusText');
@@ -964,8 +1217,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const startRes = await fetch(`${API_URL}/start_download`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, format_id, ext, title, type })
+                body: JSON.stringify({ url, format_id, ext, title, type, device_id: deviceId, ad_token: token })
             });
+
+            if (startRes.status === 402) {
+                // Intercept and watch ad
+                statusBox.classList.add('hidden');
+                stopCanvasParticles();
+                
+                showAdModalFlow((newToken) => {
+                    initiateInstagramDownload(url, format_id, ext, title, type, newToken);
+                });
+                return;
+            }
 
             if (!startRes.ok) {
                 const errData = await startRes.json().catch(() => ({ error: 'Could not connect to backend.' }));
@@ -1046,6 +1310,416 @@ document.addEventListener('DOMContentLoaded', () => {
             handleDownloadFailure(statusBox, progressFill, statusText, err.message);
         }
     }
+    // === Video-to-Audio Local Converter Logic ===
+    const convertForm = document.getElementById('convertForm');
+    const dragZone = document.getElementById('dragZone');
+    const videoFileInput = document.getElementById('videoFileInput');
+    const selectedFileInfo = document.getElementById('selectedFileInfo');
+    const selectedFileName = document.getElementById('selectedFileName');
+    const selectedFileSize = document.getElementById('selectedFileSize');
+    const convertBtn = document.getElementById('convertBtn');
+    const convertLoader = document.getElementById('convertLoader');
+    const convertStatus = document.getElementById('convertStatus');
+    const convertProgressFill = document.getElementById('convertProgressFill');
+    const convertStatusText = document.getElementById('convertStatusText');
+    const adModal = document.getElementById('adModal');
+    const closeAdModalBtn = document.getElementById('closeAdModalBtn');
+    const adTimerVal = document.getElementById('adTimerVal');
+    const adUpgradeBtn = document.getElementById('adUpgradeBtn');
+    
+    // Drag and Drop triggers for Converter
+    if (dragZone && videoFileInput) {
+        dragZone.addEventListener('click', () => {
+            videoFileInput.click();
+        });
+
+        dragZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragZone.classList.add('dragover');
+        });
+
+        dragZone.addEventListener('dragleave', () => {
+            dragZone.classList.remove('dragover');
+        });
+
+        dragZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('video/')) {
+                videoFileInput.files = e.dataTransfer.files;
+                handleSelectedFile(file);
+            } else {
+                showError("Please drop a valid video file.");
+            }
+        });
+        
+        videoFileInput.addEventListener('change', () => {
+            const file = videoFileInput.files[0];
+            if (file) handleSelectedFile(file);
+        });
+    }
+    
+    function handleSelectedFile(file) {
+        if (selectedFileInfo && selectedFileName && selectedFileSize) {
+            selectedFileName.textContent = file.name;
+            selectedFileSize.textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+            selectedFileInfo.classList.remove('hidden');
+            if (convertBtn) {
+                convertBtn.disabled = false;
+            }
+        }
+    }
+    
+    if (convertForm) {
+        convertForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const file = videoFileInput.files[0];
+            if (!file) return;
+            
+            runWithAdGating((token) => {
+                startVideoToAudioConversion(file, token);
+            });
+        });
+    }
+
+    function runWithAdGating(onAuthorizedCallback) {
+        // Query server balance
+        fetch(`${API_URL}/device-status?device_id=${deviceId}`)
+            .then(res => res.json())
+            .then(data => {
+                const remaining = data.free_downloads_remaining;
+                if (remaining > 0 || adToken) {
+                    onAuthorizedCallback(adToken);
+                    adToken = null; // Consume token
+                } else {
+                    showAdModalFlow(onAuthorizedCallback);
+                }
+            })
+            .catch(() => {
+                // Offline fallback
+                onAuthorizedCallback(null);
+            });
+    }
+
+    function showAdModalFlow(onAuthorizedCallback) {
+        if (!adModal) return;
+        
+        adModal.classList.remove('hidden');
+        if (closeAdModalBtn) {
+            closeAdModalBtn.disabled = true;
+            closeAdModalBtn.style.opacity = '0.3';
+            closeAdModalBtn.style.cursor = 'not-allowed';
+            closeAdModalBtn.innerHTML = '&times;';
+        }
+        
+        let seconds = 5;
+        if (adTimerVal) adTimerVal.textContent = seconds.toString();
+        
+        const adInterval = setInterval(() => {
+            seconds--;
+            if (adTimerVal) adTimerVal.textContent = seconds.toString();
+            
+            if (seconds <= 0) {
+                clearInterval(adInterval);
+                if (adTimerVal) adTimerVal.textContent = "Ready!";
+                if (closeAdModalBtn) {
+                    closeAdModalBtn.disabled = false;
+                    closeAdModalBtn.style.opacity = '1';
+                    closeAdModalBtn.style.cursor = 'pointer';
+                    closeAdModalBtn.innerHTML = '&times; Close & Continue';
+                }
+            }
+        }, 1000);
+
+        // Bind close button handler
+        closeAdModalBtn.onclick = async () => {
+            adModal.classList.add('hidden');
+            try {
+                const regRes = await fetch(`${API_URL}/register-ad-complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ device_id: deviceId })
+                });
+                const regData = await regRes.json();
+                if (regData.success) {
+                    adToken = regData.ad_token;
+                    showError("Ad Watched! Extraction slot unlocked.");
+                    onAuthorizedCallback(adToken);
+                    adToken = null; // Consume immediately
+                    checkDeviceAllowance();
+                } else {
+                    showError("Ad verification failed. Please try again.");
+                }
+            } catch (err) {
+                showError("Ad verification failed. Please try again.");
+            }
+        };
+    }
+    
+    if (adUpgradeBtn) {
+        adUpgradeBtn.addEventListener('click', () => {
+            showError("Billing is disabled. Ad support helps keep Downloadyfy.AI free for everyone!");
+        });
+    }
+
+    function startVideoToAudioConversion(file, token) {
+        return new Promise((resolve, reject) => {
+            if (convertBtn) convertBtn.disabled = true;
+            if (convertLoader) convertLoader.classList.remove('hidden');
+            if (convertStatus) convertStatus.classList.remove('hidden');
+            if (convertProgressFill) convertProgressFill.style.width = '0%';
+            if (convertStatusText) convertStatusText.textContent = 'Uploading video file... 0%';
+            
+            const format = document.getElementById('audioFormatSelect').value;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('format', format);
+            formData.append('device_id', deviceId);
+            if (token) formData.append('ad_token', token);
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `${API_URL}/convert-to-audio`, true);
+            
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    const mappedPercent = Math.round(percent * 0.7);
+                    if (convertProgressFill) convertProgressFill.style.width = `${mappedPercent}%`;
+                    if (convertStatusText) convertStatusText.textContent = `Uploading video file... ${percent}%`;
+                }
+            });
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    if (convertProgressFill) convertProgressFill.style.width = '95%';
+                    if (convertStatusText) convertStatusText.textContent = 'AI Engine extracting audio track... This may take a moment.';
+                    
+                    setTimeout(() => {
+                        const blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+                        const nameParts = file.name.split('.');
+                        nameParts.pop();
+                        const outName = `${nameParts.join('.')}.${format}`;
+                        
+                        const downloadUrl = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = downloadUrl;
+                        link.download = outName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        if (convertProgressFill) convertProgressFill.style.width = '100%';
+                        if (convertStatusText) convertStatusText.textContent = '🎉 Extraction complete! Audio saved to device.';
+                        
+                        SoundFX.playSuccess();
+                        checkDeviceAllowance();
+                        
+                        if (convertBtn) convertBtn.disabled = false;
+                        if (convertLoader) convertLoader.classList.add('hidden');
+                        setTimeout(() => {
+                            if (convertStatus) convertStatus.classList.add('hidden');
+                        }, 5000);
+                        
+                        resolve();
+                    }, 1500);
+                } else {
+                    let errMsg = 'Failed to extract audio track.';
+                    try {
+                        const resJson = JSON.parse(xhr.responseText);
+                        errMsg = resJson.error || errMsg;
+                    } catch(err) {}
+                    
+                    handleConversionFailure(errMsg);
+                    reject(new Error(errMsg));
+                }
+            };
+            
+            xhr.onerror = function() {
+                handleConversionFailure("Network error communicating with extraction backend.");
+                reject(new Error("Network error."));
+            };
+            
+            xhr.responseType = 'blob';
+            xhr.send(formData);
+        });
+    }
+
+    function handleConversionFailure(errMsg) {
+        if (convertProgressFill) convertProgressFill.style.width = '100%';
+        if (convertStatusText) convertStatusText.textContent = `❌ Conversion failed: ${errMsg}`;
+        showError(errMsg);
+        if (convertBtn) convertBtn.disabled = false;
+        if (convertLoader) convertLoader.classList.add('hidden');
+        
+        setTimeout(() => {
+            if (convertStatus) convertStatus.classList.add('hidden');
+        }, 8000);
+    }
+
+    // === Audio Trimmer / Ringtone Creator Logic ===
+    const trimForm = document.getElementById('trimForm');
+    const audioDragZone = document.getElementById('audioDragZone');
+    const audioFileInput = document.getElementById('audioFileInput');
+    const trimFileInfo = document.getElementById('trimFileInfo');
+    const trimFileName = document.getElementById('trimFileName');
+    const trimFileSize = document.getElementById('trimFileSize');
+    const trimBtn = document.getElementById('trimBtn');
+    const trimLoader = document.getElementById('trimLoader');
+    const trimStatus = document.getElementById('trimStatus');
+    const trimProgressFill = document.getElementById('trimProgressFill');
+    const trimStatusText = document.getElementById('trimStatusText');
+    
+    if (audioDragZone && audioFileInput) {
+        audioDragZone.addEventListener('click', () => {
+            audioFileInput.click();
+        });
+        audioDragZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            audioDragZone.classList.add('dragover');
+        });
+        audioDragZone.addEventListener('dragleave', () => {
+            audioDragZone.classList.remove('dragover');
+        });
+        audioDragZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            audioDragZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                audioFileInput.files = e.dataTransfer.files;
+                handleSelectedAudioFile(file);
+            } else {
+                showError("Please drop a valid audio file.");
+            }
+        });
+        audioFileInput.addEventListener('change', () => {
+            const file = audioFileInput.files[0];
+            if (file) handleSelectedAudioFile(file);
+        });
+    }
+    
+    function handleSelectedAudioFile(file) {
+        if (trimFileInfo && trimFileName && trimFileSize) {
+            trimFileName.textContent = file.name;
+            trimFileSize.textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+            trimFileInfo.classList.remove('hidden');
+            if (trimBtn) trimBtn.disabled = false;
+        }
+    }
+    
+    if (trimForm) {
+        trimForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const file = audioFileInput.files[0];
+            if (!file) return;
+            
+            runWithAdGating((token) => {
+                startAudioTrimming(file, token);
+            });
+        });
+    }
+
+    function startAudioTrimming(file, token) {
+        if (trimBtn) trimBtn.disabled = true;
+        if (trimLoader) trimLoader.classList.remove('hidden');
+        if (trimStatus) trimStatus.classList.remove('hidden');
+        if (trimProgressFill) trimProgressFill.style.width = '0%';
+        if (trimStatusText) trimStatusText.textContent = 'Uploading audio file... 0%';
+        
+        const start = document.getElementById('trimStartInput').value || '0';
+        const end = document.getElementById('trimEndInput').value || '30';
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('start', start);
+        formData.append('end', end);
+        formData.append('device_id', deviceId);
+        if (token) formData.append('ad_token', token);
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API_URL}/trim-audio`, true);
+        
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                const mappedPercent = Math.round(percent * 0.7);
+                if (trimProgressFill) trimProgressFill.style.width = `${mappedPercent}%`;
+                if (trimStatusText) trimStatusText.textContent = `Uploading audio file... ${percent}%`;
+            }
+        });
+        
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                if (trimProgressFill) trimProgressFill.style.width = '95%';
+                if (trimStatusText) trimStatusText.textContent = 'AI cutting & converting track... Please wait.';
+                
+                setTimeout(() => {
+                    const blob = new Blob([xhr.response], { type: 'audio/mpeg' });
+                    const outName = `${file.name.split('.')[0]}_trimmed.mp3`;
+                    
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = outName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    if (trimProgressFill) trimProgressFill.style.width = '100%';
+                    if (trimStatusText) trimStatusText.textContent = '🎉 Cut complete! Ringtone saved to device.';
+                    
+                    SoundFX.playSuccess();
+                    checkDeviceAllowance();
+                    
+                    if (trimBtn) trimBtn.disabled = false;
+                    if (trimLoader) trimLoader.classList.add('hidden');
+                    setTimeout(() => {
+                        if (trimStatus) trimStatus.classList.add('hidden');
+                    }, 5000);
+                }, 1500);
+            } else {
+                let errMsg = 'Failed to trim audio file.';
+                try {
+                    const resJson = JSON.parse(xhr.responseText);
+                    errMsg = resJson.error || errMsg;
+                } catch(err) {}
+                
+                handleTrimFailure(errMsg);
+            }
+        };
+        
+        xhr.onerror = function() {
+            handleTrimFailure("Network error communicating with trimming server.");
+        };
+        
+        xhr.responseType = 'blob';
+        xhr.send(formData);
+    }
+
+    function handleTrimFailure(errMsg) {
+        if (trimProgressFill) trimProgressFill.style.width = '100%';
+        if (trimStatusText) trimStatusText.textContent = `❌ Trimming failed: ${errMsg}`;
+        showError(errMsg);
+        if (trimBtn) trimBtn.disabled = false;
+        if (trimLoader) trimLoader.classList.add('hidden');
+        setTimeout(() => {
+            if (trimStatus) trimStatus.classList.add('hidden');
+        }, 8000);
+    }
+
+    // Modal overlays close handlers window click
+    window.addEventListener('click', (e) => {
+        if (e.target === legalModal) {
+            legalModal.classList.add('hidden');
+        }
+        if (e.target === adModal) {
+            // Cannot dismiss ad modal by clicking outside while countdown runs
+            const timerVal = document.getElementById('adTimerVal').textContent;
+            if (timerVal === "Ready!") {
+                adModal.classList.add('hidden');
+            }
+        }
+    });
 
 });
 

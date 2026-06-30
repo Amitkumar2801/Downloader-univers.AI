@@ -23,6 +23,22 @@ except ModuleNotFoundError:
 
 COOKIES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'yt_cookies.txt')
 
+def handle_compliance_check(error_message):
+    err_lower = error_message.lower()
+    compliance_keywords = [
+        "private", "members-only", "copyright", "drm", "protected", "login", 
+        "sign in", "restricted", "password", "age-restricted", "paid", "subscription",
+        "geo-restricted", "country-restricted", "blocked"
+    ]
+    for kw in compliance_keywords:
+        if kw in err_lower:
+            return True, (
+                "Legal & Compliance Block: This content is private, DRM-protected, paywalled, "
+                "or copyright restricted. Downloadyfy.AI is intended solely for personal or educational "
+                "downloads of public, non-copyright-locked content in compliance with platform terms."
+            )
+    return False, error_message
+
 def tag_mp3_metadata(file_path, title, artists, cover_url):
     try:
         try:
@@ -473,7 +489,11 @@ def get_video_info():
             return jsonify(response_data)
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        err_msg = str(e)
+        is_blocked, comp_msg = handle_compliance_check(err_msg)
+        if is_blocked:
+            return jsonify({'error': comp_msg}), 403
+        return jsonify({'error': err_msg}), 500
 
 def make_progress_hook(job_id):
     def hook(d):
@@ -705,13 +725,24 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
         if not healed:
             print(f"Download thread error: {e}")
             traceback.print_exc()
+            err_msg = str(e)
+            is_blocked, comp_msg = handle_compliance_check(err_msg)
+            if is_blocked:
+                err_msg = comp_msg
             download_jobs[job_id].update({
                 'status': 'failed',
-                'error': str(e)
+                'error': err_msg
             })
 
 @app.route('/api/download', methods=['GET'])
 def download_video():
+    device_id = request.args.get('device_id')
+    ad_token = request.args.get('ad_token')
+    
+    allowed, method = check_and_consume_device_action(device_id, ad_token)
+    if not allowed:
+        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
+
     url = request.args.get('url')
     format_id = request.args.get('format_id', 'best')
     ext = request.args.get('ext', 'mp4')
@@ -885,7 +916,11 @@ def download_video():
                 except Exception as rename_err:
                     print(f"[SELF-HEAL] Server: Attempt {attempt+1} failed: {rename_err}")
         if not healed:
-            return jsonify({'error': str(e)}), 500
+            err_msg = str(e)
+            is_blocked, comp_msg = handle_compliance_check(err_msg)
+            if is_blocked:
+                return jsonify({'error': comp_msg}), 403
+            return jsonify({'error': err_msg}), 500
 
     # Find the downloaded file
     filepath = f"{filepath_without_ext}.{ext}"
@@ -957,7 +992,14 @@ def download_file(job_id):
 
 @app.route('/api/start_download', methods=['POST'])
 def start_download():
-    data = request.json
+    data = request.json or {}
+    device_id = data.get('device_id')
+    ad_token = data.get('ad_token')
+    
+    allowed, method = check_and_consume_device_action(device_id, ad_token)
+    if not allowed:
+        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
+
     url = data.get('url')
     format_id = data.get('format_id', 'best')
     ext = data.get('ext', 'mp4')
@@ -966,7 +1008,7 @@ def start_download():
     height_val = data.get('height')
     video_quality = data.get('video_quality')
     audio_bitrate = data.get('audio_bitrate')
-
+    
     if not url:
         return jsonify({'error': 'URL is required'}), 400
 
@@ -1144,6 +1186,205 @@ def upload_cookies():
         f.write(content)
     
     return jsonify({'success': True, 'message': f'Cookies uploaded! ({len(content)} bytes)'})
+
+# ==========================================
+# Device Fingerprint Ad Gating Registry
+# ==========================================
+
+REGISTRY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'device_registry.json')
+
+def load_registry():
+    if not os.path.exists(REGISTRY_FILE):
+        return {"devices": {}}
+    try:
+        with open(REGISTRY_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {"devices": {}}
+
+def save_registry(registry):
+    try:
+        with open(REGISTRY_FILE, 'w', encoding='utf-8') as f:
+            json.dump(registry, f, indent=2)
+    except Exception as e:
+        print(f"Error saving registry: {e}")
+
+def check_and_consume_device_action(device_id, ad_token=None):
+    if not device_id:
+        return True, "fallback"
+        
+    registry = load_registry()
+    devices = registry.setdefault("devices", {})
+    device = devices.setdefault(device_id, {"free_downloads_used": 0, "ad_tokens": []})
+    
+    # Check if they still have free balance
+    if device["free_downloads_used"] < 1:
+        device["free_downloads_used"] += 1
+        save_registry(registry)
+        return True, "free"
+        
+    # Check if they provided a valid ad token
+    tokens_list = device.setdefault("ad_tokens", [])
+    if ad_token and ad_token in tokens_list:
+        tokens_list.remove(ad_token)
+        save_registry(registry)
+        return True, "ad"
+        
+    return False, None
+
+@app.route('/api/device-status', methods=['GET'])
+def device_status():
+    device_id = request.args.get('device_id')
+    if not device_id:
+        return jsonify({'error': 'Device ID is required'}), 400
+        
+    registry = load_registry()
+    devices = registry.setdefault("devices", {})
+    device = devices.get(device_id, {"free_downloads_used": 0})
+    
+    used = device.get("free_downloads_used", 0)
+    remaining = max(0, 1 - used)
+    return jsonify({
+        'device_id': device_id,
+        'free_downloads_used': used,
+        'free_downloads_remaining': remaining
+    })
+
+@app.route('/api/register-ad-complete', methods=['POST'])
+def register_ad_complete():
+    data = request.get_json() or {}
+    device_id = data.get('device_id')
+    if not device_id:
+        return jsonify({'success': False, 'message': 'Device ID is required'}), 400
+        
+    registry = load_registry()
+    devices = registry.setdefault("devices", {})
+    device = devices.setdefault(device_id, {"free_downloads_used": 0, "ad_tokens": []})
+    
+    # Mark free downloads as used since they've transitioned to ad-watch mode
+    device["free_downloads_used"] = max(1, device.get("free_downloads_used", 0))
+    
+    new_token = uuid.uuid4().hex
+    device.setdefault("ad_tokens", []).append(new_token)
+    
+    save_registry(registry)
+    return jsonify({'success': True, 'ad_token': new_token})
+
+@app.route('/api/convert-to-audio', methods=['POST'])
+def convert_to_audio():
+    device_id = request.form.get('device_id')
+    ad_token = request.form.get('ad_token')
+    
+    allowed, method = check_and_consume_device_action(device_id, ad_token)
+    if not allowed:
+        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    file = request.files['file']
+    out_format = request.form.get('format', 'mp3')
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+        
+    if out_format not in ('mp3', 'wav', 'flac', 'm4a'):
+        out_format = 'mp3'
+        
+    video_uid = uuid.uuid4().hex[:8]
+    video_ext = os.path.splitext(file.filename)[1].lower() or '.mp4'
+    video_path = os.path.join(DOWNLOADS_DIR, f"conv_{video_uid}{video_ext}")
+    file.save(video_path)
+    
+    audio_path = os.path.join(DOWNLOADS_DIR, f"conv_{video_uid}.{out_format}")
+    
+    try:
+        import subprocess
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        cmd = [ffmpeg_exe, '-y', '-i', video_path, '-vn']
+        
+        if out_format == 'mp3':
+            cmd.extend(['-acodec', 'libmp3lame', '-q:a', '2'])
+        elif out_format == 'flac':
+            cmd.extend(['-acodec', 'flac'])
+        elif out_format == 'wav':
+            cmd.extend(['-acodec', 'pcm_s16le'])
+        elif out_format == 'm4a':
+            cmd.extend(['-acodec', 'aac', '-b:a', '192k'])
+            
+        cmd.append(audio_path)
+        
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=60)
+        if result.returncode != 0:
+            raise Exception(f"FFmpeg error: {result.stderr}")
+            
+        if not os.path.exists(audio_path):
+            raise Exception("Failed to extract audio track.")
+            
+        threading.Timer(60.0, cleanup_file, args=[video_path]).start()
+        threading.Timer(120.0, cleanup_file, args=[audio_path]).start()
+        
+        download_name = f"{os.path.splitext(file.filename)[0]}.{out_format}"
+        return send_file(audio_path, as_attachment=True, download_name=download_name)
+    except Exception as e:
+        cleanup_file(video_path)
+        cleanup_file(audio_path)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/trim-audio', methods=['POST'])
+def trim_audio():
+    device_id = request.form.get('device_id')
+    ad_token = request.form.get('ad_token')
+    
+    allowed, method = check_and_consume_device_action(device_id, ad_token)
+    if not allowed:
+        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    file = request.files['file']
+    start_time = request.form.get('start', '0')
+    end_time = request.form.get('end', '10')
+    
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+        
+    audio_uid = uuid.uuid4().hex[:8]
+    audio_ext = os.path.splitext(file.filename)[1].lower() or '.mp3'
+    input_path = os.path.join(DOWNLOADS_DIR, f"trim_in_{audio_uid}{audio_ext}")
+    file.save(input_path)
+    
+    output_path = os.path.join(DOWNLOADS_DIR, f"trim_out_{audio_uid}.mp3")
+    
+    try:
+        import subprocess
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        
+        # ffmpeg audio cut command
+        cmd = [
+            ffmpeg_exe, '-y',
+            '-ss', str(start_time),
+            '-to', str(end_time),
+            '-i', input_path,
+            '-acodec', 'libmp3lame',
+            '-q:a', '2',
+            output_path
+        ]
+        
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=60)
+        if result.returncode != 0:
+            raise Exception(f"FFmpeg error: {result.stderr}")
+            
+        if not os.path.exists(output_path):
+            raise Exception("Failed to trim audio track.")
+            
+        threading.Timer(60.0, cleanup_file, args=[input_path]).start()
+        threading.Timer(120.0, cleanup_file, args=[output_path]).start()
+        
+        download_name = f"{os.path.splitext(file.filename)[0]}_trimmed.mp3"
+        return send_file(output_path, as_attachment=True, download_name=download_name)
+    except Exception as e:
+        cleanup_file(input_path)
+        cleanup_file(output_path)
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
