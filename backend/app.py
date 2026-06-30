@@ -179,6 +179,119 @@ def get_video_info():
     if not url:
         return jsonify({'error': 'URL is required'}), 400
 
+    # Custom Pinterest extractor fallback
+    is_pinterest = 'pinterest.com' in url.lower() or 'pin.it' in url.lower()
+    if is_pinterest:
+        try:
+            import urllib.parse
+            import json
+            import re
+            
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+            }
+            res = requests.get(url, headers=headers, timeout=12)
+            if res.status_code == 200:
+                html_text = res.text
+                
+                for match in re.finditer(r'__PWS_RELAY_REGISTER_COMPLETED_REQUEST__\((.*?)\)', html_text, re.DOTALL):
+                    try:
+                        raw_param = match.group(1).strip()
+                        
+                        data_part = None
+                        comma_idx = raw_param.find('",')
+                        if comma_idx != -1:
+                            data_part = raw_param[comma_idx + 2:].strip()
+                        else:
+                            comma_idx = raw_param.find("',")
+                            if comma_idx != -1:
+                                data_part = raw_param[comma_idx + 2:].strip()
+                                
+                        if data_part:
+                            payload = json.loads(data_part)
+                            if 'data' in payload and 'v3GetPinQueryv2' in payload['data']:
+                                pin_data = payload['data']['v3GetPinQueryv2']
+                                is_video = pin_data.get('isVideo', False)
+                                title = pin_data.get('title') or pin_data.get('gridTitle') or "Pinterest Media"
+                                
+                                video_formats = []
+                                if is_video and 'videos' in pin_data and pin_data['videos']:
+                                    v_list = pin_data['videos'].get('video_list', {})
+                                    for v_key, v_info in v_list.items():
+                                        v_url = v_info.get('url')
+                                        if v_url:
+                                            note = f"Pinterest Video ({v_key})"
+                                            video_formats.append({
+                                                'format_id': v_url,
+                                                'ext': 'mp4',
+                                                'format_note': note,
+                                                'resolution': f"{v_info.get('width', 0)}x{v_info.get('height', 0)}",
+                                                'filesize': None
+                                            })
+                                            
+                                img_url = None
+                                if 'imageSpecs' in pin_data:
+                                    img_url = pin_data.get('imageSpecs', {}).get('originals', {}).get('url')
+                                if not img_url:
+                                    urls = []
+                                    def search_urls(node):
+                                        if isinstance(node, dict):
+                                            for k, v in node.items():
+                                                if k == 'url' and isinstance(v, str) and '/originals/' in v:
+                                                    urls.append(v)
+                                                else:
+                                                    search_urls(v)
+                                        elif isinstance(node, list):
+                                            for item in node:
+                                                search_urls(item)
+                                    search_urls(pin_data)
+                                    if urls:
+                                        img_url = urls[0]
+                                        
+                                if not img_url:
+                                    img_url = pin_data.get('imageLargeUrl')
+                                    
+                                if is_video and video_formats:
+                                    return jsonify({
+                                        'title': title,
+                                        'thumbnail': img_url or pin_data.get('imageLargeUrl', ''),
+                                        'uploader': pin_data.get('pinner', {}).get('username') or 'Pinterest User',
+                                        'duration': int(pin_data.get('duration', 0) / 1000) if pin_data.get('duration') else 0,
+                                        'url': res.url,
+                                        'formats': {
+                                            'video': video_formats,
+                                            'audio': []
+                                        }
+                                    })
+                                elif img_url:
+                                    return jsonify({
+                                        'title': title,
+                                        'thumbnail': img_url,
+                                        'uploader': pin_data.get('pinner', {}).get('username') or 'Pinterest User',
+                                        'duration': 0,
+                                        'url': res.url,
+                                        'formats': {
+                                            'video': [
+                                                {
+                                                    'format_id': img_url,
+                                                    'ext': 'jpg',
+                                                    'format_note': 'Original High Resolution Image',
+                                                    'resolution': 'Original',
+                                                    'filesize': None,
+                                                    'media_type': 'image'
+                                                }
+                                            ],
+                                            'audio': []
+                                        }
+                                    })
+                    except Exception as json_err:
+                        print(f"[PINTEREST] Regex match parse failed: {json_err}")
+                        continue
+        except Exception as pin_err:
+            print(f"[PINTEREST] Custom scraper failed: {pin_err}")
+
     sp_type, sp_id = parse_spotify_url(url)
     if sp_type and sp_id:
         try:
@@ -1009,6 +1122,14 @@ def start_download():
     video_quality = data.get('video_quality')
     audio_bitrate = data.get('audio_bitrate')
     
+    # Check if format_id is a direct URL (like Pinterest media)
+    is_direct_url = format_id and (format_id.startswith('http://') or format_id.startswith('https://'))
+    if is_direct_url:
+        url = format_id
+        format_id = 'best'
+        if ext in ('jpg', 'jpeg', 'png', 'webp'):
+            media_type = 'image'
+            
     if not url:
         return jsonify({'error': 'URL is required'}), 400
 
