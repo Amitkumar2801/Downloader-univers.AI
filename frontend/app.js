@@ -88,6 +88,36 @@ const SoundFX = {
 
 const API_URL = 'http://127.0.0.1:5000/api';
 
+// === Device Fingerprint ===
+function getBrowserFingerprint() {
+    const nav = window.navigator;
+    const screen = window.screen;
+    const parts = [
+        nav.userAgent,
+        nav.language,
+        screen.colorDepth,
+        screen.width + 'x' + screen.height,
+        new Date().getTimezoneOffset(),
+        !!nav.cookieEnabled,
+        typeof window.Worker,
+        nav.hardwareConcurrency || 'unknown',
+    ];
+    let hash = 0;
+    const str = parts.join('|');
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash).toString(36);
+}
+
+let deviceId = localStorage.getItem('deviceId');
+if (!deviceId) {
+    deviceId = getBrowserFingerprint() + '_' + Date.now().toString(36);
+    localStorage.setItem('deviceId', deviceId);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const fetchForm = document.getElementById('fetchForm');
     const urlInput = document.getElementById('videoUrl');
