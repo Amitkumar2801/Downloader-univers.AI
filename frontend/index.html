@@ -252,6 +252,40 @@
                 DOWNLOADYFY<span>.AI</span>
             </div>
             <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+                <!-- Language Selector Dropdown -->
+                <div class="language-selector-wrapper" style="position: relative;">
+                    <select id="languageSelect" class="lang-select-dropdown" aria-label="Select Language" style="
+                        background: var(--glass-bg);
+                        color: var(--text-main);
+                        border: 1px solid var(--glass-border);
+                        border-radius: 12px;
+                        padding: 0.5rem 1.8rem 0.5rem 0.8rem;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        outline: none;
+                        cursor: pointer;
+                        appearance: none;
+                        -webkit-appearance: none;
+                        transition: all 0.2s ease;
+                    ">
+                        <option value="en">🇺🇸 EN</option>
+                        <option value="hi">🇮🇳 HI</option>
+                        <option value="es">🇪🇸 ES</option>
+                        <option value="pt">🇵🇹 PT</option>
+                        <option value="fr">🇫🇷 FR</option>
+                        <option value="de">🇩🇪 DE</option>
+                        <option value="ru">🇷🇺 RU</option>
+                    </select>
+                    <span class="select-arrow" style="
+                        position: absolute;
+                        right: 10px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: var(--text-muted);
+                        pointer-events: none;
+                        font-size: 0.7rem;
+                    ">▼</span>
+                </div>
                 <div id="downloadAllowanceBadge" class="premium-status-pill" style="cursor: default;" title="Device allowance status">
                     <span class="status-dot" style="background-color: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime);"></span>
                     <span id="allowanceBadgeText">Free Downloads Left: 1/1</span>
@@ -263,12 +297,12 @@
             </div>
         </div>
     </nav>
-
+ 
     <div class="background-elements">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
-
+ 
     <main class="container">
         <!-- Hero -->
         <header class="home-hero">
@@ -283,10 +317,10 @@
                 <span class="badge-item vimeo">Vimeo</span>
                 <span class="badge-item reddit">Reddit</span>
             </div>
-            <h1 class="hero-title">Experience <span class="gradient-text">Intelligent Simplicity</span></h1>
-            <p class="hero-subtitle">Paste a link below to download videos, audio, or playlists instantly.</p>
+            <h1 class="hero-title" data-translate="hero_title">Experience <span class="gradient-text">Intelligent Simplicity</span></h1>
+            <p class="hero-subtitle" data-translate="hero_subtitle">Paste a link below to download videos, audio, or playlists instantly.</p>
         </header>
-
+ 
         <!-- Homepage Link Downloader Form -->
         <section class="downloader-section">
             <div class="input-glass">
@@ -296,7 +330,7 @@
                         <input type="url" id="videoUrl" placeholder="Paste your link here (e.g. YouTube, Instagram Reel, Spotify, X/Twitter...)" required autocomplete="off">
                     </div>
                     <button type="submit" class="glow-button" id="fetchBtn">
-                        <span class="btn-text">Analyze Link</span>
+                        <span class="btn-text" data-translate="analyze_btn">Analyze Link</span>
                         <div class="loader-spinner hidden" id="fetchLoader"></div>
                     </button>
                 </form>
@@ -305,15 +339,15 @@
                 <div class="ai-telemetry-bar">
                     <span class="telemetry-tag">AI CORE V4.8</span>
                     <span class="telemetry-bracket">[</span>
-                    <span class="telemetry-status" id="telemetryStatus">AI PARSER STATE: IDLE // AWAITING URL INPUT</span>
+                    <span class="telemetry-status" id="telemetryStatus" data-translate="telemetry_idle">AI PARSER STATE: IDLE // AWAITING URL INPUT</span>
                     <span class="telemetry-cursor">_</span>
                     <span class="telemetry-bracket">]</span>
                 </div>
             </div>
-
+ 
             <!-- Disclaimer Box -->
             <div class="legal-disclaimer" style="margin-top: 1.5rem;">
-                <p>⚠️ <strong>Disclaimer:</strong> Downloadyfy.AI is intended for personal and educational use only. We do not support downloading private or copyrighted content. Users are responsible for ensuring compliance with platform terms and copyright laws.</p>
+                <p data-translate="disclaimer">⚠️ <strong>Disclaimer:</strong> Downloadyfy.AI is intended for personal and educational use only. We do not support downloading private or copyrighted content. Users are responsible for ensuring compliance with platform terms and copyright laws.</p>
             </div>
             <!-- Simulated Ad Banner -->
             <div id="adBanner" class="ad-banner-wrapper">
@@ -527,25 +561,25 @@
         <!-- Additional Media Tools Section -->
         <section class="additional-tools-section" id="additionalToolsSection" style="margin-top: 3rem; width: 100%;">
             <div style="text-align: center; margin-bottom: 2rem;">
-                <h2 class="section-title">Additional Media Tools</h2>
-                <p class="section-subtitle">Need offline file conversions or precision audio splitting? Try our high-performance utilities.</p>
+                <h2 class="section-title" data-translate="additional_tools_title">Additional Media Tools</h2>
+                <p class="section-subtitle" data-translate="additional_tools_subtitle">Need offline file conversions or precision audio splitting? Try our high-performance utilities.</p>
             </div>
             <div class="tools-grid">
                 <!-- Tool 1: Video to Audio Converter -->
                 <a href="converter.html" class="tool-card converter-tool">
                     <div class="tool-icon-wrapper">⚡</div>
                     <div>
-                        <h2 class="tool-title">Video → Audio</h2>
-                        <p class="tool-desc">Drag and drop a local video file (MP4, MKV, AVI, MOV) and instantly extract a high-quality audio track. Choose from MP3, WAV, FLAC, or M4A output formats.</p>
+                        <h2 class="tool-title" data-translate="video_audio_title">Video → Audio</h2>
+                        <p class="tool-desc" data-translate="video_audio_desc">Drag and drop a local video file (MP4, MKV, AVI, MOV) and instantly extract a high-quality audio track. Choose from MP3, WAV, FLAC, or M4A output formats.</p>
                     </div>
-                    <div class="tool-features">
+                    <div class="tools-features">
                         <span class="tool-feature-pill">320kbps MP3</span>
                         <span class="tool-feature-pill">Lossless FLAC</span>
                         <span class="tool-feature-pill">WAV / M4A</span>
                         <span class="tool-feature-pill">Drag &amp; Drop</span>
                     </div>
                     <div class="tool-cta">
-                        <span>Convert Now</span>
+                        <span data-translate="convert_now">Convert Now</span>
                         <span class="cta-arrow">→</span>
                     </div>
                 </a>
@@ -554,8 +588,8 @@
                 <a href="trimmer.html" class="tool-card trimmer-tool">
                     <div class="tool-icon-wrapper">✂️</div>
                     <div>
-                        <h2 class="tool-title">Audio Trimmer</h2>
-                        <p class="tool-desc">Upload any audio file and trim it to the perfect length. Ideal for creating custom ringtones, notification sounds, and podcast clips in high-quality MP3.</p>
+                        <h2 class="tool-title" data-translate="audio_trimmer_title">Audio Trimmer</h2>
+                        <p class="tool-desc" data-translate="audio_trimmer_desc">Upload any audio file and trim it to the perfect length. Ideal for creating custom ringtones, notification sounds, and podcast clips in high-quality MP3.</p>
                     </div>
                     <div class="tool-features">
                         <span class="tool-feature-pill">Ringtone Creator</span>
@@ -564,7 +598,7 @@
                         <span class="tool-feature-pill">MP3/WAV/M4A</span>
                     </div>
                     <div class="tool-cta">
-                        <span>Trim Audio</span>
+                        <span data-translate="trim_audio">Trim Audio</span>
                         <span class="cta-arrow">→</span>
                     </div>
                 </a>
@@ -598,41 +632,41 @@
         <!-- How It Works -->
         <div class="hiw-section">
             <div style="text-align: center;">
-                <h2 class="section-title">How Downloadyfy<span>.AI</span> Works</h2>
-                <p class="section-subtitle">Follow these simple steps to download, extract, and manage your media.</p>
+                <h2 class="section-title" data-translate="hiw_title">How Downloadyfy<span>.AI</span> Works</h2>
+                <p class="section-subtitle" data-translate="hiw_subtitle">Follow these simple steps to download, extract, and manage your media.</p>
             </div>
             <div class="hiw-grid">
                 <div class="hiw-card">
                     <div class="hiw-icon">🔗</div>
                     <div class="hiw-num">1</div>
-                    <h4>Choose Your Tool</h4>
-                    <p>Select the right tool from the cards above — Link Downloader for URLs, Converter for local videos, or Trimmer for audio clips.</p>
+                    <h4 data-translate="hiw_step1_title">Choose Your Tool</h4>
+                    <p data-translate="hiw_step1_desc">Select the right tool from the cards above — Link Downloader for URLs, Converter for local videos, or Trimmer for audio clips.</p>
                 </div>
                 <div class="hiw-card">
                     <div class="hiw-icon">📋</div>
                     <div class="hiw-num">2</div>
-                    <h4>Paste Link or Upload File</h4>
-                    <p>For downloads, copy any public URL and paste it. For local tools, drag-and-drop your video or audio file directly onto the page.</p>
+                    <h4 data-translate="hiw_step2_title">Paste Link or Upload File</h4>
+                    <p data-translate="hiw_step2_desc">For downloads, copy any public URL and paste it. For local tools, drag-and-drop your video or audio file directly onto the page.</p>
                 </div>
                 <div class="hiw-card">
                     <div class="hiw-icon">⚙️</div>
                     <div class="hiw-num">3</div>
-                    <h4>Select Format &amp; Quality</h4>
-                    <p>Our AI engine auto-detects available formats. Pick from video resolutions up to 8K or audio quality up to 320kbps Lossless FLAC.</p>
+                    <h4 data-translate="hiw_step3_title">Select Format &amp; Quality</h4>
+                    <p data-translate="hiw_step3_desc">Our AI engine auto-detects available formats. Pick from video resolutions up to 8K or audio quality up to 320kbps Lossless FLAC.</p>
                 </div>
                 <div class="hiw-card">
                     <div class="hiw-icon">⬇️</div>
                     <div class="hiw-num">4</div>
-                    <h4>Download to Device</h4>
-                    <p>Click Download and the file saves directly to your browser's downloads folder. No accounts, no subscriptions. Free forever.</p>
+                    <h4 data-translate="hiw_step4_title">Download to Device</h4>
+                    <p data-translate="hiw_step4_desc">Click Download and the file saves directly to your browser's downloads folder. No accounts, no subscriptions. Free forever.</p>
                 </div>
             </div>
         </div>
 
         <!-- Demo Section -->
         <section class="demo-section" id="demoSection" style="margin-top: 3rem;">
-            <h2 class="section-title">Experience the Premium Speed</h2>
-            <p class="section-subtitle">A high-fidelity universal media downloader with cover art mapping and zero configuration.</p>
+            <h2 class="section-title" data-translate="demo_title">Experience the Premium Speed</h2>
+            <p class="section-subtitle" data-translate="demo_subtitle">A high-fidelity universal media downloader with cover art mapping and zero configuration.</p>
             <div class="demo-grid">
                 <div class="demo-card">
                     <div class="demo-img-wrapper">
@@ -666,8 +700,8 @@
 
         <!-- Partners Section -->
         <section class="partners-section reveal" id="partnersSection">
-            <h2 class="section-title">Creative &amp; Educational Partners</h2>
-            <p class="section-subtitle">Empower your study and design projects with high-quality, royalty-free content from our network.</p>
+            <h2 class="section-title" data-translate="partners_title">Creative &amp; Educational Partners</h2>
+            <p class="section-subtitle" data-translate="partners_subtitle">Empower your study and design projects with high-quality, royalty-free content from our network.</p>
             <div class="partners-grid">
                 <a href="https://unsplash.com" target="_blank" class="partner-card">
                     <div class="partner-icon">🖼️</div>
