@@ -1909,6 +1909,16 @@ function initLanguage() {
         const savedLang = localStorage.getItem('appLanguage') || 'en';
         languageSelect.value = savedLang;
         
+        // Helper to set Google Translate cookie
+        const setTranslateCookie = (lang) => {
+            document.cookie = "googtrans=/en/" + lang + "; path=/";
+            const host = window.location.hostname;
+            document.cookie = "googtrans=/en/" + lang + "; path=/; domain=" + host;
+        };
+
+        // Set initial cookie
+        setTranslateCookie(savedLang);
+        
         // Polling to make sure the Google Translate combo is ready
         let attempts = 0;
         const checkInterval = setInterval(() => {
@@ -1925,6 +1935,7 @@ function initLanguage() {
         languageSelect.addEventListener('change', (e) => {
             const lang = e.target.value;
             localStorage.setItem('appLanguage', lang);
+            setTranslateCookie(lang);
             
             const googCombo = document.querySelector('.goog-te-combo');
             if (googCombo) {
