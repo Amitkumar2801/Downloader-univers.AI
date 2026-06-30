@@ -733,9 +733,9 @@ input::placeholder {
 }
 
 .format-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
     padding: 1rem;
     border-radius: 12px;
     cursor: pointer;
@@ -746,7 +746,7 @@ input::placeholder {
 }
 
 .format-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     border-color: var(--secondary);
     transform: translateX(4px);
 }
@@ -909,9 +909,9 @@ input::placeholder {
 }
 
 .playlist-item-actions select {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--glass-bg);
+    color: var(--text-main);
+    border: 1px solid var(--glass-border);
     padding: 0.5rem;
     border-radius: 8px;
     outline: none;
@@ -919,6 +919,7 @@ input::placeholder {
 
 .playlist-item-actions select option {
     background: var(--bg-color);
+    color: var(--text-main);
 }
 
 /* Responsive */
