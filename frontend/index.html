@@ -3,23 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOWNLOADYFY.AI - Experience Intelligent Simplicity</title>
-    <meta name="description" content="Download YouTube 4K videos, MP3, Instagram Reels, and Spotify playlists easily with AI.">
-    <!-- Google Fonts -->
+    <title>DOWNLOADYFY.AI - Universal Media Downloader & Converter</title>
+    <meta name="description" content="Download YouTube 4K, Instagram Reels, Spotify playlists, convert video to audio, and trim ringtones — all in one AI-powered tool.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css?v=7">
+    <link rel="stylesheet" href="styles.css?v=8">
+    <style>
+        /* ===== HOME PAGE SPECIFIC STYLES ===== */
+        .home-hero {
+            text-align: center;
+            padding: 5rem 1rem 3rem;
+        }
+        .home-hero .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            margin-bottom: 1.2rem;
+        }
+        .home-hero .hero-subtitle {
+            font-size: 1.15rem;
+            max-width: 640px;
+            margin: 0 auto 2.5rem;
+        }
+
+        /* Tool Selection Cards */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.8rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.2rem 2rem;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.3s ease,
+                        border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .tool-card.downloader-tool::before { background: radial-gradient(ellipse at top left, rgba(255, 95, 0, 0.12), transparent 70%); }
+        .tool-card.converter-tool::before { background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.12), transparent 70%); }
+        .tool-card.trimmer-tool::before { background: radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.12), transparent 70%); }
+
+        .tool-card:hover::before { opacity: 1; }
+
+        .tool-card.downloader-tool { border-color: rgba(255, 95, 0, 0.3); }
+        .tool-card.converter-tool { border-color: rgba(99, 102, 241, 0.3); }
+        .tool-card.trimmer-tool { border-color: rgba(16, 185, 129, 0.3); }
+
+        .tool-card.downloader-tool:hover { border-color: var(--accent-orange); box-shadow: 0 20px 60px rgba(255,95,0,0.15); }
+        .tool-card.converter-tool:hover { border-color: #6366f1; box-shadow: 0 20px 60px rgba(99,102,241,0.15); }
+        .tool-card.trimmer-tool:hover { border-color: #10b981; box-shadow: 0 20px 60px rgba(16,185,129,0.15); }
+
+        .tool-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 0.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .tool-card:hover .tool-icon-wrapper { transform: scale(1.1) rotate(-3deg); }
+
+        .tool-card.downloader-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(255,95,0,0.2), rgba(255,140,0,0.1)); border: 1px solid rgba(255,95,0,0.3); }
+        .tool-card.converter-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.1)); border: 1px solid rgba(99,102,241,0.3); }
+        .tool-card.trimmer-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.1)); border: 1px solid rgba(16,185,129,0.3); }
+
+        .tool-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .tool-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+            flex: 1;
+        }
+
+        .tool-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.4rem;
+        }
+
+        .tool-feature-pill {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.02em;
+        }
+
+        .tool-card.downloader-tool .tool-feature-pill { background: rgba(255,95,0,0.15); color: var(--accent-orange); border: 1px solid rgba(255,95,0,0.2); }
+        .tool-card.converter-tool .tool-feature-pill { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
+        .tool-card.trimmer-tool .tool-feature-pill { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+
+        .tool-cta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-top: 0.5rem;
+            transition: gap 0.2s ease;
+        }
+
+        .tool-card:hover .tool-cta { gap: 0.9rem; }
+
+        .tool-card.downloader-tool .tool-cta { color: var(--accent-orange); }
+        .tool-card.converter-tool .tool-cta { color: #818cf8; }
+        .tool-card.trimmer-tool .tool-cta { color: #34d399; }
+
+        .cta-arrow {
+            font-size: 1.1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .tool-card:hover .cta-arrow { transform: translateX(4px); }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            padding: 2rem 1rem;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--glass-border);
+            margin: 0 auto;
+            max-width: 900px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-orange), #ff9500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-lbl {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        /* Platforms section */
+        .platforms-strip {
+            text-align: center;
+            padding: 2rem 1rem 3rem;
+        }
+
+        .platforms-strip h3 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        /* How it works */
+        .hiw-section {
+            background: var(--card-bg);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 4rem 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .hiw-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 2rem auto 0;
+        }
+
+        .hiw-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .hiw-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-orange), #ff9500);
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .hiw-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0 0 0.5rem;
+        }
+
+        .hiw-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .hiw-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">DOWNLOADYFY<span>.AI</span></div>
-            <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </button>
+            <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+                <a href="downloader.html" class="glow-button" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; text-decoration: none; min-height: unset; height: auto;">🔗 Open Downloader</a>
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -29,33 +279,142 @@
     </div>
 
     <main class="container">
-        <header class="hero-section">
-            <div class="badge-container">
+        <!-- Hero -->
+        <header class="home-hero">
+            <div class="badge-container flex-wrap" style="justify-content: center; max-width: 900px; flex-wrap: wrap; margin: 0 auto 1.5rem;">
                 <span class="badge-item youtube">YouTube</span>
                 <span class="badge-item instagram">Instagram</span>
                 <span class="badge-item spotify">Spotify</span>
+                <span class="badge-item twitter">Twitter (X)</span>
+                <span class="badge-item facebook">Facebook</span>
+                <span class="badge-item tiktok">TikTok</span>
+                <span class="badge-item soundcloud">SoundCloud</span>
+                <span class="badge-item vimeo">Vimeo</span>
+                <span class="badge-item reddit">Reddit</span>
             </div>
             <h1 class="hero-title">Experience <span class="gradient-text">Intelligent Simplicity</span></h1>
-            <p class="hero-subtitle">Empowering AI Downloads for Videos, Reels, & Audio Tracks.</p>
+            <p class="hero-subtitle">Choose a tool below — download videos, extract audio from local files, or craft perfect ringtones in seconds.</p>
         </header>
 
-        <section class="downloader-section">
-            <div class="input-glass">
-                <form id="fetchForm">
-                    <div class="input-wrapper">
-                        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        <input type="url" id="videoUrl" placeholder="Paste your link here (e.g. YouTube, Instagram Reel...)" required autocomplete="off">
-                    </div>
-                    <button type="submit" class="glow-button" id="fetchBtn">
-                        <span class="btn-text">Analyze Link</span>
-                        <div class="loader-spinner hidden" id="fetchLoader"></div>
-                    </button>
-                </form>
-            </div>
-        </section>
+        <!-- 3 Tool Cards -->
+        <div class="tools-grid">
 
-        <!-- Demo Mockup Previews Section -->
-        <section class="demo-section" id="demoSection">
+            <!-- Tool 1: Link Downloader -->
+            <a href="downloader.html" class="tool-card downloader-tool">
+                <div class="tool-icon-wrapper">🔗</div>
+                <div>
+                    <h2 class="tool-title">Link Downloader</h2>
+                    <p class="tool-desc">Paste any URL from YouTube, Instagram, Spotify, TikTok, Reddit, and 8+ more platforms. Our AI engine analyzes the link and provides all available formats instantly.</p>
+                </div>
+                <div class="tool-features">
+                    <span class="tool-feature-pill">YouTube 4K</span>
+                    <span class="tool-feature-pill">Spotify MP3</span>
+                    <span class="tool-feature-pill">Instagram Reels</span>
+                    <span class="tool-feature-pill">TikTok</span>
+                    <span class="tool-feature-pill">11+ Platforms</span>
+                </div>
+                <div class="tool-cta">
+                    <span>Start Downloading</span>
+                    <span class="cta-arrow">→</span>
+                </div>
+            </a>
+
+            <!-- Tool 2: Video to Audio Converter -->
+            <a href="converter.html" class="tool-card converter-tool">
+                <div class="tool-icon-wrapper">⚡</div>
+                <div>
+                    <h2 class="tool-title">Video → Audio</h2>
+                    <p class="tool-desc">Drag and drop a local video file (MP4, MKV, AVI, MOV) and instantly extract a high-quality audio track. Choose from MP3, WAV, FLAC, or M4A output formats.</p>
+                </div>
+                <div class="tool-features">
+                    <span class="tool-feature-pill">320kbps MP3</span>
+                    <span class="tool-feature-pill">Lossless FLAC</span>
+                    <span class="tool-feature-pill">WAV / M4A</span>
+                    <span class="tool-feature-pill">Drag & Drop</span>
+                </div>
+                <div class="tool-cta">
+                    <span>Convert Now</span>
+                    <span class="cta-arrow">→</span>
+                </div>
+            </a>
+
+            <!-- Tool 3: Audio Trimmer -->
+            <a href="trimmer.html" class="tool-card trimmer-tool">
+                <div class="tool-icon-wrapper">✂️</div>
+                <div>
+                    <h2 class="tool-title">Audio Trimmer</h2>
+                    <p class="tool-desc">Upload any audio file and trim it to the perfect length. Ideal for creating custom ringtones, notification sounds, and podcast clips in high-quality MP3.</p>
+                </div>
+                <div class="tool-features">
+                    <span class="tool-feature-pill">Ringtone Creator</span>
+                    <span class="tool-feature-pill">Precise Trim</span>
+                    <span class="tool-feature-pill">MP3 Export</span>
+                    <span class="tool-feature-pill">MP3/WAV/M4A</span>
+                </div>
+                <div class="tool-cta">
+                    <span>Trim Audio</span>
+                    <span class="cta-arrow">→</span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-num">11+</div>
+                <div class="stat-lbl">PLATFORMS</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">4K</div>
+                <div class="stat-lbl">MAX QUALITY</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">320</div>
+                <div class="stat-lbl">KBPS AUDIO</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">Free</div>
+                <div class="stat-lbl">FOREVER</div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="hiw-section">
+            <div style="text-align: center;">
+                <h2 class="section-title">How Downloadyfy<span>.AI</span> Works</h2>
+                <p class="section-subtitle">Follow these simple steps to download, extract, and manage your media.</p>
+            </div>
+            <div class="hiw-grid">
+                <div class="hiw-card">
+                    <div class="hiw-icon">🔗</div>
+                    <div class="hiw-num">1</div>
+                    <h4>Choose Your Tool</h4>
+                    <p>Select the right tool from the cards above — Link Downloader for URLs, Converter for local videos, or Trimmer for audio clips.</p>
+                </div>
+                <div class="hiw-card">
+                    <div class="hiw-icon">📋</div>
+                    <div class="hiw-num">2</div>
+                    <h4>Paste Link or Upload File</h4>
+                    <p>For downloads, copy any public URL and paste it. For local tools, drag-and-drop your video or audio file directly onto the page.</p>
+                </div>
+                <div class="hiw-card">
+                    <div class="hiw-icon">⚙️</div>
+                    <div class="hiw-num">3</div>
+                    <h4>Select Format & Quality</h4>
+                    <p>Our AI engine auto-detects available formats. Pick from video resolutions up to 4K or audio quality up to 320kbps Lossless FLAC.</p>
+                </div>
+                <div class="hiw-card">
+                    <div class="hiw-icon">⬇️</div>
+                    <div class="hiw-num">4</div>
+                    <h4>Download to Device</h4>
+                    <p>Click Download and the file saves directly to your browser's downloads folder. No accounts, no subscriptions. Free forever.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Section -->
+        <section class="demo-section" id="demoSection" style="margin-top: 3rem;">
             <h2 class="section-title">Experience the Premium Speed</h2>
             <p class="section-subtitle">A high-fidelity universal media downloader with cover art mapping and zero configuration.</p>
             
@@ -92,301 +451,49 @@
             </div>
         </section>
 
-        <!-- Analysis Loader (Animated state) -->
-        <section class="loader-section hidden" id="analysisLoader">
-            <div class="glass-card loading-card">
-                <div class="scanner-container">
-                    <div class="orbit-spinner">
-                        <div class="orbit"></div>
-                        <div class="orbit"></div>
-                        <div class="orbit"></div>
-                        <div class="center-glow">AI</div>
+        <!-- Partners Section -->
+        <section class="partners-section reveal" id="partnersSection">
+            <h2 class="section-title">Creative & Educational Partners</h2>
+            <p class="section-subtitle">Empower your study and design projects with high-quality, royalty-free content from our network.</p>
+            
+            <div class="partners-grid">
+                <a href="https://unsplash.com" target="_blank" class="partner-card">
+                    <div class="partner-icon">🖼️</div>
+                    <div class="partner-info">
+                        <h3>Unsplash</h3>
+                        <p>Beautiful, free educational and creative images that you can use for online courses and tutorials.</p>
+                        <span class="partner-tag">Affiliate Partner</span>
                     </div>
-                    <div class="scanner-bar"></div>
-                </div>
-                <div class="loading-status">
-                    <h3 class="status-heading">AI Engine Analyzing Link</h3>
-                    <div class="status-steps">
-                        <div class="step" id="step1">
-                            <span class="dot"></span>
-                            <span class="step-text">Parsing URL metadata...</span>
-                        </div>
-                        <div class="step" id="step2">
-                            <span class="dot"></span>
-                            <span class="step-text">Connecting to streaming servers...</span>
-                        </div>
-                        <div class="step" id="step3">
-                            <span class="dot"></span>
-                            <span class="step-text">Extracting video and audio formats...</span>
-                        </div>
+                </a>
+                
+                <a href="https://pixabay.com" target="_blank" class="partner-card">
+                    <div class="partner-icon">🎥</div>
+                    <div class="partner-info">
+                        <h3>Pixabay Stock</h3>
+                        <p>Stunning royalty-free video clips, stock sound tracks, and animations for educational projects.</p>
+                        <span class="partner-tag">Affiliate Partner</span>
                     </div>
-                </div>
+                </a>
+                
+                <a href="https://freesound.org" target="_blank" class="partner-card">
+                    <div class="partner-icon">🔊</div>
+                    <div class="partner-info">
+                        <h3>Freesound</h3>
+                        <p>A collaborative repository of creative-commons audio clips and sound effects for creators.</p>
+                        <span class="partner-tag">Affiliate Partner</span>
+                    </div>
+                </a>
+                
+                <a href="https://www.pexels.com" target="_blank" class="partner-card">
+                    <div class="partner-icon">🎬</div>
+                    <div class="partner-info">
+                        <h3>Pexels Media</h3>
+                        <p>Premium quality free video loops and stock photography. Highly recommended for creative edits.</p>
+                        <span class="partner-tag">Affiliate Partner</span>
+                    </div>
+                </a>
             </div>
         </section>
-
-        <section class="result-section hidden" id="resultCard">
-            <div class="glass-card">
-                <div class="media-preview">
-                    <div class="img-wrapper">
-                        <img id="mediaThumbnail" src="" alt="Video Thumbnail">
-                        <span class="duration-badge" id="mediaDuration">00:00</span>
-                    </div>
-                    <div class="media-info">
-                        <h2 id="mediaTitle">Video Title Loading...</h2>
-                        <p id="mediaAuthor">Channel Name</p>
-                    </div>
-                </div>
-
-                <div class="download-options">
-                    <h3>Select Quality / Format</h3>
-                    
-                    <div class="format-grid">
-                        <div class="format-column">
-                            <h4>🎬 Video</h4>
-                            <div class="btn-group" id="videoFormats">
-                                <!-- Dynamically populated -->
-                            </div>
-                        </div>
-                        <div class="format-column">
-                            <h4>🎵 Audio</h4>
-                            <div class="btn-group" id="audioFormats">
-                                <!-- Dynamically populated -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="status-box hidden" id="downloadStatus">
-                        <canvas id="downloadCanvas" class="download-canvas"></canvas>
-                        <div class="download-animation-container">
-                            <!-- Video Animation Wrapper -->
-                            <div class="video-anim-wrapper">
-                                <div class="video-shutter">
-                                    <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
-                                    <div class="pulse-ring"></div>
-                                    <div class="pulse-ring delay-1"></div>
-                                </div>
-                                <div class="film-reel-container">
-                                    <div class="reel-dot"></div>
-                                    <div class="reel-dot"></div>
-                                    <div class="reel-dot"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Audio Animation Wrapper -->
-                            <div class="audio-anim-wrapper">
-                                <div class="vinyl-disc">
-                                    <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                                    <div class="pulse-ring"></div>
-                                    <div class="pulse-ring delay-1"></div>
-                                </div>
-                                <div class="download-waves">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill"></div>
-                        </div>
-                        <div class="terminal-log-wrapper">
-                            <span class="terminal-prompt">></span> <span id="statusText">Starting download...</span>
-                        </div>
-                        <div class="download-stats-grid">
-                            <div class="stat-card">
-                                <span class="stat-label">SPEED</span>
-                                <span class="stat-value" id="downloadSpeed">0.0 MB/s</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-label">PROCESSED</span>
-                                <span class="stat-value" id="downloadProcessed">0.0 MB</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-label">TIME LEFT</span>
-                                <span class="stat-value" id="downloadETA">--s</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Instagram Downloader Result Card -->
-        <section class="instagram-section hidden" id="instagramCard">
-            <div class="glass-card instagram-glass-card">
-                <!-- Instagram Post Header -->
-                <div class="instagram-post-header">
-                    <div class="instagram-avatar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ig-avatar-icon"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle></svg>
-                    </div>
-                    <div class="instagram-meta">
-                        <h3 id="igUploader">instagram_user</h3>
-                        <p id="igTitle">Instagram Media Downloader</p>
-                    </div>
-                    <!-- Stats badge metrics -->
-                    <div class="instagram-stats-badge">
-                        <span class="ig-stat-pill"><span class="stat-icon">❤️</span> <span id="igLikesVal">0</span></span>
-                        <span class="ig-stat-pill"><span class="stat-icon">💬</span> <span id="igCommentsVal">0</span></span>
-                        <span class="ig-stat-pill"><span class="stat-icon">✈️</span> <span id="igSharesVal">0</span></span>
-                    </div>
-                    <!-- Brand Instagram SVG Logo -->
-                    <div class="instagram-brand-logo-wrapper">
-                        <svg class="ig-brand-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </div>
-                </div>
-
-                <div class="ig-divider"></div>
-
-                <!-- Instagram Main Image/Video Preview -->
-                <div class="instagram-media-preview" id="igPreviewContainer">
-                    <img id="igMainPreview" src="" alt="Instagram Preview">
-                    <span class="media-type-badge" id="igMediaTypeBadge">Reel</span>
-                </div>
-
-                <div class="ig-divider"></div>
-
-                <!-- Download Options / Items Grid -->
-                <div class="instagram-download-options">
-                    <h3 class="ig-options-title">Available Media Downloads</h3>
-                    
-                    <!-- Single video / Reel / Image options -->
-                    <div class="ig-single-options" id="igSingleOptions">
-                        <div class="ig-download-grid">
-                            <div class="ig-download-item" id="igVideoItem">
-                                <span class="ig-item-label">🎬 High Resolution Video (MP4)</span>
-                                <button class="glow-button ig-btn" id="igVideoBtn">Download Video</button>
-                            </div>
-                            <div class="ig-download-item" id="igImageItem">
-                                <span class="ig-item-label">🖼️ High Resolution Image (JPG)</span>
-                                <button class="glow-button ig-btn" id="igImageBtn">Download Image</button>
-                            </div>
-                            <div class="ig-download-item" id="igAudioItem">
-                                <span class="ig-item-label">🎵 Extract Audio Track (MP3)</span>
-                                <button class="glow-button ig-btn" id="igAudioBtn">Download Audio</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Carousel items (multi-image/video post) -->
-                    <div class="ig-carousel-options hidden" id="igCarouselOptions">
-                        <div class="ig-carousel-grid" id="igCarouselGrid">
-                            <!-- Dynamically populated carousel items -->
-                        </div>
-                    </div>
-
-                    <!-- Instagram Download Status Box -->
-                    <div class="status-box hidden" id="igDownloadStatus">
-                        <canvas id="igDownloadCanvas" class="download-canvas"></canvas>
-                        <div class="download-animation-container">
-                            <div class="video-anim-wrapper">
-                                <div class="video-shutter">
-                                    <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
-                                    <div class="pulse-ring"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="igProgressFill"></div>
-                        </div>
-                        <div class="terminal-log-wrapper">
-                            <span class="terminal-prompt">></span> <span id="igStatusText">Downloading media...</span>
-                        </div>
-                        <div class="download-stats-grid">
-                            <div class="stat-card">
-                                <span class="stat-label">SPEED</span>
-                                <span class="stat-value" id="igDownloadSpeed">0.0 MB/s</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-label">PROCESSED</span>
-                                <span class="stat-value" id="igDownloadProcessed">0.0 MB</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-label">TIME LEFT</span>
-                                <span class="stat-value" id="igDownloadETA">--s</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="playlist-section hidden" id="playlistCard">
-            <div class="glass-card">
-                <div class="playlist-header">
-                    <h2 id="playlistTitle">Playlist Title Loading...</h2>
-                    <p id="playlistCount">0 videos found</p>
-                    <div class="playlist-actions">
-                        <button class="glow-button small-btn" id="downloadAllBtn">Download All</button>
-                    </div>
-                </div>
-
-                <div class="playlist-items" id="playlistItems">
-                    <!-- Playlist items will be populated here -->
-                </div>
-
-                <div class="status-box hidden" id="playlistStatus">
-                    <canvas id="playlistDownloadCanvas" class="download-canvas"></canvas>
-                    <div class="download-animation-container">
-                        <!-- Video Animation Wrapper -->
-                        <div class="video-anim-wrapper">
-                            <div class="video-shutter">
-                                <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
-                                <div class="pulse-ring"></div>
-                                <div class="pulse-ring delay-1"></div>
-                            </div>
-                            <div class="film-reel-container">
-                                <div class="reel-dot"></div>
-                                <div class="reel-dot"></div>
-                                <div class="reel-dot"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Audio Animation Wrapper -->
-                        <div class="audio-anim-wrapper">
-                            <div class="vinyl-disc">
-                                <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                                <div class="pulse-ring"></div>
-                                <div class="pulse-ring delay-1"></div>
-                            </div>
-                            <div class="download-waves">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="playlistProgressFill"></div>
-                    </div>
-                    <div class="terminal-log-wrapper">
-                        <span class="terminal-prompt">></span> <span id="playlistStatusText">Downloading playlist...</span>
-                    </div>
-                    <div class="download-stats-grid">
-                        <div class="stat-card">
-                            <span class="stat-label">SPEED</span>
-                            <span class="stat-value" id="playlistDownloadSpeed">0.0 MB/s</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-label">PROCESSED</span>
-                            <span class="stat-value" id="playlistDownloadProcessed">0.0 MB</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-label">TIME LEFT</span>
-                            <span class="stat-value" id="playlistDownloadETA">--s</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <div id="errorToast" class="toast hidden">
-            <p id="errorMsg">Something went wrong. Please try again.</p>
-        </div>
     </main>
 
     <footer class="footer">
@@ -394,6 +501,11 @@
             <div class="footer-left">
                 <div class="footer-logo">DOWNLOADYFY<span>.AI</span></div>
                 <p class="footer-copyright">© 2026 DOWNLOADYFY.AI. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#" id="openTermsBtn" class="footer-link">Terms & Conditions</a>
+                    <span class="link-separator">|</span>
+                    <a href="#" id="openPrivacyBtn" class="footer-link">Privacy Policy</a>
+                </div>
             </div>
             <div class="footer-right">
                 <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
@@ -401,6 +513,64 @@
         </div>
     </footer>
 
-    <script src="app.js?v=8"></script>
+    <!-- Terms & Privacy Modal -->
+    <div id="legalModal" class="modal-overlay hidden">
+        <div class="modal-card legal-modal">
+            <button class="modal-close-btn" id="closeLegalModalBtn">&times;</button>
+            <div class="modal-header">
+                <h2 id="legalModalTitle">Terms & Conditions</h2>
+                <p>Downloadyfy.AI Legal and Security Compliance Policies</p>
+            </div>
+            <div class="legal-content-body" id="legalContentBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.querySelector('.sun-icon');
+        const moonIcon = document.querySelector('.moon-icon');
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-theme');
+            const isLight = body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            sunIcon.classList.toggle('hidden', !isLight);
+            moonIcon.classList.toggle('hidden', isLight);
+        });
+
+        // Reveal animations
+        const reveals = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => revealObserver.observe(el));
+
+        // Legal modals
+        const legalModal = document.getElementById('legalModal');
+        const legalModalTitle = document.getElementById('legalModalTitle');
+        const legalContentBody = document.getElementById('legalContentBody');
+        const closeLegalModalBtn = document.getElementById('closeLegalModalBtn');
+        const openTermsBtn = document.getElementById('openTermsBtn');
+        const openPrivacyBtn = document.getElementById('openPrivacyBtn');
+
+        const TERMS_CONTENT = `<h3>1. Acceptance of Terms</h3><p>By using Downloadyfy.AI, you agree to these terms. This platform is for personal and educational use only.</p><h3>2. Legal Use Only</h3><p>You may only download content you own or have explicit permission to download. Downloading copyrighted content is strictly prohibited.</p><h3>3. No Warranty</h3><p>This service is provided as-is. We are not responsible for service interruptions or data loss.</p>`;
+        const PRIVACY_CONTENT = `<h3>Privacy Policy</h3><p>We do not store your download history or personal data. Device fingerprints are stored locally in your browser only. We do not share data with third parties.</p>`;
+
+        if (openTermsBtn) openTermsBtn.addEventListener('click', (e) => { e.preventDefault(); legalModalTitle.textContent = 'Terms & Conditions'; legalContentBody.innerHTML = TERMS_CONTENT; legalModal.classList.remove('hidden'); });
+        if (openPrivacyBtn) openPrivacyBtn.addEventListener('click', (e) => { e.preventDefault(); legalModalTitle.textContent = 'Privacy Policy'; legalContentBody.innerHTML = PRIVACY_CONTENT; legalModal.classList.remove('hidden'); });
+        if (closeLegalModalBtn) closeLegalModalBtn.addEventListener('click', () => legalModal.classList.add('hidden'));
+        window.addEventListener('click', (e) => { if (e.target === legalModal) legalModal.classList.add('hidden'); });
+    </script>
 </body>
 </html>

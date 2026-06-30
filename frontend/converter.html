@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video → Audio Converter — DOWNLOADYFY.AI</title>
+    <meta name="description" content="Convert local MP4, MKV, AVI videos to high-quality MP3, WAV, FLAC audio tracks. Free, no upload limits.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=8">
+    <style>
+        .page-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg);
+            transition: all 0.2s ease;
+        }
+        .page-back-btn:hover {
+            color: #818cf8;
+            border-color: #6366f1;
+            transform: translateX(-2px);
+        }
+
+        .page-header-section {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+        }
+        .page-header-section h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            margin: 0.8rem 0 0.5rem;
+        }
+        .page-header-section p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        .page-icon { font-size: 2.5rem; margin-bottom: 0.3rem; }
+
+        /* Accent overrides for converter theme (purple/indigo) */
+        .converter-page .drag-zone:hover,
+        .converter-page .drag-zone.dragover {
+            border-color: #6366f1;
+            background: rgba(99,102,241,0.06);
+        }
+        .converter-page .browse-link { color: #818cf8; }
+        .converter-page .browse-link:hover { color: #6366f1; }
+
+        /* How it works mini section */
+        .mini-how {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 750px;
+            margin: 0 auto 2rem;
+        }
+        .mini-step {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 0.75rem 1.2rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .mini-step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Allowance badge */
+        .allowance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: rgba(99,102,241,0.12);
+            border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #818cf8;
+        }
+
+        .format-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-bottom: 1.2rem;
+        }
+        .format-pill-btn {
+            padding: 0.5rem 1.1rem;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 2px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .format-pill-btn:hover,
+        .format-pill-btn.active {
+            border-color: #6366f1;
+            color: #818cf8;
+            background: rgba(99,102,241,0.1);
+        }
+
+        .converter-main-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 28px;
+            padding: 2.5rem;
+            max-width: 680px;
+            margin: 0 auto 3rem;
+        }
+
+        .converter-main-card .drag-zone {
+            border: 2px dashed rgba(99,102,241,0.4);
+            background: rgba(99,102,241,0.03);
+            border-radius: 18px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-bottom: 1.5rem;
+        }
+        .converter-main-card .drag-zone:hover,
+        .converter-main-card .drag-zone.dragover {
+            border-color: #6366f1;
+            background: rgba(99,102,241,0.08);
+            transform: scale(1.01);
+        }
+        .converter-main-card .drag-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .converter-main-card .drag-text { font-size: 0.95rem; color: var(--text-muted); margin: 0; }
+        .converter-main-card .browse-link { color: #818cf8; text-decoration: underline; cursor: pointer; }
+
+        .converter-controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .converter-controls-row label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .quality-select-styled {
+            background: var(--card-bg);
+            border: 2px solid rgba(99,102,241,0.3);
+            padding: 0.55rem 1rem;
+            border-radius: 12px;
+            color: var(--text-main);
+            cursor: pointer;
+            outline: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: border-color 0.2s ease;
+        }
+        .quality-select-styled:focus { border-color: #6366f1; }
+
+        .convert-submit-btn {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 160px;
+            justify-content: center;
+        }
+        .convert-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+        }
+        .convert-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .selected-file-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99,102,241,0.12);
+            border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 12px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.82rem;
+            color: #818cf8;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="converter-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DOWNLOADYFY<span>.AI</span></div>
+            <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+                <div id="downloadAllowanceBadge" class="allowance-badge" title="Device allowance status">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #818cf8; display: inline-block; box-shadow: 0 0 8px #818cf8;"></span>
+                    <span id="allowanceBadgeText">Slots: 1/1</span>
+                </div>
+                <a href="index.html" class="page-back-btn">← Home</a>
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="background-elements">
+        <div class="blob blob-1" style="background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);"></div>
+        <div class="blob blob-2" style="background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);"></div>
+    </div>
+
+    <main class="container">
+        <header class="page-header-section">
+            <div class="page-icon">⚡</div>
+            <h1 style="background: linear-gradient(135deg, #818cf8, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Video → Audio Converter</h1>
+            <p>Extract high-quality audio tracks from any local video file</p>
+        </header>
+
+        <!-- Mini How-to steps -->
+        <div class="mini-how">
+            <div class="mini-step"><div class="mini-step-num">1</div>Drop or browse a video file</div>
+            <div class="mini-step"><div class="mini-step-num">2</div>Choose output format</div>
+            <div class="mini-step"><div class="mini-step-num">3</div>Click Extract & download</div>
+        </div>
+
+        <!-- Main converter card -->
+        <div class="converter-main-card">
+
+            <form id="convertForm">
+                <!-- Drag Zone -->
+                <div class="drag-zone" id="dragZone">
+                    <div class="drag-icon">📁</div>
+                    <p class="drag-text">Drag & Drop video here or <span class="browse-link">Browse files</span></p>
+                    <p class="drag-text" style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">Supports: MP4, MKV, AVI, MOV, WebM, FLV</p>
+                    <input type="file" id="videoFileInput" accept="video/*" style="display: none;" required>
+                </div>
+
+                <!-- Selected file chip -->
+                <div class="selected-file-chip hidden" id="selectedFileInfo">
+                    <span>📄</span>
+                    <span class="file-name" id="selectedFileName">video.mp4</span>
+                    <span style="color: var(--text-muted);">·</span>
+                    <span class="file-size" id="selectedFileSize">0 MB</span>
+                </div>
+
+                <!-- Controls -->
+                <div class="converter-controls-row">
+                    <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+                        <label for="audioFormatSelect">Output Format:</label>
+                        <select id="audioFormatSelect" class="quality-select-styled">
+                            <option value="mp3">🎵 320kbps MP3 (HQ)</option>
+                            <option value="wav">🎛️ Uncompressed WAV (Lossless)</option>
+                            <option value="flac">💎 Lossless FLAC (Super HQ)</option>
+                            <option value="m4a">🍎 320kbps M4A/AAC (Best)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="convert-submit-btn" id="convertBtn" disabled>
+                        <span class="convert-btn-text">⚡ Extract Audio</span>
+                        <div class="loader-spinner hidden" id="convertLoader" style="width: 16px; height: 16px; border-color: rgba(255,255,255,0.2); border-top-color: #fff;"></div>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Status Box -->
+            <div class="status-box hidden" id="convertStatus" style="margin-top: 1.5rem;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="convertProgressFill" style="width: 0%; background: linear-gradient(90deg, #6366f1, #818cf8);"></div>
+                </div>
+                <div class="terminal-log-wrapper" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    <span class="terminal-prompt">></span> <span id="convertStatusText">Uploading file to server...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format Info Cards -->
+        <div style="max-width: 680px; margin: 0 auto 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🎵</div>
+                <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-main);">MP3</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">320kbps · Best Compatibility</div>
+            </div>
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🎛️</div>
+                <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-main);">WAV</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Lossless · Studio Quality</div>
+            </div>
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">💎</div>
+                <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-main);">FLAC</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Lossless Compressed</div>
+            </div>
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🍎</div>
+                <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-main);">M4A</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">AAC · Apple Optimized</div>
+            </div>
+        </div>
+
+        <div id="errorToast" class="toast hidden">
+            <p id="errorMsg">Something went wrong. Please try again.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo">DOWNLOADYFY<span>.AI</span></div>
+                <p class="footer-copyright">© 2026 DOWNLOADYFY.AI. All rights reserved.</p>
+            </div>
+            <div class="footer-right">
+                <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Ad Countdown Modal -->
+    <div id="adModal" class="modal-overlay hidden">
+        <div class="modal-card ad-viewer-modal" style="max-width: 500px; text-align: center; gap: 1.5rem; background: #1e1e1e;">
+            <button class="modal-close-btn" id="closeAdModalBtn" disabled style="opacity: 0.3; cursor: not-allowed;">&times;</button>
+            <div class="modal-header">
+                <h2>Support Downloadyfy<span>.AI</span></h2>
+                <p>Watching this ad unlocks <strong>1 free conversion slot</strong>!</p>
+            </div>
+            <div class="ad-player-box" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="ad-animation" style="position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #1e1b4b 0%, #030712 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
+                    <div class="spinner" style="width: 44px; height: 44px; border: 3px solid rgba(99,102,241,0.15); border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+                    <p style="font-weight: 700; color: #ffffff; margin: 0; font-size: 1.1rem;">Grammarly Pro for Students 📝</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Write documents, check homework, 10x faster!</p>
+                </div>
+                <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; color: #ffffff; z-index: 2;">
+                    Ad ends in: <span id="adTimerVal" style="color: #818cf8;">5</span>s
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <button class="convert-submit-btn" id="adUpgradeBtn" style="width: 100%; border-radius: 12px;">Support Free Conversions</button>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Or wait for the countdown to unlock your free slot.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="converter.js?v=2"></script>
+</body>
+</html>

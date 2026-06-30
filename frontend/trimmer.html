@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Trimmer & Ringtone Creator — DOWNLOADYFY.AI</title>
+    <meta name="description" content="Trim MP3, WAV, M4A audio files to create perfect ringtones and clips. Free, browser-based audio trimmer.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=8">
+    <style>
+        .page-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg);
+            transition: all 0.2s ease;
+        }
+        .page-back-btn:hover {
+            color: #34d399;
+            border-color: #10b981;
+            transform: translateX(-2px);
+        }
+
+        .page-header-section {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+        }
+        .page-header-section h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            margin: 0.8rem 0 0.5rem;
+        }
+        .page-header-section p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        .page-icon { font-size: 2.5rem; margin-bottom: 0.3rem; }
+
+        /* Mini steps */
+        .mini-how {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 750px;
+            margin: 0 auto 2rem;
+        }
+        .mini-step {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 0.75rem 1.2rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .mini-step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Allowance badge */
+        .allowance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.3);
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #34d399;
+        }
+
+        /* Trimmer card */
+        .trimmer-main-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 28px;
+            padding: 2.5rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .trimmer-main-card .drag-zone {
+            border: 2px dashed rgba(16,185,129,0.4);
+            background: rgba(16,185,129,0.03);
+            border-radius: 18px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-bottom: 1.5rem;
+        }
+        .trimmer-main-card .drag-zone:hover,
+        .trimmer-main-card .drag-zone.dragover {
+            border-color: #10b981;
+            background: rgba(16,185,129,0.08);
+            transform: scale(1.01);
+        }
+        .trimmer-main-card .drag-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .trimmer-main-card .drag-text { font-size: 0.95rem; color: var(--text-muted); margin: 0; }
+        .trimmer-main-card .browse-link { color: #34d399; text-decoration: underline; cursor: pointer; }
+
+        .selected-file-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.3);
+            border-radius: 12px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.82rem;
+            color: #34d399;
+            margin-bottom: 1.2rem;
+        }
+
+        /* Time range control */
+        .trim-range-section {
+            background: rgba(16,185,129,0.05);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .trim-range-section h4 {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0 0 1rem;
+        }
+        .trim-inputs-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .trim-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .trim-field label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .trim-field input {
+            background: var(--card-bg);
+            border: 2px solid rgba(16,185,129,0.3);
+            padding: 0.6rem 0.9rem;
+            border-radius: 10px;
+            color: var(--text-main);
+            width: 100px;
+            outline: none;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: border-color 0.2s ease;
+        }
+        .trim-field input:focus { border-color: #10b981; }
+        .duration-preview {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .duration-preview strong { color: #34d399; }
+
+        /* Submit button */
+        .trim-submit-btn {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 160px;
+            justify-content: center;
+            width: 100%;
+        }
+        .trim-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.4);
+        }
+        .trim-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Ringtone presets */
+        .preset-chips {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .preset-chip {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.2);
+            color: #34d399;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .preset-chip:hover {
+            background: rgba(16,185,129,0.2);
+            border-color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DOWNLOADYFY<span>.AI</span></div>
+            <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+                <div id="downloadAllowanceBadge" class="allowance-badge" title="Device allowance status">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #34d399; display: inline-block; box-shadow: 0 0 8px #10b981;"></span>
+                    <span id="allowanceBadgeText">Slots: 1/1</span>
+                </div>
+                <a href="index.html" class="page-back-btn">← Home</a>
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="background-elements">
+        <div class="blob blob-1" style="background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%);"></div>
+        <div class="blob blob-2" style="background: radial-gradient(circle, rgba(5,150,105,0.15) 0%, transparent 70%);"></div>
+    </div>
+
+    <main class="container">
+        <header class="page-header-section">
+            <div class="page-icon">✂️</div>
+            <h1 style="background: linear-gradient(135deg, #34d399, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Audio Trimmer & Ringtone Creator</h1>
+            <p>Trim any audio file to the perfect length — ideal for ringtones, clips, and podcast snippets</p>
+        </header>
+
+        <!-- Mini How-to steps -->
+        <div class="mini-how">
+            <div class="mini-step"><div class="mini-step-num">1</div>Upload audio file</div>
+            <div class="mini-step"><div class="mini-step-num">2</div>Set start & end time</div>
+            <div class="mini-step"><div class="mini-step-num">3</div>Trim & download MP3</div>
+        </div>
+
+        <!-- Main Trimmer Card -->
+        <div class="trimmer-main-card">
+            <form id="trimForm">
+                <!-- Drag Zone -->
+                <div class="drag-zone" id="audioDragZone">
+                    <div class="drag-icon">🎵</div>
+                    <p class="drag-text">Drag & Drop audio here or <span class="browse-link">Browse files</span></p>
+                    <p class="drag-text" style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">Supports: MP3, WAV, M4A, FLAC, OGG, AAC</p>
+                    <input type="file" id="audioFileInput" accept="audio/*" style="display: none;" required>
+                </div>
+
+                <!-- Selected file chip -->
+                <div class="selected-file-chip hidden" id="trimFileInfo">
+                    <span>🎶</span>
+                    <span class="file-name" id="trimFileName">audio.mp3</span>
+                    <span style="color: var(--text-muted);">·</span>
+                    <span class="file-size" id="trimFileSize">0 MB</span>
+                </div>
+
+                <!-- Trim Range -->
+                <div class="trim-range-section">
+                    <h4>✂️ Set Trim Range</h4>
+
+                    <!-- Preset chips -->
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase;">Quick Presets</div>
+                        <div class="preset-chips">
+                            <div class="preset-chip" onclick="applyPreset(0, 30)">📱 30s Ringtone</div>
+                            <div class="preset-chip" onclick="applyPreset(0, 15)">🔔 15s Alert</div>
+                            <div class="preset-chip" onclick="applyPreset(0, 60)">⏱️ 1 min Clip</div>
+                            <div class="preset-chip" onclick="applyPreset(0, 20)">🎹 20s Notif.</div>
+                        </div>
+                    </div>
+
+                    <div class="trim-inputs-row">
+                        <div class="trim-field">
+                            <label for="trimStartInput">Start (seconds)</label>
+                            <input type="number" id="trimStartInput" min="0" step="0.1" value="0.0">
+                        </div>
+                        <div class="trim-field">
+                            <label for="trimEndInput">End (seconds)</label>
+                            <input type="number" id="trimEndInput" min="0.1" step="0.1" value="30.0">
+                        </div>
+                    </div>
+
+                    <div class="duration-preview">
+                        Duration: <strong id="trimDurationPreview">30.0s</strong>
+                    </div>
+                </div>
+
+                <button type="submit" class="trim-submit-btn" id="trimBtn" disabled>
+                    <span class="trim-btn-text">✂️ Trim & Export MP3</span>
+                    <div class="loader-spinner hidden" id="trimLoader" style="width: 16px; height: 16px; border-color: rgba(255,255,255,0.2); border-top-color: #fff;"></div>
+                </button>
+            </form>
+
+            <!-- Status Box -->
+            <div class="status-box hidden" id="trimStatus" style="margin-top: 1.5rem;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="trimProgressFill" style="width: 0%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                </div>
+                <div class="terminal-log-wrapper" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    <span class="terminal-prompt">></span> <span id="trimStatusText">Uploading audio file...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Case Cards -->
+        <div style="max-width: 700px; margin: 0 auto 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">📱</div>
+                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Ringtones</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Cut perfect 30s clips</div>
+            </div>
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🔔</div>
+                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Notifications</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Short alert sounds</div>
+            </div>
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🎙️</div>
+                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Podcast Clips</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Highlight segments</div>
+            </div>
+            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🎵</div>
+                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Music Clips</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Best drops & choruses</div>
+            </div>
+        </div>
+
+        <div id="errorToast" class="toast hidden">
+            <p id="errorMsg">Something went wrong. Please try again.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo">DOWNLOADYFY<span>.AI</span></div>
+                <p class="footer-copyright">© 2026 DOWNLOADYFY.AI. All rights reserved.</p>
+            </div>
+            <div class="footer-right">
+                <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Ad Countdown Modal -->
+    <div id="adModal" class="modal-overlay hidden">
+        <div class="modal-card ad-viewer-modal" style="max-width: 500px; text-align: center; gap: 1.5rem; background: #1e1e1e;">
+            <button class="modal-close-btn" id="closeAdModalBtn" disabled style="opacity: 0.3; cursor: not-allowed;">&times;</button>
+            <div class="modal-header">
+                <h2>Support Downloadyfy<span>.AI</span></h2>
+                <p>Watching this ad unlocks <strong>1 free trim slot</strong>!</p>
+            </div>
+            <div class="ad-player-box" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="ad-animation" style="position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #064e3b 0%, #030712 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
+                    <div class="spinner" style="width: 44px; height: 44px; border: 3px solid rgba(16,185,129,0.15); border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+                    <p style="font-weight: 700; color: #ffffff; margin: 0; font-size: 1.1rem;">Grammarly Pro for Students 📝</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Write documents, check homework, 10x faster!</p>
+                </div>
+                <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; color: #ffffff; z-index: 2;">
+                    Ad ends in: <span id="adTimerVal" style="color: #34d399;">5</span>s
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <button class="trim-submit-btn" id="adUpgradeBtn">Support Free Trims</button>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Or wait for the countdown to unlock your free slot.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function applyPreset(start, end) {
+            document.getElementById('trimStartInput').value = start;
+            document.getElementById('trimEndInput').value = end;
+            updateDurationPreview();
+        }
+
+        function updateDurationPreview() {
+            const start = parseFloat(document.getElementById('trimStartInput').value) || 0;
+            const end = parseFloat(document.getElementById('trimEndInput').value) || 30;
+            const dur = Math.max(0, end - start).toFixed(1);
+            const el = document.getElementById('trimDurationPreview');
+            if (el) el.textContent = `${dur}s`;
+        }
+
+        document.getElementById('trimStartInput').addEventListener('input', updateDurationPreview);
+        document.getElementById('trimEndInput').addEventListener('input', updateDurationPreview);
+    </script>
+    <script src="trimmer.js?v=2"></script>
+</body>
+</html>
