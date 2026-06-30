@@ -4,258 +4,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DOWNLOADYFY.AI - Universal Media Downloader & Converter</title>
-    <meta name="description" content="Download YouTube 4K, Instagram Reels, Spotify playlists, convert video to audio, and trim ringtones — all in one AI-powered tool.">
+    <meta name="description" content="Download YouTube 8K videos, MP3, Instagram Reels, Spotify playlists. Convert video to audio. Trim ringtones. Free forever.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=8">
+    <link rel="stylesheet" href="styles.css?v=9">
     <style>
-        /* ===== HOME PAGE SPECIFIC STYLES ===== */
-        .home-hero {
-            text-align: center;
-            padding: 5rem 1rem 3rem;
-        }
-        .home-hero .hero-title {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            margin-bottom: 1.2rem;
-        }
-        .home-hero .hero-subtitle {
-            font-size: 1.15rem;
-            max-width: 640px;
-            margin: 0 auto 2.5rem;
-        }
-
-        /* Tool Selection Cards */
+        /* ===== TOOL CARDS ===== */
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.8rem;
-            max-width: 1100px;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 1.2rem;
+            max-width: 1040px;
             margin: 0 auto;
-            padding: 0 1.5rem 4rem;
+            padding: 0 1.2rem 2rem;
         }
 
         .tool-card {
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 2.2rem 2rem;
+            border-radius: 20px;
+            padding: 1.8rem 1.6rem;
             cursor: pointer;
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        box-shadow 0.3s ease,
-                        border-color 0.3s ease;
+            gap: 0.75rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
             position: relative;
             overflow: hidden;
         }
-
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 24px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
         .tool-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
         }
+        .tool-card.downloader-tool { border-color: rgba(255,95,0,0.25); }
+        .tool-card.converter-tool  { border-color: rgba(99,102,241,0.25); }
+        .tool-card.trimmer-tool    { border-color: rgba(16,185,129,0.25); }
 
-        .tool-card.downloader-tool::before { background: radial-gradient(ellipse at top left, rgba(255, 95, 0, 0.12), transparent 70%); }
-        .tool-card.converter-tool::before { background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.12), transparent 70%); }
-        .tool-card.trimmer-tool::before { background: radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.12), transparent 70%); }
+        .tool-card.downloader-tool:hover { border-color: rgba(255,95,0,0.6); box-shadow: 0 16px 40px rgba(255,95,0,0.1); }
+        .tool-card.converter-tool:hover  { border-color: rgba(99,102,241,0.6); box-shadow: 0 16px 40px rgba(99,102,241,0.1); }
+        .tool-card.trimmer-tool:hover    { border-color: rgba(16,185,129,0.6); box-shadow: 0 16px 40px rgba(16,185,129,0.1); }
 
-        .tool-card:hover::before { opacity: 1; }
-
-        .tool-card.downloader-tool { border-color: rgba(255, 95, 0, 0.3); }
-        .tool-card.converter-tool { border-color: rgba(99, 102, 241, 0.3); }
-        .tool-card.trimmer-tool { border-color: rgba(16, 185, 129, 0.3); }
-
-        .tool-card.downloader-tool:hover { border-color: var(--accent-orange); box-shadow: 0 20px 60px rgba(255,95,0,0.15); }
-        .tool-card.converter-tool:hover { border-color: #6366f1; box-shadow: 0 20px 60px rgba(99,102,241,0.15); }
-        .tool-card.trimmer-tool:hover { border-color: #10b981; box-shadow: 0 20px 60px rgba(16,185,129,0.15); }
+        .tool-top {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
 
         .tool-icon-wrapper {
-            width: 64px;
-            height: 64px;
-            border-radius: 18px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 0.2rem;
-            transition: transform 0.3s ease;
+            font-size: 1.5rem;
+            flex-shrink: 0;
         }
-
-        .tool-card:hover .tool-icon-wrapper { transform: scale(1.1) rotate(-3deg); }
-
-        .tool-card.downloader-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(255,95,0,0.2), rgba(255,140,0,0.1)); border: 1px solid rgba(255,95,0,0.3); }
-        .tool-card.converter-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.1)); border: 1px solid rgba(99,102,241,0.3); }
-        .tool-card.trimmer-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.1)); border: 1px solid rgba(16,185,129,0.3); }
+        .downloader-tool .tool-icon-wrapper { background: rgba(255,95,0,0.12); border: 1px solid rgba(255,95,0,0.2); }
+        .converter-tool  .tool-icon-wrapper { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2); }
+        .trimmer-tool    .tool-icon-wrapper { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2); }
 
         .tool-title {
-            font-size: 1.4rem;
+            font-size: 1.15rem;
             font-weight: 800;
             color: var(--text-main);
             margin: 0;
+            line-height: 1.2;
+        }
+        .tool-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 2px 0 0;
+            font-weight: 500;
         }
 
         .tool-desc {
-            font-size: 0.92rem;
+            font-size: 0.875rem;
             color: var(--text-muted);
-            line-height: 1.6;
+            line-height: 1.55;
             margin: 0;
-            flex: 1;
         }
 
-        .tool-features {
+        .tool-pills {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.4rem;
+            gap: 0.4rem;
         }
-
-        .tool-feature-pill {
-            font-size: 0.72rem;
+        .tool-pill {
+            font-size: 0.68rem;
             font-weight: 700;
-            padding: 3px 10px;
+            padding: 3px 9px;
             border-radius: 20px;
             letter-spacing: 0.02em;
         }
-
-        .tool-card.downloader-tool .tool-feature-pill { background: rgba(255,95,0,0.15); color: var(--accent-orange); border: 1px solid rgba(255,95,0,0.2); }
-        .tool-card.converter-tool .tool-feature-pill { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
-        .tool-card.trimmer-tool .tool-feature-pill { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+        .downloader-tool .tool-pill { background: rgba(255,95,0,0.12); color: var(--accent-orange); border: 1px solid rgba(255,95,0,0.18); }
+        .converter-tool  .tool-pill { background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.18); }
+        .trimmer-tool    .tool-pill { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.18); }
 
         .tool-cta {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.45rem;
             font-weight: 700;
-            font-size: 0.92rem;
-            margin-top: 0.5rem;
-            transition: gap 0.2s ease;
+            font-size: 0.85rem;
+            margin-top: auto;
+            padding-top: 0.2rem;
         }
+        .downloader-tool .tool-cta { color: var(--accent-orange); }
+        .converter-tool  .tool-cta { color: #818cf8; }
+        .trimmer-tool    .tool-cta { color: #34d399; }
+        .cta-arrow { transition: transform 0.2s ease; display: inline-block; }
+        .tool-card:hover .cta-arrow { transform: translateX(5px); }
 
-        .tool-card:hover .tool-cta { gap: 0.9rem; }
-
-        .tool-card.downloader-tool .tool-cta { color: var(--accent-orange); }
-        .tool-card.converter-tool .tool-cta { color: #818cf8; }
-        .tool-card.trimmer-tool .tool-cta { color: #34d399; }
-
-        .cta-arrow {
-            font-size: 1.1rem;
-            transition: transform 0.2s ease;
-        }
-
-        .tool-card:hover .cta-arrow { transform: translateX(4px); }
-
-        /* Stats bar */
-        .stats-bar {
+        /* ===== STATS ROW ===== */
+        .stats-row {
             display: flex;
             justify-content: center;
-            gap: 3rem;
-            padding: 2rem 1rem;
-            flex-wrap: wrap;
-            border-top: 1px solid var(--glass-border);
-            margin: 0 auto;
-            max-width: 900px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-num {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-orange), #ff9500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-lbl {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            letter-spacing: 0.05em;
-        }
-
-        /* Platforms section */
-        .platforms-strip {
-            text-align: center;
-            padding: 2rem 1rem 3rem;
-        }
-
-        .platforms-strip h3 {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 1.2rem;
-        }
-
-        /* How it works */
-        .hiw-section {
-            background: var(--card-bg);
+            gap: 0;
+            max-width: 600px;
+            margin: 0.5rem auto 0;
+            padding: 1.2rem 1rem;
             border-top: 1px solid var(--glass-border);
             border-bottom: 1px solid var(--glass-border);
-            padding: 4rem 1.5rem;
-            margin: 2rem 0;
+        }
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            border-right: 1px solid var(--glass-border);
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent-orange);
+            line-height: 1;
+        }
+        .stat-lbl {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-top: 2px;
         }
 
+        /* ===== HOW IT WORKS ===== */
+        .hiw-section {
+            max-width: 1040px;
+            margin: 2rem auto 0;
+            padding: 0 1.2rem 1.5rem;
+        }
+        .hiw-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0 0 1.2rem;
+        }
+        .hiw-title span { color: var(--accent-orange); }
         .hiw-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2rem;
-            max-width: 1000px;
-            margin: 2rem auto 0;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
         }
-
         .hiw-card {
-            text-align: center;
-            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.2rem;
         }
-
+        .hiw-step {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
         .hiw-num {
-            width: 44px;
-            height: 44px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-orange), #ff9500);
+            background: var(--accent-orange);
             color: white;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
+            flex-shrink: 0;
         }
-
         .hiw-card h4 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: var(--text-main);
-            margin: 0 0 0.5rem;
-        }
-
-        .hiw-card p {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            line-height: 1.6;
             margin: 0;
         }
-
-        .hiw-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+        .hiw-card p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin: 0;
         }
     </style>
 </head>
@@ -263,8 +212,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">DOWNLOADYFY<span>.AI</span></div>
-            <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
-                <a href="downloader.html" class="glow-button" style="padding: 0.4rem 1.2rem; font-size: 0.85rem; text-decoration: none; min-height: unset; height: auto;">🔗 Open Downloader</a>
+            <div class="nav-actions" style="display:flex;align-items:center;gap:0.8rem;">
+                <a href="downloader.html" class="glow-button" style="padding:0.38rem 1rem;font-size:0.82rem;text-decoration:none;">🔗 Download Now</a>
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
                     <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -279,9 +228,10 @@
     </div>
 
     <main class="container">
-        <!-- Hero -->
-        <header class="home-hero">
-            <div class="badge-container flex-wrap" style="justify-content: center; max-width: 900px; flex-wrap: wrap; margin: 0 auto 1.5rem;">
+
+        <!-- Original-style Hero -->
+        <header class="hero-section" style="padding-bottom: 1.5rem;">
+            <div class="badge-container" style="justify-content:center;flex-wrap:wrap;max-width:860px;margin:0 auto 1.2rem;">
                 <span class="badge-item youtube">YouTube</span>
                 <span class="badge-item instagram">Instagram</span>
                 <span class="badge-item spotify">Spotify</span>
@@ -293,142 +243,138 @@
                 <span class="badge-item reddit">Reddit</span>
             </div>
             <h1 class="hero-title">Experience <span class="gradient-text">Intelligent Simplicity</span></h1>
-            <p class="hero-subtitle">Choose a tool below — download videos, extract audio from local files, or craft perfect ringtones in seconds.</p>
+            <p class="hero-subtitle" style="margin-bottom:0;">Empowering AI Downloads for Videos, Reels, &amp; Audio Tracks.</p>
         </header>
 
         <!-- 3 Tool Cards -->
         <div class="tools-grid">
 
-            <!-- Tool 1: Link Downloader -->
+            <!-- Link Downloader -->
             <a href="downloader.html" class="tool-card downloader-tool">
-                <div class="tool-icon-wrapper">🔗</div>
-                <div>
-                    <h2 class="tool-title">Link Downloader</h2>
-                    <p class="tool-desc">Paste any URL from YouTube, Instagram, Spotify, TikTok, Reddit, and 8+ more platforms. Our AI engine analyzes the link and provides all available formats instantly.</p>
+                <div class="tool-top">
+                    <div class="tool-icon-wrapper">🔗</div>
+                    <div>
+                        <h2 class="tool-title">Link Downloader</h2>
+                        <p class="tool-subtitle">YouTube, Instagram, Spotify & more</p>
+                    </div>
                 </div>
-                <div class="tool-features">
-                    <span class="tool-feature-pill">YouTube 4K</span>
-                    <span class="tool-feature-pill">Spotify MP3</span>
-                    <span class="tool-feature-pill">Instagram Reels</span>
-                    <span class="tool-feature-pill">TikTok</span>
-                    <span class="tool-feature-pill">11+ Platforms</span>
+                <p class="tool-desc">Paste any public URL and our AI engine analyzes it instantly — video quality up to 8K, audio up to 320kbps FLAC. Works with 9 platforms.</p>
+                <div class="tool-pills">
+                    <span class="tool-pill">YouTube 8K</span>
+                    <span class="tool-pill">Spotify MP3</span>
+                    <span class="tool-pill">Instagram Reels</span>
+                    <span class="tool-pill">TikTok</span>
                 </div>
-                <div class="tool-cta">
-                    <span>Start Downloading</span>
-                    <span class="cta-arrow">→</span>
-                </div>
+                <div class="tool-cta">Open Downloader <span class="cta-arrow">→</span></div>
             </a>
 
-            <!-- Tool 2: Video to Audio Converter -->
+            <!-- Video → Audio -->
             <a href="converter.html" class="tool-card converter-tool">
-                <div class="tool-icon-wrapper">⚡</div>
-                <div>
-                    <h2 class="tool-title">Video → Audio</h2>
-                    <p class="tool-desc">Drag and drop a local video file (MP4, MKV, AVI, MOV) and instantly extract a high-quality audio track. Choose from MP3, WAV, FLAC, or M4A output formats.</p>
+                <div class="tool-top">
+                    <div class="tool-icon-wrapper">⚡</div>
+                    <div>
+                        <h2 class="tool-title">Video → Audio</h2>
+                        <p class="tool-subtitle">Extract audio from local video files</p>
+                    </div>
                 </div>
-                <div class="tool-features">
-                    <span class="tool-feature-pill">320kbps MP3</span>
-                    <span class="tool-feature-pill">Lossless FLAC</span>
-                    <span class="tool-feature-pill">WAV / M4A</span>
-                    <span class="tool-feature-pill">Drag & Drop</span>
+                <p class="tool-desc">Drop any local video (MP4, MKV, AVI, MOV) and extract a high-quality audio track. Choose MP3, WAV, FLAC or M4A output — no upload needed.</p>
+                <div class="tool-pills">
+                    <span class="tool-pill">320kbps MP3</span>
+                    <span class="tool-pill">Lossless FLAC</span>
+                    <span class="tool-pill">WAV / M4A</span>
                 </div>
-                <div class="tool-cta">
-                    <span>Convert Now</span>
-                    <span class="cta-arrow">→</span>
-                </div>
+                <div class="tool-cta">Convert Video <span class="cta-arrow">→</span></div>
             </a>
 
-            <!-- Tool 3: Audio Trimmer -->
+            <!-- Audio Trimmer -->
             <a href="trimmer.html" class="tool-card trimmer-tool">
-                <div class="tool-icon-wrapper">✂️</div>
-                <div>
-                    <h2 class="tool-title">Audio Trimmer</h2>
-                    <p class="tool-desc">Upload any audio file and trim it to the perfect length. Ideal for creating custom ringtones, notification sounds, and podcast clips in high-quality MP3.</p>
+                <div class="tool-top">
+                    <div class="tool-icon-wrapper">✂️</div>
+                    <div>
+                        <h2 class="tool-title">Audio Trimmer</h2>
+                        <p class="tool-subtitle">Cut audio for ringtones & clips</p>
+                    </div>
                 </div>
-                <div class="tool-features">
-                    <span class="tool-feature-pill">Ringtone Creator</span>
-                    <span class="tool-feature-pill">Precise Trim</span>
-                    <span class="tool-feature-pill">MP3 Export</span>
-                    <span class="tool-feature-pill">MP3/WAV/M4A</span>
+                <p class="tool-desc">Upload any MP3, WAV or M4A file, set your start and end time, and export a perfectly trimmed clip. Great for ringtones and podcast highlights.</p>
+                <div class="tool-pills">
+                    <span class="tool-pill">Ringtone Creator</span>
+                    <span class="tool-pill">Precise Trim</span>
+                    <span class="tool-pill">MP3 Export</span>
                 </div>
-                <div class="tool-cta">
-                    <span>Trim Audio</span>
-                    <span class="cta-arrow">→</span>
-                </div>
+                <div class="tool-cta">Trim Audio <span class="cta-arrow">→</span></div>
             </a>
 
         </div>
 
-        <!-- Stats Bar -->
-        <div class="stats-bar">
+        <!-- Stats Row -->
+        <div class="stats-row">
             <div class="stat-item">
-                <div class="stat-num">11+</div>
-                <div class="stat-lbl">PLATFORMS</div>
+                <div class="stat-num">8K</div>
+                <div class="stat-lbl">Max Quality</div>
             </div>
             <div class="stat-item">
-                <div class="stat-num">4K</div>
-                <div class="stat-lbl">MAX QUALITY</div>
+                <div class="stat-num">9+</div>
+                <div class="stat-lbl">Platforms</div>
             </div>
             <div class="stat-item">
                 <div class="stat-num">320</div>
-                <div class="stat-lbl">KBPS AUDIO</div>
+                <div class="stat-lbl">KBPS Audio</div>
             </div>
             <div class="stat-item">
                 <div class="stat-num">Free</div>
-                <div class="stat-lbl">FOREVER</div>
+                <div class="stat-lbl">Forever</div>
             </div>
         </div>
 
         <!-- How It Works -->
         <div class="hiw-section">
-            <div style="text-align: center;">
-                <h2 class="section-title">How Downloadyfy<span>.AI</span> Works</h2>
-                <p class="section-subtitle">Follow these simple steps to download, extract, and manage your media.</p>
-            </div>
+            <h2 class="hiw-title">How Downloadyfy<span>.AI</span> Works</h2>
             <div class="hiw-grid">
                 <div class="hiw-card">
-                    <div class="hiw-icon">🔗</div>
-                    <div class="hiw-num">1</div>
-                    <h4>Choose Your Tool</h4>
-                    <p>Select the right tool from the cards above — Link Downloader for URLs, Converter for local videos, or Trimmer for audio clips.</p>
+                    <div class="hiw-step">
+                        <div class="hiw-num">1</div>
+                        <h4>Choose a Tool</h4>
+                    </div>
+                    <p>Pick from the 3 tools above — Link Downloader for URLs, Video→Audio for local files, or Trimmer to cut audio clips.</p>
                 </div>
                 <div class="hiw-card">
-                    <div class="hiw-icon">📋</div>
-                    <div class="hiw-num">2</div>
-                    <h4>Paste Link or Upload File</h4>
-                    <p>For downloads, copy any public URL and paste it. For local tools, drag-and-drop your video or audio file directly onto the page.</p>
+                    <div class="hiw-step">
+                        <div class="hiw-num">2</div>
+                        <h4>Paste Link or Upload</h4>
+                    </div>
+                    <p>Copy any public video/audio URL and paste it. For local tools, drag and drop the file directly onto the page.</p>
                 </div>
                 <div class="hiw-card">
-                    <div class="hiw-icon">⚙️</div>
-                    <div class="hiw-num">3</div>
-                    <h4>Select Format & Quality</h4>
-                    <p>Our AI engine auto-detects available formats. Pick from video resolutions up to 4K or audio quality up to 320kbps Lossless FLAC.</p>
+                    <div class="hiw-step">
+                        <div class="hiw-num">3</div>
+                        <h4>Select Format & Quality</h4>
+                    </div>
+                    <p>AI auto-detects available formats. Pick video up to 8K or audio up to 320kbps Lossless FLAC — you choose.</p>
                 </div>
                 <div class="hiw-card">
-                    <div class="hiw-icon">⬇️</div>
-                    <div class="hiw-num">4</div>
-                    <h4>Download to Device</h4>
-                    <p>Click Download and the file saves directly to your browser's downloads folder. No accounts, no subscriptions. Free forever.</p>
+                    <div class="hiw-step">
+                        <div class="hiw-num">4</div>
+                        <h4>Download to Device</h4>
+                    </div>
+                    <p>Click Download — file saves directly to your browser downloads folder. No account, no subscription required.</p>
                 </div>
             </div>
         </div>
 
         <!-- Demo Section -->
-        <section class="demo-section" id="demoSection" style="margin-top: 3rem;">
+        <section class="demo-section" id="demoSection" style="margin-top:2rem;">
             <h2 class="section-title">Experience the Premium Speed</h2>
             <p class="section-subtitle">A high-fidelity universal media downloader with cover art mapping and zero configuration.</p>
-            
             <div class="demo-grid">
                 <div class="demo-card">
                     <div class="demo-img-wrapper">
                         <img src="assets/youtube_demo.png" alt="YouTube Downloader Preview">
                     </div>
                     <div class="demo-card-info">
-                        <span class="demo-tag youtube-tag">YouTube 4K & MP3</span>
+                        <span class="demo-tag youtube-tag">YouTube 8K & MP3</span>
                         <h3>FHD Video & HQ Audio Extracts</h3>
                     </div>
                 </div>
-                
                 <div class="demo-card">
                     <div class="demo-img-wrapper">
                         <img src="assets/instagram_demo.png" alt="Instagram Reels Downloader Preview">
@@ -438,7 +384,6 @@
                         <h3>Download Carousel Posts & Audio Tracks</h3>
                     </div>
                 </div>
-                
                 <div class="demo-card">
                     <div class="demo-img-wrapper">
                         <img src="assets/spotify_demo.png" alt="Spotify Playlist Downloader Preview">
@@ -451,21 +396,19 @@
             </div>
         </section>
 
-        <!-- Partners Section -->
+        <!-- Partners -->
         <section class="partners-section reveal" id="partnersSection">
-            <h2 class="section-title">Creative & Educational Partners</h2>
+            <h2 class="section-title">Creative &amp; Educational Partners</h2>
             <p class="section-subtitle">Empower your study and design projects with high-quality, royalty-free content from our network.</p>
-            
             <div class="partners-grid">
                 <a href="https://unsplash.com" target="_blank" class="partner-card">
                     <div class="partner-icon">🖼️</div>
                     <div class="partner-info">
                         <h3>Unsplash</h3>
-                        <p>Beautiful, free educational and creative images that you can use for online courses and tutorials.</p>
+                        <p>Beautiful, free educational and creative images for online courses and tutorials.</p>
                         <span class="partner-tag">Affiliate Partner</span>
                     </div>
                 </a>
-                
                 <a href="https://pixabay.com" target="_blank" class="partner-card">
                     <div class="partner-icon">🎥</div>
                     <div class="partner-info">
@@ -474,7 +417,6 @@
                         <span class="partner-tag">Affiliate Partner</span>
                     </div>
                 </a>
-                
                 <a href="https://freesound.org" target="_blank" class="partner-card">
                     <div class="partner-icon">🔊</div>
                     <div class="partner-info">
@@ -483,17 +425,17 @@
                         <span class="partner-tag">Affiliate Partner</span>
                     </div>
                 </a>
-                
                 <a href="https://www.pexels.com" target="_blank" class="partner-card">
                     <div class="partner-icon">🎬</div>
                     <div class="partner-info">
                         <h3>Pexels Media</h3>
-                        <p>Premium quality free video loops and stock photography. Highly recommended for creative edits.</p>
+                        <p>Premium quality free video loops and stock photography for creative edits.</p>
                         <span class="partner-tag">Affiliate Partner</span>
                     </div>
                 </a>
             </div>
         </section>
+
     </main>
 
     <footer class="footer">
@@ -502,23 +444,23 @@
                 <div class="footer-logo">DOWNLOADYFY<span>.AI</span></div>
                 <p class="footer-copyright">© 2026 DOWNLOADYFY.AI. All rights reserved.</p>
                 <div class="footer-links">
-                    <a href="#" id="openTermsBtn" class="footer-link">Terms & Conditions</a>
+                    <a href="#" id="openTermsBtn" class="footer-link">Terms &amp; Conditions</a>
                     <span class="link-separator">|</span>
                     <a href="#" id="openPrivacyBtn" class="footer-link">Privacy Policy</a>
                 </div>
             </div>
             <div class="footer-right">
-                <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
+                <span class="developer-credit">Designed &amp; Developed by <span class="credit-name">AMIT KUMAR</span></span>
             </div>
         </div>
     </footer>
 
-    <!-- Terms & Privacy Modal -->
+    <!-- Legal Modal -->
     <div id="legalModal" class="modal-overlay hidden">
         <div class="modal-card legal-modal">
             <button class="modal-close-btn" id="closeLegalModalBtn">&times;</button>
             <div class="modal-header">
-                <h2 id="legalModalTitle">Terms & Conditions</h2>
+                <h2 id="legalModalTitle">Terms &amp; Conditions</h2>
                 <p>Downloadyfy.AI Legal and Security Compliance Policies</p>
             </div>
             <div class="legal-content-body" id="legalContentBody"></div>
@@ -526,51 +468,38 @@
     </div>
 
     <script>
-        // Theme Toggle
+        // Theme
         const themeToggle = document.getElementById('themeToggle');
         const sunIcon = document.querySelector('.sun-icon');
         const moonIcon = document.querySelector('.moon-icon');
-        const body = document.body;
-
         const savedTheme = localStorage.getItem('theme') || 'dark';
         if (savedTheme === 'light') {
-            body.classList.add('light-theme');
+            document.body.classList.add('light-theme');
             sunIcon.classList.remove('hidden');
             moonIcon.classList.add('hidden');
         }
-
         themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-theme');
-            const isLight = body.classList.contains('light-theme');
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             sunIcon.classList.toggle('hidden', !isLight);
             moonIcon.classList.toggle('hidden', isLight);
         });
 
-        // Reveal animations
-        const reveals = document.querySelectorAll('.reveal');
+        // Scroll reveals
         const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
         }, { threshold: 0.1 });
-        reveals.forEach(el => revealObserver.observe(el));
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
         // Legal modals
         const legalModal = document.getElementById('legalModal');
-        const legalModalTitle = document.getElementById('legalModalTitle');
-        const legalContentBody = document.getElementById('legalContentBody');
-        const closeLegalModalBtn = document.getElementById('closeLegalModalBtn');
-        const openTermsBtn = document.getElementById('openTermsBtn');
-        const openPrivacyBtn = document.getElementById('openPrivacyBtn');
-
-        const TERMS_CONTENT = `<h3>1. Acceptance of Terms</h3><p>By using Downloadyfy.AI, you agree to these terms. This platform is for personal and educational use only.</p><h3>2. Legal Use Only</h3><p>You may only download content you own or have explicit permission to download. Downloading copyrighted content is strictly prohibited.</p><h3>3. No Warranty</h3><p>This service is provided as-is. We are not responsible for service interruptions or data loss.</p>`;
-        const PRIVACY_CONTENT = `<h3>Privacy Policy</h3><p>We do not store your download history or personal data. Device fingerprints are stored locally in your browser only. We do not share data with third parties.</p>`;
-
-        if (openTermsBtn) openTermsBtn.addEventListener('click', (e) => { e.preventDefault(); legalModalTitle.textContent = 'Terms & Conditions'; legalContentBody.innerHTML = TERMS_CONTENT; legalModal.classList.remove('hidden'); });
-        if (openPrivacyBtn) openPrivacyBtn.addEventListener('click', (e) => { e.preventDefault(); legalModalTitle.textContent = 'Privacy Policy'; legalContentBody.innerHTML = PRIVACY_CONTENT; legalModal.classList.remove('hidden'); });
-        if (closeLegalModalBtn) closeLegalModalBtn.addEventListener('click', () => legalModal.classList.add('hidden'));
-        window.addEventListener('click', (e) => { if (e.target === legalModal) legalModal.classList.add('hidden'); });
+        const TERMS = `<h3>1. Personal & Educational Use</h3><p>Downloadyfy.AI is for personal, educational, and non-commercial use only. Do not use it to pirate copyrighted content.</p><h3>2. Copyright</h3><p>Only download content you own or have explicit permission to download. Users are fully responsible for legal compliance.</p><h3>3. No Warranty</h3><p>Service is provided as-is. We are not liable for service interruptions or data loss.</p>`;
+        const PRIVACY = `<h3>Privacy Policy</h3><p>We do not store your download history or personal data. Device fingerprints are stored locally in your browser only. No trackers or marketing cookies are loaded.</p>`;
+        document.getElementById('openTermsBtn').addEventListener('click', e => { e.preventDefault(); document.getElementById('legalModalTitle').textContent='Terms & Conditions'; document.getElementById('legalContentBody').innerHTML=TERMS; legalModal.classList.remove('hidden'); });
+        document.getElementById('openPrivacyBtn').addEventListener('click', e => { e.preventDefault(); document.getElementById('legalModalTitle').textContent='Privacy Policy'; document.getElementById('legalContentBody').innerHTML=PRIVACY; legalModal.classList.remove('hidden'); });
+        document.getElementById('closeLegalModalBtn').addEventListener('click', () => legalModal.classList.add('hidden'));
+        window.addEventListener('click', e => { if (e.target === legalModal) legalModal.classList.add('hidden'); });
     </script>
 </body>
 </html>
