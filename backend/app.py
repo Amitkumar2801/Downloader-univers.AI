@@ -973,34 +973,37 @@ def start_download():
     sp_type, sp_id = parse_spotify_url(url)
     spotify_meta = None
     if sp_type and sp_id and sp_type == 'track':
+        media_type = 'audio'
+        ext = 'mp3'
+        if format_id == 'spotify_flac':
+            ext = 'flac'
+        elif format_id == 'spotify_wav':
+            ext = 'wav'
+        elif format_id == 'spotify_m4a':
+            ext = 'm4a'
+        
+        bitrate_suffix = '320k'
+        if format_id and format_id.startswith('spotify_'):
+            part = format_id[8:]
+            if part.endswith('k') and part[:-1].isdigit():
+                bitrate_suffix = part
+            elif part.isdigit():
+                bitrate_suffix = f"{part}k"
+        format_id = f"bestaudio/{bitrate_suffix}"
+
         track_info = get_spotify_track_info(sp_id)
         if track_info:
             title = f"{track_info['artists']} - {track_info['title']}"
-            media_type = 'audio'
-            
-            ext = 'mp3'
-            if format_id == 'spotify_flac':
-                ext = 'flac'
-            elif format_id == 'spotify_wav':
-                ext = 'wav'
-            elif format_id == 'spotify_m4a':
-                ext = 'm4a'
-            
-            bitrate_suffix = '320k'
-            if format_id and format_id.startswith('spotify_'):
-                part = format_id[8:]
-                if part.endswith('k') and part[:-1].isdigit():
-                    bitrate_suffix = part
-                elif part.isdigit():
-                    bitrate_suffix = f"{part}k"
-            format_id = f"bestaudio/{bitrate_suffix}"
-            
             url = f"ytsearch:{track_info['artists']} - {track_info['title']}"
             spotify_meta = {
                 'title': track_info['title'],
                 'artists': track_info['artists'],
                 'cover_url': track_info['thumbnail']
             }
+        else:
+            # Fallback to frontend-provided title to avoid DRM block and Spotify embed rate-limit!
+            print(f"[SPOTIFY] Fallback search for {title}")
+            url = f"ytsearch:{title}"
 
     try:
         height = int(height_val) if height_val else 0

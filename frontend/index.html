@@ -3,25 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CUDA.AI - Chamgadar Universal Downloader AI</title>
-    <meta name="description" content="Download YouTube 4K videos, MP3, Instagram Reels, and more easily.">
+    <title>DOWNLOADYFY.AI - Experience Intelligent Simplicity</title>
+    <meta name="description" content="Download YouTube 4K videos, MP3, Instagram Reels, and Spotify playlists easily with AI.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css?v=6">
+    <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DOWNLOADYFY<span>.AI</span></div>
+            <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
     <div class="background-elements">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
 
     <main class="container">
-        <header>
-            <h1 class="logo-title">CUDA<span>.AI</span></h1>
-            <p class="subtitle">Chamgadar Universal Downloader AI</p>
+        <header class="hero-section">
+            <div class="badge-container">
+                <span class="badge-item youtube">YouTube</span>
+                <span class="badge-item instagram">Instagram</span>
+                <span class="badge-item spotify">Spotify</span>
+            </div>
+            <h1 class="hero-title">Experience <span class="gradient-text">Intelligent Simplicity</span></h1>
+            <p class="hero-subtitle">Empowering AI Downloads for Videos, Reels, & Audio Tracks.</p>
         </header>
 
         <section class="downloader-section">
@@ -36,6 +51,44 @@
                         <div class="loader-spinner hidden" id="fetchLoader"></div>
                     </button>
                 </form>
+            </div>
+        </section>
+
+        <!-- Demo Mockup Previews Section -->
+        <section class="demo-section" id="demoSection">
+            <h2 class="section-title">Experience the Premium Speed</h2>
+            <p class="section-subtitle">A high-fidelity universal media downloader with cover art mapping and zero configuration.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <div class="demo-img-wrapper">
+                        <img src="assets/youtube_demo.png" alt="YouTube Downloader Preview">
+                    </div>
+                    <div class="demo-card-info">
+                        <span class="demo-tag youtube-tag">YouTube 4K & MP3</span>
+                        <h3>FHD Video & HQ Audio Extracts</h3>
+                    </div>
+                </div>
+                
+                <div class="demo-card">
+                    <div class="demo-img-wrapper">
+                        <img src="assets/instagram_demo.png" alt="Instagram Reels Downloader Preview">
+                    </div>
+                    <div class="demo-card-info">
+                        <span class="demo-tag instagram-tag">Instagram Reels</span>
+                        <h3>Download Carousel Posts & Audio Tracks</h3>
+                    </div>
+                </div>
+                
+                <div class="demo-card">
+                    <div class="demo-img-wrapper">
+                        <img src="assets/spotify_demo.png" alt="Spotify Playlist Downloader Preview">
+                    </div>
+                    <div class="demo-card-info">
+                        <span class="demo-tag spotify-tag">Spotify Playlists</span>
+                        <h3>Concurrently download tracks in Lossless FLAC/MP3</h3>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -336,6 +389,18 @@
         </div>
     </main>
 
-    <script src="app.js"></script>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo">DOWNLOADYFY<span>.AI</span></div>
+                <p class="footer-copyright">© 2026 DOWNLOADYFY.AI. All rights reserved.</p>
+            </div>
+            <div class="footer-right">
+                <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js?v=8"></script>
 </body>
 </html>

@@ -99,6 +99,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorToast = document.getElementById('errorToast');
     const errorMsg = document.getElementById('errorMsg');
     const playlistItems = document.getElementById('playlistItems');
+    const demoSection = document.getElementById('demoSection');
+
+    // Theme toggle logic
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+
+    // Load saved theme choice
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        body.classList.add('light-theme');
+        if (sunIcon) sunIcon.classList.remove('hidden');
+        if (moonIcon) moonIcon.classList.add('hidden');
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-theme');
+            const isLight = body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            
+            if (isLight) {
+                if (sunIcon) sunIcon.classList.remove('hidden');
+                if (moonIcon) moonIcon.classList.add('hidden');
+            } else {
+                if (sunIcon) sunIcon.classList.add('hidden');
+                if (moonIcon) moonIcon.classList.remove('hidden');
+            }
+        });
+    }
 
     // Auto-apply selected quality to all other tracks in the list
     if (playlistItems) {
@@ -125,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playlistCard.classList.add('hidden');
         const igCard = document.getElementById('instagramCard');
         if (igCard) igCard.classList.add('hidden');
+        if (demoSection) demoSection.classList.add('hidden');
         hideError();
 
         const analysisLoader = document.getElementById('analysisLoader');
@@ -182,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             showError(error.message);
+            if (demoSection) demoSection.classList.remove('hidden');
         } finally {
             clearTimeout(step2Timeout);
             clearTimeout(step3Timeout);
@@ -410,6 +443,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const tasks = Array.from(btns).map((btn) => {
                 return async () => {
+                    if (btn.getAttribute('data-status') === 'completed') {
+                        completedCount++;
+                        const processed = completedCount + failedCount;
+                        progressFill.style.width = `${(processed / btns.length) * 100}%`;
+                        statusText.textContent = `Downloading... Processed ${processed} of ${btns.length} tracks (${failedCount} failed).`;
+                        return;
+                    }
+
                     const url = btn.getAttribute('data-url');
                     const title = btn.getAttribute('data-title');
                     const index = btn.getAttribute('data-index');
@@ -427,12 +468,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         ext = 'mp4';
                     }
                     
-                    try {
-                        await initiateDownload(url, format_id, ext, title, type, null, null, index);
-                        completedCount++;
-                    } catch (err) {
-                        console.error(`Failed to download track:`, err);
-                        failedCount++;
+                    let success = false;
+                    let retries = 2; // Auto-retry up to 2 times
+                    
+                    while (!success && retries >= 0) {
+                        try {
+                            await initiateDownload(url, format_id, ext, title, type, null, null, index);
+                            success = true;
+                            completedCount++;
+                        } catch (err) {
+                            console.error(`Failed to download track (retries left: ${retries}):`, err);
+                            if (retries === 0) {
+                                failedCount++;
+                            } else {
+                                // Wait 2 seconds before retrying
+                                await new Promise(r => setTimeout(r, 2000));
+                            }
+                            retries--;
+                        }
                     }
 
                     const processed = completedCount + failedCount;
@@ -519,11 +572,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const startData = await startRes.json();
                 const jobId = startData.job_id;
 
-                // Poll download status
-                const pollInterval = setInterval(async () => {
+                // Poll download status using safe recursive setTimeout to prevent overlapping requests
+                async function pollStatus() {
                     try {
                         const statusRes = await fetch(`${API_URL}/download_status/${jobId}`);
-                        if (!statusRes.ok) return; // skip this frame if server error
+                        if (!statusRes.ok) {
+                            // Retry after 1 second if server responds with error
+                            setTimeout(pollStatus, 1000);
+                            return;
+                        }
 
                         const job = await statusRes.json();
 
@@ -566,8 +623,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             const detailMsg = job.status_text || 'Processing download';
                             statusText.textContent = `${speedMsg} | ${detailMsg}`;
 
+                            // Schedule next poll
+                            setTimeout(pollStatus, 1000);
+
                         } else if (job.status === 'completed') {
-                            clearInterval(pollInterval);
                             if (itemProgressFill) {
                                 itemProgressFill.style.width = '100%';
                             } else {
@@ -575,8 +634,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                             
                             if (itemBtn) {
-                                itemBtn.textContent = 'Done!';
+                                itemBtn.textContent = 'Completed';
                                 itemBtn.classList.add('success-btn');
+                                itemBtn.disabled = true;
+                                itemBtn.setAttribute('data-status', 'completed');
                             }
                             
                             statusBox.classList.add('completed');
@@ -597,11 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             setTimeout(() => {
                                 if (itemProgress) itemProgress.classList.add('hidden');
-                                if (itemBtn) {
-                                    itemBtn.disabled = false;
-                                    itemBtn.textContent = 'Download';
-                                    itemBtn.classList.remove('success-btn');
-                                }
                                 statusBox.classList.add('hidden');
                                 statusBox.classList.remove('completed');
                                 progressFill.style.width = '0%';
@@ -610,7 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             resolve(job);
 
                         } else if (job.status === 'failed') {
-                            clearInterval(pollInterval);
                             if (itemBtn) {
                                 itemBtn.disabled = false;
                                 itemBtn.textContent = 'Retry';
@@ -618,11 +673,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             throw new Error(job.error || 'Server reported download failure.');
                         }
                     } catch (pollErr) {
-                        clearInterval(pollInterval);
                         handleDownloadFailure(statusBox, progressFill, statusText, pollErr.message, itemBtn, itemProgress);
                         reject(pollErr);
                     }
-                }, 1000);
+                }
+
+                // Start first poll
+                setTimeout(pollStatus, 1000);
 
             } catch (err) {
                 handleDownloadFailure(statusBox, progressFill, statusText, err.message, itemBtn, itemProgress);
