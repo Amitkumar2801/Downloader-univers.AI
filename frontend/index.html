@@ -252,6 +252,10 @@
                 DOWNLOADYFY<span>.AI</span>
             </div>
             <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+                <div id="downloadAllowanceBadge" class="premium-status-pill" style="cursor: default;" title="Device allowance status">
+                    <span class="status-dot" style="background-color: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime);"></span>
+                    <span id="allowanceBadgeText">Free Downloads Left: 1/1</span>
+                </div>
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
                     <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -280,69 +284,295 @@
                 <span class="badge-item reddit">Reddit</span>
             </div>
             <h1 class="hero-title">Experience <span class="gradient-text">Intelligent Simplicity</span></h1>
-            <p class="hero-subtitle">Choose a tool below — download videos, extract audio from local files, or craft perfect ringtones in seconds.</p>
+            <p class="hero-subtitle">Paste a link below to download videos, audio, or playlists instantly.</p>
         </header>
 
-        <!-- 3 Tool Cards -->
-        <div class="tools-grid">
+        <!-- Homepage Link Downloader Form -->
+        <section class="downloader-section">
+            <div class="input-glass">
+                <form id="fetchForm">
+                    <div class="input-wrapper">
+                        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        <input type="url" id="videoUrl" placeholder="Paste your link here (e.g. YouTube, Instagram Reel, Spotify, X/Twitter...)" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="glow-button" id="fetchBtn">
+                        <span class="btn-text">Analyze Link</span>
+                        <div class="loader-spinner hidden" id="fetchLoader"></div>
+                    </button>
+                </form>
+                
+                <!-- AI Live Telemetry Parser -->
+                <div class="ai-telemetry-bar">
+                    <span class="telemetry-tag">AI CORE V4.8</span>
+                    <span class="telemetry-bracket">[</span>
+                    <span class="telemetry-status" id="telemetryStatus">AI PARSER STATE: IDLE // AWAITING URL INPUT</span>
+                    <span class="telemetry-cursor">_</span>
+                    <span class="telemetry-bracket">]</span>
+                </div>
+            </div>
 
-            <!-- Tool 1: Link Downloader -->
-            <a href="downloader.html" class="tool-card downloader-tool">
-                <div class="tool-icon-wrapper">🔗</div>
-                <div>
-                    <h2 class="tool-title">Link Downloader</h2>
-                    <p class="tool-desc">Paste any URL from YouTube, Instagram, Spotify, TikTok, Reddit, and 8+ more platforms. Our AI engine analyzes the link and provides all available formats instantly.</p>
-                </div>
-                <div class="tool-features">
-                    <span class="tool-feature-pill">YouTube 8K</span>
-                    <span class="tool-feature-pill">Spotify MP3</span>
-                    <span class="tool-feature-pill">Instagram Reels</span>
-                    <span class="tool-feature-pill">TikTok</span>
-                </div>
-                <div class="tool-cta">
-                    <span>Start Downloading</span>
-                    <span class="cta-arrow">→</span>
-                </div>
-            </a>
+            <!-- Disclaimer Box -->
+            <div class="legal-disclaimer" style="margin-top: 1.5rem;">
+                <p>⚠️ <strong>Disclaimer:</strong> Downloadyfy.AI is intended for personal and educational use only. We do not support downloading private or copyrighted content. Users are responsible for ensuring compliance with platform terms and copyright laws.</p>
+            </div>
+            <!-- Simulated Ad Banner -->
+            <div id="adBanner" class="ad-banner-wrapper">
+                <div class="ad-badge">SPONSORED AD</div>
+                <p class="ad-text">💡 Support free downloads by watching a short ad when prompted. <a href="#" id="adUpgradeLink" class="ad-link">Learn More</a></p>
+                <button type="button" class="close-ad-btn" id="closeAdBtn">&times;</button>
+            </div>
+        </section>
 
-            <!-- Tool 2: Video to Audio Converter -->
-            <a href="converter.html" class="tool-card converter-tool">
-                <div class="tool-icon-wrapper">⚡</div>
-                <div>
-                    <h2 class="tool-title">Video → Audio</h2>
-                    <p class="tool-desc">Drag and drop a local video file (MP4, MKV, AVI, MOV) and instantly extract a high-quality audio track. Choose from MP3, WAV, FLAC, or M4A output formats.</p>
+        <!-- Analysis Loader -->
+        <section class="loader-section hidden" id="analysisLoader">
+            <div class="glass-card loading-card">
+                <div class="scanner-container">
+                    <div class="orbit-spinner">
+                        <div class="orbit"></div>
+                        <div class="orbit"></div>
+                        <div class="orbit"></div>
+                        <div class="center-glow">AI</div>
+                    </div>
+                    <div class="scanner-bar"></div>
                 </div>
-                <div class="tool-features">
-                    <span class="tool-feature-pill">320kbps MP3</span>
-                    <span class="tool-feature-pill">Lossless FLAC</span>
-                    <span class="tool-feature-pill">WAV / M4A</span>
-                    <span class="tool-feature-pill">Drag &amp; Drop</span>
+                <div class="loading-status">
+                    <h3 class="status-heading">AI Engine Analyzing Link</h3>
+                    <div class="status-steps">
+                        <div class="step" id="step1"><span class="dot"></span><span class="step-text">Parsing URL metadata...</span></div>
+                        <div class="step" id="step2"><span class="dot"></span><span class="step-text">Connecting to streaming servers...</span></div>
+                        <div class="step" id="step3"><span class="dot"></span><span class="step-text">Extracting video and audio formats...</span></div>
+                    </div>
                 </div>
-                <div class="tool-cta">
-                    <span>Convert Now</span>
-                    <span class="cta-arrow">→</span>
-                </div>
-            </a>
+            </div>
+        </section>
 
-            <!-- Tool 3: Audio Trimmer -->
-            <a href="trimmer.html" class="tool-card trimmer-tool">
-                <div class="tool-icon-wrapper">✂️</div>
-                <div>
-                    <h2 class="tool-title">Audio Trimmer</h2>
-                    <p class="tool-desc">Upload any audio file and trim it to the perfect length. Ideal for creating custom ringtones, notification sounds, and podcast clips in high-quality MP3.</p>
+        <!-- Result Card (YouTube / General) -->
+        <section class="result-section hidden" id="resultCard">
+            <div class="glass-card">
+                <div class="media-preview">
+                    <div class="img-wrapper">
+                        <img id="mediaThumbnail" src="" alt="Video Thumbnail">
+                        <span class="duration-badge" id="mediaDuration">00:00</span>
+                    </div>
+                    <div class="media-info">
+                        <h2 id="mediaTitle">Video Title Loading...</h2>
+                        <p id="mediaAuthor">Channel Name</p>
+                    </div>
                 </div>
-                <div class="tool-features">
-                    <span class="tool-feature-pill">Ringtone Creator</span>
-                    <span class="tool-feature-pill">Precise Trim</span>
-                    <span class="tool-feature-pill">MP3 Export</span>
-                    <span class="tool-feature-pill">MP3/WAV/M4A</span>
+                <div class="download-options">
+                    <h3>Select Quality / Format</h3>
+                    <div class="format-grid">
+                        <div class="format-column">
+                            <h4>🎬 Video</h4>
+                            <div class="btn-group" id="videoFormats"></div>
+                        </div>
+                        <div class="format-column">
+                            <h4>🎵 Audio</h4>
+                            <div class="btn-group" id="audioFormats"></div>
+                        </div>
+                    </div>
+                    <div class="status-box hidden" id="downloadStatus">
+                        <canvas id="downloadCanvas" class="download-canvas"></canvas>
+                        <div class="download-animation-container">
+                            <div class="video-anim-wrapper">
+                                <div class="video-shutter">
+                                    <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                                    <div class="pulse-ring"></div>
+                                    <div class="pulse-ring delay-1"></div>
+                                </div>
+                                <div class="film-reel-container">
+                                    <div class="reel-dot"></div><div class="reel-dot"></div><div class="reel-dot"></div>
+                                </div>
+                            </div>
+                            <div class="audio-anim-wrapper">
+                                <div class="vinyl-disc">
+                                    <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                                    <div class="pulse-ring"></div>
+                                    <div class="pulse-ring delay-1"></div>
+                                </div>
+                                <div class="download-waves"><span></span><span></span><span></span><span></span><span></span></div>
+                            </div>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                        <div class="terminal-log-wrapper">
+                            <span class="terminal-prompt">></span> <span id="statusText">Starting download...</span>
+                        </div>
+                        <div class="download-stats-grid">
+                            <div class="stat-card"><span class="stat-label">SPEED</span><span class="stat-value" id="downloadSpeed">0.0 MB/s</span></div>
+                            <div class="stat-card"><span class="stat-label">PROCESSED</span><span class="stat-value" id="downloadProcessed">0.0 MB</span></div>
+                            <div class="stat-card"><span class="stat-label">TIME LEFT</span><span class="stat-value" id="downloadETA">--s</span></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="tool-cta">
-                    <span>Trim Audio</span>
-                    <span class="cta-arrow">→</span>
-                </div>
-            </a>
+            </div>
+        </section>
 
+        <!-- Instagram Result Card -->
+        <section class="instagram-section hidden" id="instagramCard">
+            <div class="glass-card instagram-glass-card">
+                <div class="instagram-post-header">
+                    <div class="instagram-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ig-avatar-icon"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="instagram-meta">
+                        <h3 id="igUploader">instagram_user</h3>
+                        <p id="igTitle">Instagram Media Downloader</p>
+                    </div>
+                    <div class="instagram-stats-badge">
+                        <span class="ig-stat-pill"><span class="stat-icon">❤️</span> <span id="igLikesVal">0</span></span>
+                        <span class="ig-stat-pill"><span class="stat-icon">💬</span> <span id="igCommentsVal">0</span></span>
+                        <span class="ig-stat-pill"><span class="stat-icon">✈️</span> <span id="igSharesVal">0</span></span>
+                    </div>
+                    <div class="instagram-brand-logo-wrapper">
+                        <svg class="ig-brand-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </div>
+                </div>
+                <div class="ig-divider"></div>
+                <div class="instagram-media-preview" id="igPreviewContainer">
+                    <img id="igMainPreview" src="" alt="Instagram Preview">
+                    <span class="media-type-badge" id="igMediaTypeBadge">Reel</span>
+                </div>
+                <div class="ig-divider"></div>
+                <div class="instagram-download-options">
+                    <h3 class="ig-options-title">Available Media Downloads</h3>
+                    <div class="ig-single-options" id="igSingleOptions">
+                        <div class="ig-download-grid">
+                            <div class="ig-download-item" id="igVideoItem">
+                                <span class="ig-item-label">🎬 High Resolution Video (MP4)</span>
+                                <button class="glow-button ig-btn" id="igVideoBtn">Download Video</button>
+                            </div>
+                            <div class="ig-download-item" id="igImageItem">
+                                <span class="ig-item-label">🖼️ High Resolution Image (JPG)</span>
+                                <button class="glow-button ig-btn" id="igImageBtn">Download Image</button>
+                            </div>
+                            <div class="ig-download-item" id="igAudioItem">
+                                <span class="ig-item-label">🎵 Extract Audio Track (MP3)</span>
+                                <button class="glow-button ig-btn" id="igAudioBtn">Download Audio</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ig-carousel-options hidden" id="igCarouselOptions">
+                        <div class="ig-carousel-grid" id="igCarouselGrid"></div>
+                    </div>
+                    <div class="status-box hidden" id="igDownloadStatus">
+                        <canvas id="igDownloadCanvas" class="download-canvas"></canvas>
+                        <div class="download-animation-container">
+                            <div class="video-anim-wrapper">
+                                <div class="video-shutter">
+                                    <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                                    <div class="pulse-ring"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" id="igProgressFill"></div></div>
+                        <div class="terminal-log-wrapper">
+                            <span class="terminal-prompt">></span> <span id="igStatusText">Downloading media...</span>
+                        </div>
+                        <div class="download-stats-grid">
+                            <div class="stat-card"><span class="stat-label">SPEED</span><span class="stat-value" id="igDownloadSpeed">0.0 MB/s</span></div>
+                            <div class="stat-card"><span class="stat-label">PROCESSED</span><span class="stat-value" id="igDownloadProcessed">0.0 MB</span></div>
+                            <div class="stat-card"><span class="stat-label">TIME LEFT</span><span class="stat-value" id="igDownloadETA">--s</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Playlist Section -->
+        <section class="playlist-section hidden" id="playlistCard">
+            <div class="glass-card">
+                <div class="playlist-header">
+                    <h2 id="playlistTitle">Playlist Title Loading...</h2>
+                    <p id="playlistCount">0 videos found</p>
+                    <div class="playlist-actions">
+                        <button class="glow-button small-btn" id="downloadAllBtn">Download All</button>
+                    </div>
+                </div>
+                <div class="playlist-items" id="playlistItems"></div>
+                <div class="status-box hidden" id="playlistStatus">
+                    <canvas id="playlistDownloadCanvas" class="download-canvas"></canvas>
+                    <div class="download-animation-container">
+                        <div class="video-anim-wrapper">
+                            <div class="video-shutter">
+                                <svg class="video-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring delay-1"></div>
+                            </div>
+                            <div class="film-reel-container">
+                                <div class="reel-dot"></div><div class="reel-dot"></div><div class="reel-dot"></div>
+                            </div>
+                        </div>
+                        <div class="audio-anim-wrapper">
+                            <div class="vinyl-disc">
+                                <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring delay-1"></div>
+                            </div>
+                            <div class="download-waves"><span></span><span></span><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="playlistProgressFill"></div></div>
+                    <div class="terminal-log-wrapper">
+                        <span class="terminal-prompt">></span> <span id="playlistStatusText">Downloading playlist...</span>
+                    </div>
+                    <div class="download-stats-grid">
+                        <div class="stat-card"><span class="stat-label">SPEED</span><span class="stat-value" id="playlistDownloadSpeed">0.0 MB/s</span></div>
+                        <div class="stat-card"><span class="stat-label">PROCESSED</span><span class="stat-value" id="playlistDownloadProcessed">0.0 MB</span></div>
+                        <div class="stat-card"><span class="stat-label">TIME LEFT</span><span class="stat-value" id="playlistDownloadETA">--s</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Media Tools Section -->
+        <section class="additional-tools-section" id="additionalToolsSection" style="margin-top: 3rem; width: 100%;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 class="section-title">Additional Media Tools</h2>
+                <p class="section-subtitle">Need offline file conversions or precision audio splitting? Try our high-performance utilities.</p>
+            </div>
+            <div class="tools-grid">
+                <!-- Tool 1: Video to Audio Converter -->
+                <a href="converter.html" class="tool-card converter-tool">
+                    <div class="tool-icon-wrapper">⚡</div>
+                    <div>
+                        <h2 class="tool-title">Video → Audio</h2>
+                        <p class="tool-desc">Drag and drop a local video file (MP4, MKV, AVI, MOV) and instantly extract a high-quality audio track. Choose from MP3, WAV, FLAC, or M4A output formats.</p>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature-pill">320kbps MP3</span>
+                        <span class="tool-feature-pill">Lossless FLAC</span>
+                        <span class="tool-feature-pill">WAV / M4A</span>
+                        <span class="tool-feature-pill">Drag &amp; Drop</span>
+                    </div>
+                    <div class="tool-cta">
+                        <span>Convert Now</span>
+                        <span class="cta-arrow">→</span>
+                    </div>
+                </a>
+
+                <!-- Tool 2: Audio Trimmer -->
+                <a href="trimmer.html" class="tool-card trimmer-tool">
+                    <div class="tool-icon-wrapper">✂️</div>
+                    <div>
+                        <h2 class="tool-title">Audio Trimmer</h2>
+                        <p class="tool-desc">Upload any audio file and trim it to the perfect length. Ideal for creating custom ringtones, notification sounds, and podcast clips in high-quality MP3.</p>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature-pill">Ringtone Creator</span>
+                        <span class="tool-feature-pill">Precise Trim</span>
+                        <span class="tool-feature-pill">MP3 Export</span>
+                        <span class="tool-feature-pill">MP3/WAV/M4A</span>
+                    </div>
+                    <div class="tool-cta">
+                        <span>Trim Audio</span>
+                        <span class="cta-arrow">→</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <div id="errorToast" class="toast hidden">
+            <p id="errorMsg">Something went wrong. Please try again.</p>
         </div>
 
         <!-- Stats Bar -->
@@ -492,6 +722,31 @@
         </div>
     </footer>
 
+    <!-- Ad Countdown Modal -->
+    <div id="adModal" class="modal-overlay hidden">
+        <div class="modal-card ad-viewer-modal" style="max-width: 500px; text-align: center; gap: 1.5rem; background: #1e1e1e;">
+            <button class="modal-close-btn" id="closeAdModalBtn" disabled style="opacity: 0.3; cursor: not-allowed;">&times;</button>
+            <div class="modal-header">
+                <h2>Support Downloadyfy<span>.AI</span></h2>
+                <p>Watching this ad unlocks <strong>1 free download slot</strong>!</p>
+            </div>
+            <div class="ad-player-box" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 20px rgba(255,255,255,0.05);">
+                <div class="ad-animation" style="position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #1e1b4b 0%, #030712 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
+                    <div class="spinner" style="width: 44px; height: 44px; border: 3px solid rgba(255,95,0,0.1); border-top-color: var(--accent-orange); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+                    <p style="font-weight: 700; color: #ffffff; margin: 0; font-size: 1.1rem; letter-spacing: -0.5px;">Grammarly Pro for Students 📝</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Write documents, check homework, 10x faster!</p>
+                </div>
+                <div class="ad-countdown-overlay" style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; color: #ffffff; z-index: 2; border: 1px solid rgba(255,255,255,0.1);">
+                    Ad ends in: <span id="adTimerVal" style="color: var(--accent-orange); font-size: 0.9rem;">5</span>s
+                </div>
+            </div>
+            <div class="ad-modal-footer" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <button class="glow-button" id="adUpgradeBtn" style="width: 100%;">Support Downloadyfy.AI Free</button>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Or wait for the countdown to unlock your free download slot.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Terms & Privacy Modal -->
     <div id="legalModal" class="modal-overlay hidden">
         <div class="modal-card legal-modal">
@@ -504,45 +759,6 @@
         </div>
     </div>
 
-    <script>
-        // Theme Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const sunIcon = document.querySelector('.sun-icon');
-        const moonIcon = document.querySelector('.moon-icon');
-        const body = document.body;
-
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        if (savedTheme === 'light') {
-            body.classList.add('light-theme');
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-theme');
-            const isLight = body.classList.contains('light-theme');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            sunIcon.classList.toggle('hidden', !isLight);
-            moonIcon.classList.toggle('hidden', isLight);
-        });
-
-        // Reveal animations
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('active');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-        // Legal modals
-        const legalModal = document.getElementById('legalModal');
-        const TERMS_CONTENT = `<h3>1. Personal and Educational Use</h3><p>Downloadyfy.AI is designed for students, researchers, and creative professionals to manage and store content for offline academic review and instructional projects.</p><h3>2. Copyright</h3><p>Only download content you own or have explicit permission to download. Downloading copyrighted content without permission is strictly prohibited.</p><h3>3. No Warranty</h3><p>This service is provided as-is. We are not responsible for service interruptions or data loss.</p>`;
-        const PRIVACY_CONTENT = `<h3>Privacy Policy</h3><p>We do not store your download history or personal data. Device fingerprints are stored locally in your browser only. We do not share data with third parties. No trackers or marketing cookies are loaded.</p>`;
-
-        document.getElementById('openTermsBtn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('legalModalTitle').textContent = 'Terms & Conditions'; document.getElementById('legalContentBody').innerHTML = TERMS_CONTENT; legalModal.classList.remove('hidden'); });
-        document.getElementById('openPrivacyBtn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('legalModalTitle').textContent = 'Privacy Policy'; document.getElementById('legalContentBody').innerHTML = PRIVACY_CONTENT; legalModal.classList.remove('hidden'); });
-        document.getElementById('closeLegalModalBtn').addEventListener('click', () => legalModal.classList.add('hidden'));
-        window.addEventListener('click', (e) => { if (e.target === legalModal) legalModal.classList.add('hidden'); });
-    </script>
+    <script src="app.js?v=10"></script>
 </body>
 </html>

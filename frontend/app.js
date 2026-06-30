@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMsg = document.getElementById('errorMsg');
     const playlistItems = document.getElementById('playlistItems');
     const demoSection = document.getElementById('demoSection');
+    const telemetryStatus = document.getElementById('telemetryStatus');
 
     // Premium active state, ads toggle and upgrade modals
     const premiumModal = document.getElementById('premiumModal');
@@ -1060,6 +1061,30 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 logo.innerHTML = 'Downloadyfy<span>.AI</span>';
                 subtitle.textContent = 'Downloadyfy.AI – Smart AI Downloads Made Simple';
+            }
+        }
+
+        if (telemetryStatus) {
+            if (!url) {
+                telemetryStatus.textContent = 'AI PARSER STATE: IDLE // AWAITING URL INPUT';
+            } else if (isInstagram) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // INSTAGRAM REEL DEEP-SCRAPER ENGAGED';
+            } else if (isSpotify) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // SPOTIFY METADATA & COVER-ART ENGINE ACTIVE';
+            } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // YOUTUBE CORE EXTRACTOR ONLINE';
+            } else if (url.includes('twitter.com') || url.includes('x.com')) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // X-TWITTER MEDIA PARSER READY';
+            } else if (url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com')) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // FACEBOOK VIDEO PARSER LOADED';
+            } else if (url.includes('tiktok.com')) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // TIKTOK MEDIA EXTRACTOR ENGAGED';
+            } else if (url.includes('soundcloud.com')) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // SOUNDCLOUD HQ AUDIO SCRAPER ONLINE';
+            } else if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('www.')) {
+                telemetryStatus.textContent = 'AI PARSER STATE: SCANNING // GENERIC WEB PARSER INITIALIZED';
+            } else {
+                telemetryStatus.textContent = 'AI PARSER STATE: ANALYZING INPUT // VERIFYING LINK PROTOCOL...';
             }
         }
     }

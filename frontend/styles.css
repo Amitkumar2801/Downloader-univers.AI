@@ -53,6 +53,30 @@ body {
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0) 0%, var(--bg-color) 80%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 45px 45px, 45px 45px;
+    z-index: -2;
+    pointer-events: none;
+    transition: background 0.4s ease;
+}
+
+body.light-theme::before {
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, var(--bg-color) 80%),
+        linear-gradient(rgba(0, 0, 0, 0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.012) 1px, transparent 1px);
+}
+
 /* Background elements */
 .background-elements {
     position: fixed;
@@ -238,12 +262,122 @@ body.light-theme .blob-2 {
     padding: 2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
+    position: relative;
+}
+
+/* AI Cyber Corners */
+.input-glass::after, .glass-card::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 16px;
+    height: 16px;
+    border-top: 2px solid var(--accent-orange);
+    border-right: 2px solid var(--accent-orange);
+    border-top-right-radius: 12px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.input-glass::before, .glass-card::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: -1px;
+    width: 16px;
+    height: 16px;
+    border-bottom: 2px solid var(--accent-lime);
+    border-left: 2px solid var(--accent-lime);
+    border-bottom-left-radius: 12px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.input-glass:hover, .glass-card:hover {
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25), 0 0 25px rgba(255, 95, 0, 0.05);
+}
+
+.input-glass:hover::after, .glass-card:hover::after {
+    width: 24px;
+    height: 24px;
+    border-color: var(--accent-lime);
+}
+
+.input-glass:hover::before, .glass-card:hover::before {
+    width: 24px;
+    height: 24px;
+    border-color: var(--accent-orange);
 }
 
 .input-glass:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
-    border-color: var(--accent-lime);
+    border-color: rgba(255, 95, 0, 0.35);
+}
+
+/* AI Telemetry Bar Styles */
+.ai-telemetry-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px dashed rgba(255, 95, 0, 0.25);
+    border-radius: 12px;
+    padding: 0.65rem 1.2rem;
+    margin-top: 1.5rem;
+    font-family: monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    width: 100%;
+    color: var(--accent-orange);
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 12px rgba(255, 95, 0, 0.05);
+}
+
+body.light-theme .ai-telemetry-bar {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(255, 95, 0, 0.3);
+}
+
+.telemetry-tag {
+    background: linear-gradient(135deg, var(--accent-orange), #ff8c00);
+    color: #ffffff;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(255, 95, 0, 0.2);
+}
+
+.telemetry-bracket {
+    color: var(--text-muted);
+    font-weight: bold;
+}
+
+.telemetry-status {
+    flex: 1;
+    color: var(--text-main);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.15);
+}
+
+body.light-theme .telemetry-status {
+    color: #141414;
+    text-shadow: none;
+}
+
+.telemetry-cursor {
+    color: var(--accent-orange);
+    font-weight: bold;
+    animation: blink-cursor 1s step-end infinite;
+}
+
+@keyframes blink-cursor {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
 }
 
 /* Form Styles */
