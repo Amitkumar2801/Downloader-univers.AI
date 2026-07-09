@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=8">
+    <link rel="stylesheet" href="styles.css?v=17">
     <style>
         .page-back-btn {
             display: inline-flex;
@@ -224,15 +224,75 @@
 <body class="converter-page">
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo" style="display:flex;align-items:center;gap:0.55rem;">
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:0.55rem;text-decoration:none;color:inherit;">
                 <img src="assets/logo.png" alt="DOWNLOADYFY.AI Logo" style="width:34px;height:34px;border-radius:9px;object-fit:cover;flex-shrink:0;">
-                DOWNLOADYFY<span>.AI</span>
-            </div>
+                <span class="logo-text">DOWNLOADYFY<span>.AI</span></span>
+            </a>
             <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
-                <div id="downloadAllowanceBadge" class="allowance-badge" title="Device allowance status">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #818cf8; display: inline-block; box-shadow: 0 0 8px #818cf8;"></span>
-                    <span id="allowanceBadgeText">Slots: 1/1</span>
+                <!-- Language Selector Dropdown -->
+                <div class="language-selector-wrapper" style="position: relative;">
+                    <select id="languageSelect" class="lang-select-dropdown" aria-label="Select Language" style="
+                        background: var(--glass-bg);
+                        color: var(--text-main);
+                        border: 1px solid var(--glass-border);
+                        border-radius: 12px;
+                        padding: 0.5rem 1.8rem 0.5rem 0.8rem;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        outline: none;
+                        cursor: pointer;
+                        appearance: none;
+                        -webkit-appearance: none;
+                        transition: all 0.2s ease;
+                        max-width: 180px;
+                    ">
+                        <!-- Popular/User requested -->
+                        <option value="en">🇺🇸 US / 🇬🇧 UK (English)</option>
+                        <option value="hi">🇮🇳 India (हिंदी)</option>
+                        <option value="ne">🇳🇵 Nepal (नेपाली)</option>
+                        <option value="ur">🇵🇰 Pakistan (اردو)</option>
+                        <option value="ja">🇯🇵 Japan (日本語)</option>
+                        <option value="lb">🇱🇺 Luxembourg (Lëtzebuergesch)</option>
+
+                        <!-- Afghanistan to Burkina Faso -->
+                        <option value="ps">🇦🇫 Afghanistan (Pashto)</option>
+                        <option value="sq">🇦🇱 Albania (Shqip)</option>
+                        <option value="ar">🇩🇿 Algeria / Bahrain (العربية)</option>
+                        <option value="ca">🇦🇩 Andorra (Català)</option>
+                        <option value="pt">🇦🇴 Angola / Brazil (Português)</option>
+                        <option value="es">🇦🇷 Argentina / Bolivia (Español)</option>
+                        <option value="hy">🇦🇲 Armenia (Հايերեն)</option>
+                        <option value="de">🇦🇹 Austria / Germany (Deutsch)</option>
+                        <option value="az">🇦🇿 Azerbaijan (Azərbaycanca)</option>
+                        <option value="en">🇧🇸 Bahamas / Belize / Barbados (English)</option>
+                        <option value="bn">🇧🇩 Bangladesh (বাংলা)</option>
+                        <option value="be">🇧🇾 Belarus (Беларуская)</option>
+                        <option value="nl">🇧🇪 Belgium / Netherlands (Nederlands)</option>
+                        <option value="fr">🇧🇯 Benin / France / Burkina Faso (Français)</option>
+                        <option value="dz">🇧🇹 Bhutan (རྫོང་ཁ)</option>
+                        <option value="bs">🇧🇦 Bosnia (Bosanski)</option>
+                        <option value="ms">🇧🇳 Brunei (Melayu)</option>
+                        <option value="bg">🇧🇬 Bulgaria (Български)</option>
+
+                        <!-- Other major world languages -->
+                        <option value="it">🇮🇹 Italy (Italiano)</option>
+                        <option value="ko">🇰🇷 Korea (한국어)</option>
+                        <option value="ru">🇷🇺 Russia (Русский)</option>
+                        <option value="zh-CN">🇨🇳 China (简体中文)</option>
+                        <option value="tr">🇹🇷 Turkey (Türkçe)</option>
+                        <option value="vi">🇻🇳 Vietnam (Tiếng Việt)</option>
+                    </select>
+                    <span class="select-arrow" style="
+                        position: absolute;
+                        right: 10px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: var(--text-muted);
+                        pointer-events: none;
+                        font-size: 0.7rem;
+                    ">▼</span>
                 </div>
+
                 <a href="index.html" class="page-back-btn">← Home</a>
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
                     <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
@@ -376,6 +436,11 @@
         </div>
     </div>
 
+    <!-- Hidden Google Translate Element but rendered for DOM accessibility -->
+    <div id="google_translate_element" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none;"></div>
+
+    <script src="language.js"></script>
     <script src="converter.js?v=2"></script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

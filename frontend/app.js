@@ -417,6 +417,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = urlInput.value.trim();
         if (!url) return;
 
+        const searchLower = url.toLowerCase();
+        const trimKeywords = ['cut', 'trim', 'crop', 'split', 'edit', 'cutter', 'trimmer', 'music cut', 'song cut', 'mp3 cut', 'audio cut', 'cut music'];
+        const hasTrimKeyword = trimKeywords.some(keyword => searchLower.includes(keyword));
+        if (hasTrimKeyword) {
+            window.location.href = 'trimmer.html';
+            return;
+        }
+
         checkUrlTheme();
         setLoadingState(true);
         resultCard.classList.add('hidden');
@@ -1079,17 +1087,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('theme-instagram', isInstagram);
         document.body.classList.toggle('theme-spotify', isSpotify && !isInstagram);
 
-        const logo = document.querySelector('.navbar .logo');
+        const logoText = document.querySelector('.navbar .logo .logo-text');
         const subtitle = document.querySelector('.hero-subtitle');
-        if (logo && subtitle) {
+        if (logoText && subtitle) {
             if (isInstagram) {
-                logo.innerHTML = 'InstaSave<span>.AI</span>';
+                logoText.innerHTML = 'InstaSave<span>.AI</span>';
                 subtitle.textContent = 'Premium Downloader for Instagram Reels, Posts & Stories';
             } else if (isSpotify) {
-                logo.innerHTML = 'SpotifySave<span>.AI</span>';
+                logoText.innerHTML = 'SpotifySave<span>.AI</span>';
                 subtitle.textContent = 'Premium Downloader for Spotify Songs & Playlists';
             } else {
-                logo.innerHTML = 'Downloadyfy<span>.AI</span>';
+                logoText.innerHTML = 'Downloadyfy<span>.AI</span>';
                 subtitle.textContent = 'Downloadyfy.AI – Smart AI Downloads Made Simple';
             }
         }
@@ -1776,6 +1784,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Stats Count-Up Animation
+    const statsSection = document.getElementById('statsSection');
+    if (statsSection) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const elements = entry.target.querySelectorAll('.stat-num[data-target]');
+                    elements.forEach(el => {
+                        const target = parseFloat(el.getAttribute('data-target'));
+                        if (isNaN(target)) return;
+                        
+                        const suffix = el.getAttribute('data-suffix') || '';
+                        const start = 0;
+                        const duration = 1200; // ms
+                        const startTime = performance.now();
+                        
+                        const animate = (currentTime) => {
+                            const elapsed = currentTime - startTime;
+                            const progress = Math.min(elapsed / duration, 1);
+                            const currentVal = start + progress * (target - start);
+                            
+                            el.textContent = Math.floor(currentVal) + suffix;
+                            
+                            if (progress < 1) {
+                                requestAnimationFrame(animate);
+                            } else {
+                                el.textContent = target + suffix;
+                            }
+                        };
+                        requestAnimationFrame(animate);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        observer.observe(statsSection);
+    }
+
 });
 
 // === Cookie Management Functions ===
@@ -1894,60 +1940,5 @@ async function handleCookieFile(file) {
     }
 }
 
-// Google Translate Integration with Custom Dropdown
-window.googleTranslateElementInit = function() {
-    new google.translate.TranslateElement({
-        pageLanguage: 'en',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-    }, 'google_translate_element');
-};
+// Note: Google Translate / Language Selection has been moved to language.js to share across all pages.
 
-function initLanguage() {
-    const languageSelect = document.getElementById('languageSelect');
-    if (languageSelect) {
-        // Load saved language from localStorage
-        const savedLang = localStorage.getItem('appLanguage') || 'en';
-        languageSelect.value = savedLang;
-        
-        // Helper to set Google Translate cookie
-        const setTranslateCookie = (lang) => {
-            document.cookie = "googtrans=/en/" + lang + "; path=/";
-            const host = window.location.hostname;
-            document.cookie = "googtrans=/en/" + lang + "; path=/; domain=" + host;
-        };
-
-        // Set initial cookie
-        setTranslateCookie(savedLang);
-        
-        // Polling to make sure the Google Translate combo is ready
-        let attempts = 0;
-        const checkInterval = setInterval(() => {
-            const googCombo = document.querySelector('.goog-te-combo');
-            if (googCombo) {
-                clearInterval(checkInterval);
-                googCombo.value = savedLang;
-                googCombo.dispatchEvent(new Event('change'));
-            }
-            attempts++;
-            if (attempts > 50) clearInterval(checkInterval); // Stop after 5 seconds
-        }, 100);
-        
-        languageSelect.addEventListener('change', (e) => {
-            const lang = e.target.value;
-            localStorage.setItem('appLanguage', lang);
-            setTranslateCookie(lang);
-            
-            const googCombo = document.querySelector('.goog-te-combo');
-            if (googCombo) {
-                googCombo.value = lang;
-                googCombo.dispatchEvent(new Event('change'));
-            }
-        });
-    }
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLanguage);
-} else {
-    initLanguage();
-}

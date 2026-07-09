@@ -734,6 +734,8 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             'nocheckcertificate': True,
             'concurrent_fragment_downloads': 16,
             'buffersize': 1024 * 1024,
+            'http_chunk_size': 10485760,
+            'postprocessor_args': {'ffmpeg': ['-threads', '0']},
             'socket_timeout': 15,
             'retries': 10,
             'http_headers': {
@@ -964,6 +966,8 @@ def download_video():
         'nocheckcertificate': True,
         'concurrent_fragment_downloads': 16,
         'buffersize': 1024 * 1024,
+        'http_chunk_size': 10485760,
+        'postprocessor_args': {'ffmpeg': ['-threads', '0']},
         'socket_timeout': 15,
         'retries': 10,
         'http_headers': {

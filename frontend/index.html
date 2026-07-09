@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=17">
     <style>
         /* ===== HOME PAGE SPECIFIC STYLES ===== */
         .home-hero {
@@ -28,9 +28,9 @@
         /* Tool Selection Cards */
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.8rem;
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 1.5rem 4rem;
         }
@@ -70,16 +70,22 @@
         .tool-card.downloader-tool::before { background: radial-gradient(ellipse at top left, rgba(255, 95, 0, 0.12), transparent 70%); }
         .tool-card.converter-tool::before { background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.12), transparent 70%); }
         .tool-card.trimmer-tool::before { background: radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.12), transparent 70%); }
+        .tool-card.booster-tool::before { background: radial-gradient(ellipse at top left, rgba(244, 63, 94, 0.12), transparent 70%); }
+        .tool-card.tagger-tool::before { background: radial-gradient(ellipse at top left, rgba(234, 179, 8, 0.12), transparent 70%); }
 
         .tool-card:hover::before { opacity: 1; }
 
         .tool-card.downloader-tool { border-color: rgba(255, 95, 0, 0.3); }
         .tool-card.converter-tool { border-color: rgba(99, 102, 241, 0.3); }
         .tool-card.trimmer-tool { border-color: rgba(16, 185, 129, 0.3); }
+        .tool-card.booster-tool { border-color: rgba(244, 63, 94, 0.3); }
+        .tool-card.tagger-tool { border-color: rgba(234, 179, 8, 0.3); }
 
         .tool-card.downloader-tool:hover { border-color: var(--accent-orange); box-shadow: 0 20px 60px rgba(255,95,0,0.15); }
         .tool-card.converter-tool:hover { border-color: #6366f1; box-shadow: 0 20px 60px rgba(99,102,241,0.15); }
         .tool-card.trimmer-tool:hover { border-color: #10b981; box-shadow: 0 20px 60px rgba(16,185,129,0.15); }
+        .tool-card.booster-tool:hover { border-color: #f43f5e; box-shadow: 0 20px 60px rgba(244,63,94,0.15); }
+        .tool-card.tagger-tool:hover { border-color: #eab308; box-shadow: 0 20px 60px rgba(234,179,8,0.15); }
 
         .tool-icon-wrapper {
             width: 64px;
@@ -98,6 +104,8 @@
         .tool-card.downloader-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(255,95,0,0.2), rgba(255,140,0,0.1)); border: 1px solid rgba(255,95,0,0.3); }
         .tool-card.converter-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.1)); border: 1px solid rgba(99,102,241,0.3); }
         .tool-card.trimmer-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.1)); border: 1px solid rgba(16,185,129,0.3); }
+        .tool-card.booster-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(244,63,94,0.2), rgba(251,113,133,0.1)); border: 1px solid rgba(244,63,94,0.3); }
+        .tool-card.tagger-tool .tool-icon-wrapper { background: linear-gradient(135deg, rgba(234,179,8,0.2), rgba(253,224,71,0.1)); border: 1px solid rgba(234,179,8,0.3); }
 
         .tool-title {
             font-size: 1.4rem;
@@ -132,6 +140,8 @@
         .tool-card.downloader-tool .tool-feature-pill { background: rgba(255,95,0,0.15); color: var(--accent-orange); border: 1px solid rgba(255,95,0,0.2); }
         .tool-card.converter-tool .tool-feature-pill { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
         .tool-card.trimmer-tool .tool-feature-pill { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+        .tool-card.booster-tool .tool-feature-pill { background: rgba(244,63,94,0.15); color: #fb7185; border: 1px solid rgba(244,63,94,0.2); }
+        .tool-card.tagger-tool .tool-feature-pill { background: rgba(234,179,8,0.15); color: #fde047; border: 1px solid rgba(234,179,8,0.2); }
 
         .tool-cta {
             display: flex;
@@ -148,6 +158,8 @@
         .tool-card.downloader-tool .tool-cta { color: var(--accent-orange); }
         .tool-card.converter-tool .tool-cta { color: #818cf8; }
         .tool-card.trimmer-tool .tool-cta { color: #34d399; }
+        .tool-card.booster-tool .tool-cta { color: #fb7185; }
+        .tool-card.tagger-tool .tool-cta { color: #fde047; }
 
         .cta-arrow {
             font-size: 1.1rem;
@@ -156,81 +168,302 @@
 
         .tool-card:hover .cta-arrow { transform: translateX(4px); }
 
-        /* Stats bar */
-        .stats-bar {
+        /* Stats Section & Cards Styling */
+        .stats-section {
+            padding: 4rem 1.5rem;
+            width: 100%;
             display: flex;
             justify-content: center;
-            gap: 3rem;
-            padding: 2rem 1rem;
-            flex-wrap: wrap;
-            border-top: 1px solid var(--glass-border);
-            margin: 0 auto;
-            max-width: 900px;
+            align-items: center;
+            position: relative;
+            background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.02) 50%, transparent);
         }
 
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-num {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-orange), #ff9500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-lbl {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            letter-spacing: 0.05em;
-        }
-
-        /* How it works */
-        .hiw-section {
-            background: var(--card-bg);
-            border-top: 1px solid var(--glass-border);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 4rem 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .hiw-grid {
+        .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 2rem;
-            max-width: 1000px;
-            margin: 2rem auto 0;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
-        .hiw-card {
-            text-align: center;
-            padding: 1.5rem;
+        .stat-card {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .hiw-num {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-orange), #ff9500);
-            color: white;
-            font-weight: 800;
-            font-size: 1.1rem;
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05), transparent 60%);
+            opacity: 0.5;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(255, 255, 255, 0.035);
+            border-color: rgba(255, 95, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(255, 95, 0, 0.1), inset 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-card:hover .stat-icon-wrapper {
+            background: rgba(255, 95, 0, 0.15);
+            color: var(--accent-orange);
+            transform: rotate(5deg) scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 95, 0, 0.2);
+        }
+
+        .stat-card:hover .stat-num {
+            text-shadow: 0 0 15px rgba(255, 95, 0, 0.5);
+            transform: translateX(2px);
+        }
+
+        .stat-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
         }
+
+        .stat-icon {
+            width: 26px;
+            height: 26px;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stat-num {
+            font-size: 2.2rem;
+            font-weight: 850;
+            background: linear-gradient(135deg, #ffffff 30%, #a3a3a3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        /* Customize gradients for different stats */
+        .stat-card:nth-child(1) .stat-num {
+            background: linear-gradient(135deg, var(--accent-orange), #ff7b00);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .stat-card:nth-child(2) .stat-num {
+            background: linear-gradient(135deg, #818cf8, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .stat-card:nth-child(3) .stat-num {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .stat-card:nth-child(4) .stat-num {
+            background: linear-gradient(135deg, #fb7185, #f43f5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        /* Hover border colors corresponding to their gradients */
+        .stat-card:nth-child(1):hover { border-color: rgba(255, 95, 0, 0.35); box-shadow: 0 20px 40px rgba(255, 95, 0, 0.12); }
+        .stat-card:nth-child(1):hover .stat-icon-wrapper { color: var(--accent-orange); background: rgba(255, 95, 0, 0.12); }
+        
+        .stat-card:nth-child(2):hover { border-color: rgba(99, 102, 241, 0.35); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.12); }
+        .stat-card:nth-child(2):hover .stat-icon-wrapper { color: #818cf8; background: rgba(99, 102, 241, 0.12); }
+
+        .stat-card:nth-child(3):hover { border-color: rgba(16, 185, 129, 0.35); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.12); }
+        .stat-card:nth-child(3):hover .stat-icon-wrapper { color: #34d399; background: rgba(16, 185, 129, 0.12); }
+
+        .stat-card:nth-child(4):hover { border-color: rgba(244, 63, 94, 0.35); box-shadow: 0 20px 40px rgba(244, 63, 94, 0.12); }
+        .stat-card:nth-child(4):hover .stat-icon-wrapper { color: #fb7185; background: rgba(244, 63, 94, 0.12); }
+
+        .stat-lbl {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Light theme adjustments */
+        body.light-theme .stat-card {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+        body.light-theme .stat-icon-wrapper {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.06);
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* === Premium How It Works Section === */
+        .hiw-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 5rem 1.5rem;
+            border-top: 1px solid var(--divider);
+            position: relative;
+            width: 100%;
+        }
+        .hiw-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2.2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 3rem;
+            position: relative;
+        }
+        .hiw-card {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 28px;
+            padding: 3rem 2rem 2.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .hiw-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(255, 255, 255, 0.02), transparent 70%);
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        
+        .hiw-card-icon-wrapper {
+            width: 68px;
+            height: 68px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.75);
+            margin: 0 auto 1.5rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .hiw-card-icon {
+            width: 32px;
+            height: 32px;
+            stroke-width: 1.8px;
+            transition: transform 0.4s ease;
+        }
+        
+        .hiw-num {
+            position: absolute;
+            top: 1rem;
+            right: 1.25rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 800;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hiw-card-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 95, 0, 0.15);
+            border: 1px solid rgba(255, 95, 0, 0.3);
+            color: var(--accent-orange);
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 10px rgba(255, 95, 0, 0.15);
+        }
+
+        /* Hover animations and color themes */
+        .hiw-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.035);
+        }
+        
+        .hiw-card:hover .hiw-card-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
+        }
+        .hiw-card:hover .hiw-card-icon {
+            transform: scale(1.05);
+        }
+
+        /* Customize colors per step */
+        /* Card 1: Orange/Red */
+        .hiw-card:nth-child(1):hover { border-color: rgba(255, 95, 0, 0.35); box-shadow: 0 20px 40px rgba(255, 95, 0, 0.12); }
+        .hiw-card:nth-child(1):hover .hiw-card-icon-wrapper { color: var(--accent-orange); background: rgba(255, 95, 0, 0.12); border-color: rgba(255, 95, 0, 0.3); box-shadow: 0 0 25px rgba(255, 95, 0, 0.2); }
+        .hiw-card:nth-child(1):hover .hiw-num { border-color: rgba(255, 95, 0, 0.3); color: var(--accent-orange); background: rgba(255, 95, 0, 0.1); }
+        
+        /* Card 2: Indigo/Violet */
+        .hiw-card:nth-child(2):hover { border-color: rgba(99, 102, 241, 0.35); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.12); }
+        .hiw-card:nth-child(2):hover .hiw-card-icon-wrapper { color: #818cf8; background: rgba(99, 102, 241, 0.12); border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 0 25px rgba(99, 102, 241, 0.2); }
+        .hiw-card:nth-child(2):hover .hiw-num { border-color: rgba(99, 102, 241, 0.3); color: #818cf8; background: rgba(99, 102, 241, 0.1); }
+        
+        /* Card 3: Emerald/Green */
+        .hiw-card:nth-child(3):hover { border-color: rgba(16, 185, 129, 0.35); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.12); }
+        .hiw-card:nth-child(3):hover .hiw-card-icon-wrapper { color: #34d399; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 25px rgba(16, 185, 129, 0.2); }
+        .hiw-card:nth-child(3):hover .hiw-num { border-color: rgba(16, 185, 129, 0.3); color: #34d399; background: rgba(16, 185, 129, 0.1); }
+        
+        /* Card 4: Sky/Blue */
+        .hiw-card:nth-child(4):hover { border-color: rgba(56, 189, 248, 0.35); box-shadow: 0 20px 40px rgba(56, 189, 248, 0.12); }
+        .hiw-card:nth-child(4):hover .hiw-card-icon-wrapper { color: #38bdf8; background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3); box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); }
+        .hiw-card:nth-child(4):hover .hiw-num { border-color: rgba(56, 189, 248, 0.3); color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 
         .hiw-card h4 {
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 1.25rem;
+            font-weight: 800;
             color: var(--text-main);
-            margin: 0 0 0.5rem;
+            margin: 0 0 0.75rem;
+            letter-spacing: -0.5px;
         }
-
         .hiw-card p {
             font-size: 0.88rem;
             color: var(--text-muted);
@@ -238,19 +471,31 @@
             margin: 0;
         }
 
-        .hiw-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+        /* Light theme adjustments */
+        body.light-theme .hiw-card {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+        body.light-theme .hiw-card-icon-wrapper {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.06);
+            color: rgba(0, 0, 0, 0.6);
+        }
+        body.light-theme .hiw-num {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.05);
+            color: rgba(0, 0, 0, 0.4);
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo" style="display:flex;align-items:center;gap:0.55rem;">
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:0.55rem;text-decoration:none;color:inherit;">
                 <img src="assets/logo.png" alt="DOWNLOADYFY.AI Logo" style="width:34px;height:34px;border-radius:9px;object-fit:cover;flex-shrink:0;">
-                DOWNLOADYFY<span>.AI</span>
-            </div>
+                <span class="logo-text">DOWNLOADYFY<span>.AI</span></span>
+            </a>
             <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
                 <!-- Language Selector Dropdown -->
                 <div class="language-selector-wrapper" style="position: relative;">
@@ -278,7 +523,7 @@
                         <option value="lb">🇱🇺 Luxembourg (Lëtzebuergesch)</option>
 
                         <!-- Afghanistan to Burkina Faso -->
-                        <option value="ps">🇦🇫 Afghanistan (Pashto)</option>
+                        <option value="ps">🇦𝒇 Afghanistan (Pashto)</option>
                         <option value="sq">🇦🇱 Albania (Shqip)</option>
                         <option value="ar">🇩🇿 Algeria / Bahrain (العربية)</option>
                         <option value="ca">🇦🇩 Andorra (Català)</option>
@@ -315,10 +560,6 @@
                         font-size: 0.7rem;
                     ">▼</span>
                 </div>
-                <div id="downloadAllowanceBadge" class="premium-status-pill" style="cursor: default;" title="Device allowance status">
-                    <span class="status-dot" style="background-color: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime);"></span>
-                    <span id="allowanceBadgeText">Free Downloads Left: 1/1</span>
-                </div>
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
                     <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -345,6 +586,12 @@
                 <span class="badge-item soundcloud">SoundCloud</span>
                 <span class="badge-item vimeo">Vimeo</span>
                 <span class="badge-item reddit">Reddit</span>
+                <span class="badge-item pinterest">Pinterest</span>
+                <span class="badge-item dailymotion">DailyMotion</span>
+                <span class="badge-item bandcamp">Bandcamp</span>
+                <span class="badge-item mixcloud">Mixcloud</span>
+                <span class="badge-item ted">TED Talks</span>
+                <span class="badge-item twitch">Twitch</span>
             </div>
             <h1 class="hero-title" data-translate="hero_title">Experience <span class="gradient-text">Intelligent Simplicity</span></h1>
             <p class="hero-subtitle" data-translate="hero_subtitle">Paste a link below to download videos, audio, or playlists instantly.</p>
@@ -599,13 +846,13 @@
                     <div class="tool-icon-wrapper">⚡</div>
                     <div>
                         <h2 class="tool-title" data-translate="video_audio_title">Video → Audio</h2>
-                        <p class="tool-desc" data-translate="video_audio_desc">Drag and drop a local video file (MP4, MKV, AVI, MOV) and instantly extract a high-quality audio track. Choose from MP3, WAV, FLAC, or M4A output formats.</p>
+                        <p class="tool-desc" data-translate="video_audio_desc">Drag and drop local video files (MP4, MKV, AVI) to instantly extract high-fidelity audio tracks. Output formats include MP3, FLAC, WAV, and M4A.</p>
                     </div>
-                    <div class="tools-features">
+                    <div class="tool-features">
                         <span class="tool-feature-pill">320kbps MP3</span>
                         <span class="tool-feature-pill">Lossless FLAC</span>
                         <span class="tool-feature-pill">WAV / M4A</span>
-                        <span class="tool-feature-pill">Drag &amp; Drop</span>
+                        <span class="tool-feature-pill">Local Processing</span>
                     </div>
                     <div class="tool-cta">
                         <span data-translate="convert_now">Convert Now</span>
@@ -618,16 +865,54 @@
                     <div class="tool-icon-wrapper">✂️</div>
                     <div>
                         <h2 class="tool-title" data-translate="audio_trimmer_title">Audio Trimmer</h2>
-                        <p class="tool-desc" data-translate="audio_trimmer_desc">Upload any audio file and trim it to the perfect length. Ideal for creating custom ringtones, notification sounds, and podcast clips in high-quality MP3.</p>
+                        <p class="tool-desc" data-translate="audio_trimmer_desc">Trim MP3/WAV audio files down to the millisecond. Ideal for creating custom ringtones, alarms, notification sounds, and clean audio loops.</p>
                     </div>
                     <div class="tool-features">
-                        <span class="tool-feature-pill">Ringtone Creator</span>
-                        <span class="tool-feature-pill">Precise Trim</span>
-                        <span class="tool-feature-pill">MP3 Export</span>
-                        <span class="tool-feature-pill">MP3/WAV/M4A</span>
+                        <span class="tool-feature-pill">Ringtone Maker</span>
+                        <span class="tool-feature-pill">Precise Crop</span>
+                        <span class="tool-feature-pill">Audio Waveform</span>
+                        <span class="tool-feature-pill">Instant Export</span>
                     </div>
                     <div class="tool-cta">
                         <span data-translate="trim_audio">Trim Audio</span>
+                        <span class="cta-arrow">→</span>
+                    </div>
+                </a>
+
+                <!-- Tool 3: Audio Volume Booster -->
+                <a href="converter.html" class="tool-card booster-tool">
+                    <div class="tool-icon-wrapper">🔊</div>
+                    <div>
+                        <h2 class="tool-title">Volume Booster</h2>
+                        <p class="tool-desc">Boost volume levels of quiet videos or audio files by up to 300%. Perfect for quiet recordings, faint podcasts, and soft audio tracks.</p>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature-pill">300% Gain Boost</span>
+                        <span class="tool-feature-pill">Peak Limiting</span>
+                        <span class="tool-feature-pill">Distortion Filter</span>
+                        <span class="tool-feature-pill">Dual Channel</span>
+                    </div>
+                    <div class="tool-cta">
+                        <span>Boost Volume</span>
+                        <span class="cta-arrow">→</span>
+                    </div>
+                </a>
+
+                <!-- Tool 4: ID3 Tag Editor -->
+                <a href="downloader.html" class="tool-card tagger-tool">
+                    <div class="tool-icon-wrapper">🏷️</div>
+                    <div>
+                        <h2 class="tool-title">AI Metadata Tagger</h2>
+                        <p class="tool-desc">Embed high-quality thumbnail album covers, customized artist tags, track numbers, and genre metadata directly into your downloaded MP3 files.</p>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature-pill">Album Cover Art</span>
+                        <span class="tool-feature-pill">ID3v2 Support</span>
+                        <span class="tool-feature-pill">Auto Scraping</span>
+                        <span class="tool-feature-pill">Offline Tags</span>
+                    </div>
+                    <div class="tool-cta">
+                        <span>Edit Metadata</span>
                         <span class="cta-arrow">→</span>
                     </div>
                 </a>
@@ -638,59 +923,9 @@
             <p id="errorMsg">Something went wrong. Please try again.</p>
         </div>
 
-        <!-- Stats Bar -->
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-num">8K</div>
-                <div class="stat-lbl">MAX QUALITY</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">9+</div>
-                <div class="stat-lbl">PLATFORMS</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">320</div>
-                <div class="stat-lbl">KBPS AUDIO</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">Free</div>
-                <div class="stat-lbl">FOREVER</div>
-            </div>
-        </div>
 
-        <!-- How It Works -->
-        <div class="hiw-section">
-            <div style="text-align: center;">
-                <h2 class="section-title" data-translate="hiw_title">How Downloadyfy<span>.AI</span> Works</h2>
-                <p class="section-subtitle" data-translate="hiw_subtitle">Follow these simple steps to download, extract, and manage your media.</p>
-            </div>
-            <div class="hiw-grid">
-                <div class="hiw-card">
-                    <div class="hiw-icon">🔗</div>
-                    <div class="hiw-num">1</div>
-                    <h4 data-translate="hiw_step1_title">Choose Your Tool</h4>
-                    <p data-translate="hiw_step1_desc">Select the right tool from the cards above — Link Downloader for URLs, Converter for local videos, or Trimmer for audio clips.</p>
-                </div>
-                <div class="hiw-card">
-                    <div class="hiw-icon">📋</div>
-                    <div class="hiw-num">2</div>
-                    <h4 data-translate="hiw_step2_title">Paste Link or Upload File</h4>
-                    <p data-translate="hiw_step2_desc">For downloads, copy any public URL and paste it. For local tools, drag-and-drop your video or audio file directly onto the page.</p>
-                </div>
-                <div class="hiw-card">
-                    <div class="hiw-icon">⚙️</div>
-                    <div class="hiw-num">3</div>
-                    <h4 data-translate="hiw_step3_title">Select Format &amp; Quality</h4>
-                    <p data-translate="hiw_step3_desc">Our AI engine auto-detects available formats. Pick from video resolutions up to 8K or audio quality up to 320kbps Lossless FLAC.</p>
-                </div>
-                <div class="hiw-card">
-                    <div class="hiw-icon">⬇️</div>
-                    <div class="hiw-num">4</div>
-                    <h4 data-translate="hiw_step4_title">Download to Device</h4>
-                    <p data-translate="hiw_step4_desc">Click Download and the file saves directly to your browser's downloads folder. No accounts, no subscriptions. Free forever.</p>
-                </div>
-            </div>
-        </div>
+
+
 
         <!-- Demo Section -->
         <section class="demo-section" id="demoSection" style="margin-top: 3rem;">
@@ -727,45 +962,157 @@
             </div>
         </section>
 
-        <!-- Partners Section -->
-        <section class="partners-section reveal" id="partnersSection">
-            <h2 class="section-title" data-translate="partners_title">Creative &amp; Educational Partners</h2>
-            <p class="section-subtitle" data-translate="partners_subtitle">Empower your study and design projects with high-quality, royalty-free content from our network.</p>
-            <div class="partners-grid">
-                <a href="https://unsplash.com" target="_blank" class="partner-card">
-                    <div class="partner-icon">🖼️</div>
-                    <div class="partner-info">
-                        <h3>Unsplash</h3>
-                        <p>Beautiful, free educational and creative images that you can use for online courses and tutorials.</p>
-                        <span class="partner-tag">Affiliate Partner</span>
+        <!-- AI Media Processing Engine Visualizer -->
+        <section class="engine-section reveal" id="engineSection">
+            <h2 class="section-title">AI Media Processing Engine</h2>
+            <p class="section-subtitle">Real-time pipeline orchestration for decryption, stream splitting, metadata tagging, and high-speed packet delivery.</p>
+            <div class="engine-grid">
+                <div class="engine-card">
+                    <span class="engine-step-badge">STEP 01</span>
+                    <div class="engine-anim-container">
+                        <div class="pulse-circle"></div>
+                        <div class="pulse-wave"></div>
+                        <div class="pulse-wave delay-1"></div>
+                        <div class="pulse-wave delay-2"></div>
                     </div>
-                </a>
-                <a href="https://pixabay.com" target="_blank" class="partner-card">
-                    <div class="partner-icon">🎥</div>
-                    <div class="partner-info">
-                        <h3>Pixabay Stock</h3>
-                        <p>Stunning royalty-free video clips, stock sound tracks, and animations for educational projects.</p>
-                        <span class="partner-tag">Affiliate Partner</span>
+                    <div class="engine-info">
+                        <h3>Link Intake &amp; Parse</h3>
+                        <p>Incoming target URL is sanitized, analyzed, and queued for extraction handshake.</p>
                     </div>
-                </a>
-                <a href="https://freesound.org" target="_blank" class="partner-card">
-                    <div class="partner-icon">🔊</div>
-                    <div class="partner-info">
-                        <h3>Freesound</h3>
-                        <p>A collaborative repository of creative-commons audio clips and sound effects for creators.</p>
-                        <span class="partner-tag">Affiliate Partner</span>
+                </div>
+                <div class="engine-card">
+                    <span class="engine-step-badge">STEP 02</span>
+                    <div class="engine-anim-container">
+                        <div class="core-spinner">
+                            <div class="core-inner"></div>
+                        </div>
                     </div>
-                </a>
-                <a href="https://www.pexels.com" target="_blank" class="partner-card">
-                    <div class="partner-icon">🎬</div>
-                    <div class="partner-info">
-                        <h3>Pexels Media</h3>
-                        <p>Premium quality free video loops and stock photography. Highly recommended for creative edits.</p>
-                        <span class="partner-tag">Affiliate Partner</span>
+                    <div class="engine-info">
+                        <h3>AI Core Decryption</h3>
+                        <p>Bypasses rate limiting, decodes request blocks, and resolves source media keys.</p>
                     </div>
-                </a>
+                </div>
+                <div class="engine-card">
+                    <span class="engine-step-badge">STEP 03</span>
+                    <div class="engine-anim-container">
+                        <div class="equalizer-container">
+                            <div class="eq-bar"></div>
+                            <div class="eq-bar"></div>
+                            <div class="eq-bar"></div>
+                            <div class="eq-bar"></div>
+                            <div class="eq-bar"></div>
+                        </div>
+                    </div>
+                    <div class="engine-info">
+                        <h3>Split &amp; Tag Engine</h3>
+                        <p>Extracts audio spectrum, converts formats, and injects ID3 tag cover art.</p>
+                    </div>
+                </div>
+                <div class="engine-card">
+                    <span class="engine-step-badge">STEP 04</span>
+                    <div class="engine-anim-container">
+                        <div class="pipe-track">
+                            <div class="pipe-runner"></div>
+                        </div>
+                    </div>
+                    <div class="engine-info">
+                        <h3>High-Speed Delivery</h3>
+                        <p>Pipes multi-threaded packets via active TCP segments directly to your local file path.</p>
+                    </div>
+                </div>
             </div>
         </section>
+
+        <!-- How It Works -->
+        <section class="hiw-section reveal" id="howItWorksSection">
+            <div style="text-align: center;">
+                <h2 class="section-title" data-translate="hiw_title">How Downloadyfy<span>.AI</span> Works</h2>
+                <p class="section-subtitle" data-translate="hiw_subtitle">Follow these simple steps to download, extract, and manage your media.</p>
+            </div>
+            <div class="hiw-grid">
+                <div class="hiw-card">
+                    <div class="hiw-num">1</div>
+                    <div class="hiw-card-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hiw-card-icon"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    </div>
+                    <h4 data-translate="hiw_step1_title">Choose Your Tool</h4>
+                    <p data-translate="hiw_step1_desc">Select the right tool from the cards above — Link Downloader for URLs, Converter for local videos, or Trimmer for audio clips.</p>
+                </div>
+                <div class="hiw-card">
+                    <div class="hiw-num">2</div>
+                    <div class="hiw-card-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hiw-card-icon"><path d="M15 2H9a1 1 0 0 0-1 1v2c0 .6.4 1 1 1h6c.6 0 1-.4 1-1V3a1 1 0 0 0-1-1z"/><rect width="16" height="16" x="4" y="5" rx="2"/><path d="M12 9v6M9 12h6"/></svg>
+                    </div>
+                    <h4 data-translate="hiw_step2_title">Paste Link or Upload File</h4>
+                    <p data-translate="hiw_step2_desc">For downloads, copy any public URL and paste it. For local tools, drag-and-drop your video or audio file directly onto the page.</p>
+                </div>
+                <div class="hiw-card">
+                    <div class="hiw-num">3</div>
+                    <div class="hiw-card-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hiw-card-icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <div style="margin-bottom: 0.25rem;">
+                        <span class="hiw-card-badge" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #34d399; box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);">8K UHD Support</span>
+                    </div>
+                    <h4 data-translate="hiw_step3_title">Select Format &amp; Quality</h4>
+                    <p data-translate="hiw_step3_desc">Our AI engine auto-detects available formats. Pick from video resolutions up to 8K or audio quality up to 320kbps Lossless FLAC.</p>
+                </div>
+                <div class="hiw-card">
+                    <div class="hiw-num">4</div>
+                    <div class="hiw-card-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hiw-card-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    </div>
+                    <div style="margin-bottom: 0.25rem;">
+                        <span class="hiw-card-badge" style="background: rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.3); color: #818cf8; box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);">Free Forever</span>
+                    </div>
+                    <h4 data-translate="hiw_step4_title">Download to Device</h4>
+                    <p data-translate="hiw_step4_desc">Click Download and the file saves directly to your browser's downloads folder. No accounts, no subscriptions. Free forever.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section reveal" id="statsSection">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><rect width="20" height="15" x="2" y="3" rx="2"/><path d="M12 18v4M8 22h8"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-num" data-target="8" data-suffix="K">0K</div>
+                        <div class="stat-lbl">MAX QUALITY</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-num" data-target="9" data-suffix="+">0+</div>
+                        <div class="stat-lbl">PLATFORMS</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-num" data-target="320" data-suffix="">0</div>
+                        <div class="stat-lbl">KBPS AUDIO</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-num" data-text="Free">Free</div>
+                        <div class="stat-lbl">FOREVER</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer">
@@ -825,6 +1172,7 @@
     <!-- Hidden Google Translate Element but rendered for DOM accessibility -->
     <div id="google_translate_element" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none;"></div>
 
+    <script src="language.js"></script>
     <script src="app.js?v=12"></script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>

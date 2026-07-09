@@ -2136,6 +2136,27 @@ body.light-theme .glow-button:hover {
     color: #BD081C;
     border-color: rgba(189, 8, 28, 0.3);
 }
+.badge-item.dailymotion {
+    color: #0066ff;
+    border-color: rgba(0, 102, 255, 0.3);
+}
+.badge-item.bandcamp {
+    color: #1ea0c4;
+    border-color: rgba(30, 160, 196, 0.3);
+}
+.badge-item.mixcloud {
+    color: #5000ff;
+    border-color: rgba(80, 0, 255, 0.3);
+}
+.badge-item.ted {
+    color: #e62b1e;
+    border-color: rgba(230, 43, 30, 0.3);
+}
+.badge-item.twitch {
+    color: #9146ff;
+    border-color: rgba(145, 70, 255, 0.3);
+}
+
 
 /* === Legal Disclaimer Banner === */
 .legal-disclaimer {
@@ -2541,79 +2562,187 @@ body.light-theme .form-group input {
 }
 
 /* === Creator Affiliate Resources Section === */
-.partners-section {
+/* === AI Engine Pipeline Visualizer === */
+.engine-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.2rem;
-    padding: 3rem 0;
+    gap: 1.5rem;
+    padding: 4rem 0;
     border-top: 1px solid var(--divider);
 }
 
-.partners-grid {
+.engine-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.8rem;
     width: 100%;
 }
 
-.partner-card {
+.engine-card {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 1.8rem;
+    border-radius: 24px;
+    padding: 2.2rem 1.8rem;
     display: flex;
-    gap: 1.2rem;
-    align-items: flex-start;
-    text-decoration: none;
-    color: var(--text-main);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.partner-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-lime);
-    box-shadow: 0 12px 30px rgba(218, 248, 160, 0.12);
+.engine-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.03), transparent 70%);
+    pointer-events: none;
 }
 
-.partner-icon {
-    font-size: 2.2rem;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 0.6rem;
-    border-radius: 14px;
-    border: 1px solid var(--glass-border);
-    width: 54px;
-    height: 54px;
+.engine-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--accent-orange);
+    box-shadow: 0 20px 40px rgba(255, 95, 0, 0.1);
+}
+
+.engine-anim-container {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Animation 1: Intake Pulse */
+.pulse-circle {
+    width: 24px;
+    height: 24px;
+    background: var(--accent-orange);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 15px var(--accent-orange);
+}
+.pulse-wave {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--accent-orange);
+    border-radius: 50%;
+    animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+.pulse-wave.delay-1 { animation-delay: 0.6s; }
+.pulse-wave.delay-2 { animation-delay: 1.2s; }
+
+@keyframes pulseRing {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* Animation 2: Decryption Core */
+.core-spinner {
+    width: 64px;
+    height: 64px;
+    border: 3px dashed rgba(99, 102, 241, 0.2);
+    border-top-color: #6366f1;
+    border-bottom-color: #6366f1;
+    border-radius: 50%;
+    animation: spinClockwise 3s linear infinite;
     display: flex;
     align-items: center;
     justify-content: center;
 }
+.core-inner {
+    width: 40px;
+    height: 40px;
+    border: 3px dashed rgba(168, 85, 247, 0.2);
+    border-left-color: #a855f7;
+    border-right-color: #a855f7;
+    border-radius: 50%;
+    animation: spinCounter 2s linear infinite;
+}
+@keyframes spinClockwise {
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinCounter {
+    100% { transform: rotate(-360deg); }
+}
 
-.partner-info {
+/* Animation 3: Equalizer */
+.equalizer-container {
     display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    text-align: left;
+    align-items: flex-end;
+    gap: 5px;
+    height: 45px;
+}
+.eq-bar {
+    width: 6px;
+    background: linear-gradient(to top, #10b981, #34d399);
+    border-radius: 3px;
+    animation: eqBounce 1s ease-in-out infinite alternate;
+}
+.eq-bar:nth-child(1) { height: 15px; animation-delay: 0.1s; }
+.eq-bar:nth-child(2) { height: 35px; animation-delay: 0.3s; }
+.eq-bar:nth-child(3) { height: 45px; animation-delay: 0.5s; }
+.eq-bar:nth-child(4) { height: 25px; animation-delay: 0.2s; }
+.eq-bar:nth-child(5) { height: 40px; animation-delay: 0.4s; }
+
+@keyframes eqBounce {
+    0% { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
 }
 
-.partner-info h3 {
-    font-size: 1.15rem;
+/* Animation 4: Fast Pipe */
+.pipe-track {
+    width: 70px;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+}
+.pipe-runner {
+    position: absolute;
+    height: 100%;
+    width: 25px;
+    background: linear-gradient(to right, #00f2fe, #4facfe);
+    border-radius: 3px;
+    animation: runPipe 1.5s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;
+    box-shadow: 0 0 10px #4facfe;
+}
+@keyframes runPipe {
+    0% { left: -30px; }
+    100% { left: 80px; }
+}
+
+.engine-info h3 {
+    font-size: 1.2rem;
     font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
 }
-
-.partner-info p {
+.engine-info p {
     font-size: 0.85rem;
     color: var(--text-muted);
-    line-height: 1.45;
+    line-height: 1.5;
 }
-
-.partner-tag {
+.engine-step-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
     font-size: 0.72rem;
     font-weight: 700;
-    color: var(--accent-orange);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 0.3rem;
+    color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.05);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
 /* === Legal & Policy Layouts === */
