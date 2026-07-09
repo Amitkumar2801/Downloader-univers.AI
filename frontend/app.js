@@ -1796,24 +1796,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (isNaN(target)) return;
                         
                         const suffix = el.getAttribute('data-suffix') || '';
-                        const start = 0;
+                        let current = 0;
                         const duration = 1200; // ms
-                        const startTime = performance.now();
+                        const steps = 60;
+                        const stepTime = duration / steps;
+                        const increment = target / steps;
                         
-                        const animate = (currentTime) => {
-                            const elapsed = currentTime - startTime;
-                            const progress = Math.min(elapsed / duration, 1);
-                            const currentVal = start + progress * (target - start);
-                            
-                            el.textContent = Math.floor(currentVal) + suffix;
-                            
-                            if (progress < 1) {
-                                requestAnimationFrame(animate);
-                            } else {
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
                                 el.textContent = target + suffix;
+                                clearInterval(timer);
+                            } else {
+                                el.textContent = Math.floor(current) + suffix;
                             }
-                        };
-                        requestAnimationFrame(animate);
+                        }, stepTime);
                     });
                     observer.unobserve(entry.target);
                 }
