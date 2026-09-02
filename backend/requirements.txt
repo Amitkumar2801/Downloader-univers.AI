@@ -4,3 +4,5 @@ yt-dlp
 imageio-ffmpeg
 mutagen
 beautifulsoup4
+requests
+cryptography
