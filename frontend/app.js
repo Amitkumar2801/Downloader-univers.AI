@@ -632,9 +632,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             } else {
                 optionsHTML = `
-                    <option value="bestvideo[height<=2160]+bestaudio/best">4K Video</option>
-                    <option value="bestvideo[height<=1080]+bestaudio/best" selected>1080p Video</option>
-                    <option value="bestvideo[height<=720]+bestaudio/best">720p Video</option>
+                    <option value="bestvideo[height<=2160]+bestaudio[ext=m4a]/bestvideo[height<=2160]+bestaudio/best">4K Ultra HD (2160p)</option>
+                    <option value="bestvideo[height<=1440]+bestaudio[ext=m4a]/bestvideo[height<=1440]+bestaudio/best">2K Quad HD (1440p)</option>
+                    <option value="bestvideo[height<=1080]+bestaudio[ext=m4a]/bestvideo[height<=1080]+bestaudio/best" selected>1080p Full HD</option>
+                    <option value="bestvideo[height<=720]+bestaudio[ext=m4a]/bestvideo[height<=720]+bestaudio/best">720p HD</option>
+                    <option value="bestvideo[height<=480]+bestaudio[ext=m4a]/bestvideo[height<=480]+bestaudio/best">480p SD</option>
                     <option value="bestaudio/best">Audio Only (MP3)</option>
                 `;
             }
