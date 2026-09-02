@@ -28,7 +28,7 @@ def map_video_quality_to_format(quality: VideoQuality) -> str:
         height = int(height_str)
     except ValueError:
         height = 1080
-    return f"bestvideo[height<={height}]+bestaudio/best"
+    return f"bestvideo[height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/best"
 
 def map_audio_bitrate_to_format(bitrate: AudioBitrate) -> str:
     """Return yt-dlp format selector for audio extraction at given bitrate.
