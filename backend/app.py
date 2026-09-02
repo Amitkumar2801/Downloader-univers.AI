@@ -375,6 +375,7 @@ def get_video_info():
         'extract_flat': 'in_playlist',
         'socket_timeout': 30,
         'nocheckcertificate': True,
+        'js_runtimes': {'node': {}},
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -731,6 +732,7 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             'quiet': True,
             'no_warnings': True,
             'ffmpeg_location': imageio_ffmpeg.get_ffmpeg_exe(),
+            'js_runtimes': {'node': {}},
             'nocheckcertificate': True,
             'concurrent_fragment_downloads': 16,
             'buffersize': 1024 * 1024,
@@ -914,13 +916,8 @@ def download_video():
 
     # Set up formats and extensions
     if media_type == 'video':
-        # Determine extension based on desired height (if >1080 use mkv for higher resolutions)
-        if height > 1080:
-            ext = 'mkv'
-            merge_format = 'mkv'
-        else:
-            ext = 'mp4'
-            merge_format = 'mp4'
+        ext = 'mp4'
+        merge_format = 'mp4'
 
         # Use video_quality if provided, otherwise fallback to format_id/heights logic
         if video_quality:
@@ -928,12 +925,18 @@ def download_video():
                 q_enum = VideoQuality['P' + video_quality.rstrip('p')]
                 target_format = map_video_quality_to_format(q_enum)
             except Exception:
-                target_format = f"{format_id}+bestaudio/best"
+                target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/best"
         else:
             if '+bestaudio' not in format_id:
-                target_format = f"{format_id}+bestaudio/best"
+                if height > 0:
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
+                else:
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo+bestaudio/best"
             else:
-                target_format = format_id
+                if '+bestaudio/best' in format_id and '[ext=m4a]' not in format_id:
+                    target_format = format_id.replace('+bestaudio/best', '+bestaudio[ext=m4a]/') + format_id
+                else:
+                    target_format = format_id
     else:
         merge_format = None
         if audio_bitrate:
@@ -1190,24 +1193,26 @@ def start_download():
 
     # Set up formats and extensions
     if media_type == 'video':
-        if height > 1080:
-            ext = 'mkv'
-            merge_format = 'mkv'
-        else:
-            ext = 'mp4'
-            merge_format = 'mp4'
+        ext = 'mp4'
+        merge_format = 'mp4'
 
         if video_quality:
             try:
                 q_enum = VideoQuality['P' + video_quality.rstrip('p')]
                 target_format = map_video_quality_to_format(q_enum)
             except Exception:
-                target_format = f"{format_id}+bestaudio/best"
+                target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/best"
         else:
             if '+bestaudio' not in format_id:
-                target_format = f"{format_id}+bestaudio/best"
+                if height > 0:
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
+                else:
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo+bestaudio/best"
             else:
-                target_format = format_id
+                if '+bestaudio/best' in format_id and '[ext=m4a]' not in format_id:
+                    target_format = format_id.replace('+bestaudio/best', '+bestaudio[ext=m4a]/') + format_id
+                else:
+                    target_format = format_id
     elif media_type == 'image':
         merge_format = None
         target_format = 'best'
