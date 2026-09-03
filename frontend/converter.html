@@ -229,33 +229,19 @@
                 <span class="logo-text">DOWNLOADYFY<span>.AI</span></span>
             </a>
 
-            <div class="nav-links-menu" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                <a href="index.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem;">Downloader</a>
-                <a href="converter.html" class="nav-link-item active" style="color: #818cf8; font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25);">Converter</a>
-                <a href="trimmer.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem;">Trimmer</a>
-                <a href="vocal-remover.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem;">Vocal Remover</a>
-                <a href="booster.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem;">3D Booster</a>
-                <a href="tagger.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem;">ID3 Tagger</a>
+            <div class="nav-links-menu">
+                <a href="index.html" class="nav-link-item nav-downloader"><span class="nav-icon">⚡</span><span>Downloader</span></a>
+                <a href="converter.html" class="nav-link-item active nav-converter"><span class="nav-icon">🔄</span><span>Converter</span></a>
+                <a href="trimmer.html" class="nav-link-item nav-trimmer"><span class="nav-icon">✂️</span><span>Trimmer</span></a>
+                <a href="vocal-remover.html" class="nav-link-item nav-vocal"><span class="nav-icon">🎤</span><span>Vocal Remover</span></a>
+                <a href="booster.html" class="nav-link-item nav-booster"><span class="nav-icon">🔊</span><span>3D Booster</span></a>
+                <a href="tagger.html" class="nav-link-item nav-tagger"><span class="nav-icon">🏷️</span><span>ID3 Tagger</span></a>
             </div>
 
-            <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+            <div class="nav-actions">
                 <!-- Language Selector Dropdown -->
-                <div class="language-selector-wrapper" style="position: relative;">
-                    <select id="languageSelect" class="lang-select-dropdown" aria-label="Select Language" style="
-                        background: var(--glass-bg);
-                        color: var(--text-main);
-                        border: 1px solid var(--glass-border);
-                        border-radius: 12px;
-                        padding: 0.5rem 1.8rem 0.5rem 0.8rem;
-                        font-size: 0.85rem;
-                        font-weight: 600;
-                        outline: none;
-                        cursor: pointer;
-                        appearance: none;
-                        -webkit-appearance: none;
-                        transition: all 0.2s ease;
-                        max-width: 180px;
-                    ">
+                <div class="language-selector-wrapper">
+                    <select id="languageSelect" class="lang-select-dropdown" aria-label="Select Language">
                         <!-- Popular/User requested -->
                         <option value="en">🇺🇸 US / 🇬🇧 UK (English)</option>
                         <option value="hi">🇮🇳 India (हिंदी)</option>
