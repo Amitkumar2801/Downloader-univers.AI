@@ -496,6 +496,16 @@
                 <img src="assets/logo.png" alt="DOWNLOADYFY.AI Logo" style="width:34px;height:34px;border-radius:9px;object-fit:cover;flex-shrink:0;">
                 <span class="logo-text">DOWNLOADYFY<span>.AI</span></span>
             </a>
+            
+            <div class="nav-links-menu" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="index.html" class="nav-link-item active" style="color: var(--accent-orange); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem; background: rgba(255,95,0,0.1); border: 1px solid rgba(255,95,0,0.25);">Downloader</a>
+                <a href="converter.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem; transition: all 0.2s;">Converter</a>
+                <a href="trimmer.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem; transition: all 0.2s;">Trimmer</a>
+                <a href="vocal-remover.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem; transition: all 0.2s;">Vocal Remover</a>
+                <a href="booster.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem; transition: all 0.2s;">3D Booster</a>
+                <a href="tagger.html" class="nav-link-item" style="color: var(--text-muted); font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 0.88rem; transition: all 0.2s;">ID3 Tagger</a>
+            </div>
+
             <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
                 <!-- Language Selector Dropdown -->
                 <div class="language-selector-wrapper" style="position: relative;">
@@ -836,16 +846,16 @@
 
         <!-- Additional Media Tools Section -->
         <section class="additional-tools-section" id="additionalToolsSection" style="margin-top: 3rem; width: 100%;">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h2 class="section-title" data-translate="additional_tools_title">Additional Media Tools</h2>
-                <p class="section-subtitle" data-translate="additional_tools_subtitle">Need offline file conversions or precision audio splitting? Try our high-performance utilities.</p>
+            <div style="text-align: center; margin-bottom: 2.5rem;">
+                <h2 class="section-title" data-translate="additional_tools_title">Creative AI Studio Tools</h2>
+                <p class="section-subtitle" data-translate="additional_tools_subtitle">Professional-grade offline audio processing, stem separation, 8D audio enhancement, and metadata tagging.</p>
             </div>
             <div class="tools-grid">
                 <!-- Tool 1: Video to Audio Converter -->
                 <a href="converter.html" class="tool-card converter-tool">
                     <div class="tool-icon-wrapper">⚡</div>
                     <div>
-                        <h2 class="tool-title" data-translate="video_audio_title">Video → Audio</h2>
+                        <h2 class="tool-title" data-translate="video_audio_title">Video → Audio Converter</h2>
                         <p class="tool-desc" data-translate="video_audio_desc">Drag and drop local video files (MP4, MKV, AVI) to instantly extract high-fidelity audio tracks. Output formats include MP3, FLAC, WAV, and M4A.</p>
                     </div>
                     <div class="tool-features">
@@ -864,12 +874,12 @@
                 <a href="trimmer.html" class="tool-card trimmer-tool">
                     <div class="tool-icon-wrapper">✂️</div>
                     <div>
-                        <h2 class="tool-title" data-translate="audio_trimmer_title">Audio Trimmer</h2>
-                        <p class="tool-desc" data-translate="audio_trimmer_desc">Trim MP3/WAV audio files down to the millisecond. Ideal for creating custom ringtones, alarms, notification sounds, and clean audio loops.</p>
+                        <h2 class="tool-title" data-translate="audio_trimmer_title">Audio & Video Trimmer</h2>
+                        <p class="tool-desc" data-translate="audio_trimmer_desc">Trim MP3/WAV audio files down to the millisecond with live waveform visualizer. Ideal for custom ringtones, alarms, and audio loops.</p>
                     </div>
                     <div class="tool-features">
                         <span class="tool-feature-pill">Ringtone Maker</span>
-                        <span class="tool-feature-pill">Precise Crop</span>
+                        <span class="tool-feature-pill">Precise Millisec</span>
                         <span class="tool-feature-pill">Audio Waveform</span>
                         <span class="tool-feature-pill">Instant Export</span>
                     </div>
@@ -879,37 +889,56 @@
                     </div>
                 </a>
 
-                <!-- Tool 3: Audio Volume Booster -->
-                <a href="converter.html" class="tool-card booster-tool">
-                    <div class="tool-icon-wrapper">🔊</div>
+                <!-- Tool 3: AI Vocal Remover & Karaoke Maker -->
+                <a href="vocal-remover.html" class="tool-card converter-tool" style="border-color: rgba(236, 72, 153, 0.3);">
+                    <div class="tool-icon-wrapper" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(236, 72, 153, 0.3);">🎤</div>
                     <div>
-                        <h2 class="tool-title">Volume Booster</h2>
-                        <p class="tool-desc">Boost volume levels of quiet videos or audio files by up to 300%. Perfect for quiet recordings, faint podcasts, and soft audio tracks.</p>
+                        <h2 class="tool-title">AI Vocal Remover</h2>
+                        <p class="tool-desc">Separate vocals and instrumental music stems from any song with dual interactive waveforms. Create instant Karaoke tracks and Acapellas.</p>
                     </div>
                     <div class="tool-features">
-                        <span class="tool-feature-pill">300% Gain Boost</span>
-                        <span class="tool-feature-pill">Peak Limiting</span>
-                        <span class="tool-feature-pill">Distortion Filter</span>
-                        <span class="tool-feature-pill">Dual Channel</span>
+                        <span class="tool-feature-pill" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3);">Karaoke Maker</span>
+                        <span class="tool-feature-pill" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3);">Acapella Stem</span>
+                        <span class="tool-feature-pill" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3);">Live Waveform</span>
+                        <span class="tool-feature-pill" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3);">Stem Mixer</span>
                     </div>
-                    <div class="tool-cta">
-                        <span>Boost Volume</span>
+                    <div class="tool-cta" style="color: #f472b6;">
+                        <span>Separate Stems</span>
                         <span class="cta-arrow">→</span>
                     </div>
                 </a>
 
-                <!-- Tool 4: ID3 Tag Editor -->
-                <a href="downloader.html" class="tool-card tagger-tool">
-                    <div class="tool-icon-wrapper">🏷️</div>
+                <!-- Tool 4: Audio Volume Booster & 3D 8D Audio -->
+                <a href="booster.html" class="tool-card booster-tool">
+                    <div class="tool-icon-wrapper">🔊</div>
                     <div>
-                        <h2 class="tool-title">AI Metadata Tagger</h2>
-                        <p class="tool-desc">Embed high-quality thumbnail album covers, customized artist tags, track numbers, and genre metadata directly into your downloaded MP3 files.</p>
+                        <h2 class="tool-title">Volume & 3D 8D Booster</h2>
+                        <p class="tool-desc">Supercharge quiet audio up to 500% with soft-knee limiter, add deep sub-bass vibration, and create 3D 8D binaural 360° surround audio.</p>
                     </div>
                     <div class="tool-features">
-                        <span class="tool-feature-pill">Album Cover Art</span>
-                        <span class="tool-feature-pill">ID3v2 Support</span>
-                        <span class="tool-feature-pill">Auto Scraping</span>
-                        <span class="tool-feature-pill">Offline Tags</span>
+                        <span class="tool-feature-pill">500% Gain Boost</span>
+                        <span class="tool-feature-pill">Deep Sub-Bass</span>
+                        <span class="tool-feature-pill">8D 360° Surround</span>
+                        <span class="tool-feature-pill">Slowed + Reverb</span>
+                    </div>
+                    <div class="tool-cta">
+                        <span>Boost & Spatial FX</span>
+                        <span class="cta-arrow">→</span>
+                    </div>
+                </a>
+
+                <!-- Tool 5: ID3 Tag Editor & Cover Art Studio -->
+                <a href="tagger.html" class="tool-card tagger-tool">
+                    <div class="tool-icon-wrapper">🏷️</div>
+                    <div>
+                        <h2 class="tool-title">ID3 Tag & Cover Art Studio</h2>
+                        <p class="tool-desc">Auto-fetch high-res album artwork from Spotify & iTunes, customize artist metadata, and embed ID3 tags directly into MP3, FLAC, and M4A.</p>
+                    </div>
+                    <div class="tool-features">
+                        <span class="tool-feature-pill">Spotify Artwork</span>
+                        <span class="tool-feature-pill">ID3v2 Embedding</span>
+                        <span class="tool-feature-pill">3D Vinyl Preview</span>
+                        <span class="tool-feature-pill">Auto Search</span>
                     </div>
                     <div class="tool-cta">
                         <span>Edit Metadata</span>

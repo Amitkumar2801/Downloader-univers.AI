@@ -1516,5 +1516,273 @@ def trim_audio():
         cleanup_file(output_path)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/vocal-remover', methods=['POST'])
+def vocal_remover():
+    device_id = request.form.get('device_id')
+    ad_token = request.form.get('ad_token')
+    
+    allowed, method = check_and_consume_device_action(device_id, ad_token)
+    if not allowed:
+        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    file = request.files['file']
+    mode = request.form.get('mode', 'instrumental')  # 'instrumental' or 'vocals'
+    
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+        
+    audio_uid = uuid.uuid4().hex[:8]
+    audio_ext = os.path.splitext(file.filename)[1].lower() or '.mp3'
+    input_path = os.path.join(DOWNLOADS_DIR, f"voc_in_{audio_uid}{audio_ext}")
+    file.save(input_path)
+    
+    output_path = os.path.join(DOWNLOADS_DIR, f"voc_out_{audio_uid}_{mode}.mp3")
+    
+    try:
+        import subprocess
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        
+        if mode == 'instrumental':
+            # High-precision center channel vocal cancellation filter
+            af_filter = "pan=stereo|c0=c0-c1|c1=c1-c0, volume=1.6"
+        else:
+            # Vocal isolation filter (isolate center vocal frequencies + human voice bandpass)
+            af_filter = "pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1, bandpass=f=1400:width_type=h:w=2600, volume=2.0"
+        
+        cmd = [
+            ffmpeg_exe, '-y',
+            '-i', input_path,
+            '-af', af_filter,
+            '-acodec', 'libmp3lame',
+            '-b:a', '320k',
+            output_path
+        ]
+        
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=90)
+        if result.returncode != 0:
+            raise Exception(f"FFmpeg error: {result.stderr}")
+            
+        if not os.path.exists(output_path):
+            raise Exception("Failed to process vocal track.")
+            
+        threading.Timer(60.0, cleanup_file, args=[input_path]).start()
+        threading.Timer(120.0, cleanup_file, args=[output_path]).start()
+        
+        suffix = "Karaoke_Instrumental" if mode == 'instrumental' else "Isolated_Vocals"
+        download_name = f"{os.path.splitext(file.filename)[0]}_{suffix}.mp3"
+        return send_file(output_path, as_attachment=True, download_name=download_name)
+    except Exception as e:
+        cleanup_file(input_path)
+        cleanup_file(output_path)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/audio-boost', methods=['POST'])
+def audio_boost():
+    device_id = request.form.get('device_id')
+    ad_token = request.form.get('ad_token')
+    
+    allowed, method = check_and_consume_device_action(device_id, ad_token)
+    if not allowed:
+        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+        
+    vol_multiplier = float(request.form.get('volume', '1.5'))
+    bass_boost = float(request.form.get('bass', '0'))
+    spatial_3d = request.form.get('spatial_3d', 'false') == 'true'
+    reverb = request.form.get('reverb', 'false') == 'true'
+    speed = float(request.form.get('speed', '1.0'))
+    
+    audio_uid = uuid.uuid4().hex[:8]
+    audio_ext = os.path.splitext(file.filename)[1].lower() or '.mp3'
+    input_path = os.path.join(DOWNLOADS_DIR, f"boost_in_{audio_uid}{audio_ext}")
+    file.save(input_path)
+    
+    output_path = os.path.join(DOWNLOADS_DIR, f"boost_out_{audio_uid}.mp3")
+    
+    try:
+        import subprocess
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        
+        filters = []
+        
+        # 1. Bass boost filter
+        if bass_boost > 0:
+            filters.append(f"bass=g={bass_boost}:f=90:w=0.8")
+            
+        # 2. Volume boost with soft-knee limiter to prevent harsh digital clipping
+        if vol_multiplier != 1.0:
+            filters.append(f"volume={vol_multiplier}")
+            filters.append("alimiter=limit=0.98:attack=5:release=50:asc=1")
+            
+        # 3. 8D Spatial Audio (Binaural rotation + stereo widening)
+        if spatial_3d:
+            filters.append("apulsator=mode=sine:hz=0.12:amount=0.85")
+            filters.append("stereowiden=delay=20:feedback=0.25:crossfeed=0.25")
+            
+        # 4. Reverb simulation (concert hall / slowed + reverb vibe)
+        if reverb:
+            filters.append("aecho=0.8:0.85:50:0.35")
+            
+        # 5. Speed / Tempo adjustment
+        if speed != 1.0 and 0.5 <= speed <= 2.0:
+            filters.append(f"atempo={speed}")
+            
+        filter_str = ",".join(filters) if filters else "anull"
+        
+        cmd = [
+            ffmpeg_exe, '-y',
+            '-i', input_path,
+            '-af', filter_str,
+            '-acodec', 'libmp3lame',
+            '-b:a', '320k',
+            output_path
+        ]
+        
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=90)
+        if result.returncode != 0:
+            raise Exception(f"FFmpeg error: {result.stderr}")
+            
+        if not os.path.exists(output_path):
+            raise Exception("Failed to boost audio.")
+            
+        threading.Timer(60.0, cleanup_file, args=[input_path]).start()
+        threading.Timer(120.0, cleanup_file, args=[output_path]).start()
+        
+        download_name = f"{os.path.splitext(file.filename)[0]}_Enhanced.mp3"
+        return send_file(output_path, as_attachment=True, download_name=download_name)
+    except Exception as e:
+        cleanup_file(input_path)
+        cleanup_file(output_path)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/fetch-metadata', methods=['GET'])
+def fetch_metadata():
+    query = request.args.get('query', '')
+    if not query:
+        return jsonify({'error': 'Query required'}), 400
+    try:
+        url = f"https://itunes.apple.com/search?term={requests.utils.quote(query)}&entity=song&limit=6"
+        res = requests.get(url, timeout=8)
+        if res.status_code == 200:
+            data = res.json()
+            results = []
+            for item in data.get('results', []):
+                artwork = item.get('artworkUrl100', '')
+                if artwork:
+                    artwork = artwork.replace('100x100bb', '600x600bb')
+                results.append({
+                    'title': item.get('trackName'),
+                    'artist': item.get('artistName'),
+                    'album': item.get('collectionName'),
+                    'genre': item.get('primaryGenreName'),
+                    'year': item.get('releaseDate', '')[:4] if item.get('releaseDate') else '',
+                    'artwork': artwork
+                })
+            return jsonify({'results': results})
+        return jsonify({'results': []})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/edit-tags', methods=['POST'])
+def edit_tags():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    file = request.files['file']
+    title = request.form.get('title', '')
+    artist = request.form.get('artist', '')
+    album = request.form.get('album', '')
+    genre = request.form.get('genre', '')
+    year = request.form.get('year', '')
+    cover_file = request.files.get('cover')
+    cover_url = request.form.get('cover_url')
+    
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+        
+    audio_uid = uuid.uuid4().hex[:8]
+    ext = os.path.splitext(file.filename)[1].lower().lstrip('.') or 'mp3'
+    audio_path = os.path.join(DOWNLOADS_DIR, f"tag_{audio_uid}.{ext}")
+    file.save(audio_path)
+    
+    try:
+        cover_bytes = None
+        if cover_file and cover_file.filename:
+            cover_bytes = cover_file.read()
+        elif cover_url:
+            try:
+                img_res = requests.get(cover_url, timeout=10)
+                if img_res.status_code == 200:
+                    cover_bytes = img_res.content
+            except Exception:
+                pass
+                
+        if ext == 'mp3':
+            try:
+                tags = ID3(audio_path)
+            except error:
+                tags = ID3()
+            if title:
+                tags.add(TIT2(encoding=3, text=title))
+            if artist:
+                tags.add(TPE1(encoding=3, text=artist))
+            if album:
+                from mutagen.id3 import TALB
+                tags.add(TALB(encoding=3, text=album))
+            if genre:
+                from mutagen.id3 import TCON
+                tags.add(TCON(encoding=3, text=genre))
+            if year:
+                from mutagen.id3 import TYER
+                tags.add(TYER(encoding=3, text=str(year)))
+            if cover_bytes:
+                tags.add(APIC(
+                    encoding=3,
+                    mime='image/jpeg' if cover_bytes.startswith(b'\xff\xd8') else 'image/png',
+                    type=3,
+                    desc='Cover',
+                    data=cover_bytes
+                ))
+            tags.save(audio_path)
+        elif ext == 'flac':
+            audio = FLAC(audio_path)
+            if title: audio['title'] = title
+            if artist: audio['artist'] = artist
+            if album: audio['album'] = album
+            if genre: audio['genre'] = genre
+            if year: audio['date'] = str(year)
+            if cover_bytes:
+                pic = Picture()
+                pic.data = cover_bytes
+                pic.type = 3
+                pic.mime = 'image/jpeg' if cover_bytes.startswith(b'\xff\xd8') else 'image/png'
+                audio.add_picture(pic)
+            audio.save()
+        elif ext in ('m4a', 'mp4'):
+            audio = MP4(audio_path)
+            if title: audio['\xa9nam'] = [title]
+            if artist: audio['\xa9ART'] = [artist]
+            if album: audio['\xa9alb'] = [album]
+            if genre: audio['\xa9gen'] = [genre]
+            if year: audio['\xa9day'] = [str(year)]
+            if cover_bytes:
+                cov_fmt = MP4Cover.FORMAT_JPEG if cover_bytes.startswith(b'\xff\xd8') else MP4Cover.FORMAT_PNG
+                audio['covr'] = [MP4Cover(cover_bytes, imageformat=cov_fmt)]
+            audio.save()
+            
+        download_name = f"{artist} - {title}.{ext}" if (artist and title) else file.filename
+        threading.Timer(120.0, cleanup_file, args=[audio_path]).start()
+        return send_file(audio_path, as_attachment=True, download_name=download_name)
+    except Exception as e:
+        cleanup_file(audio_path)
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)

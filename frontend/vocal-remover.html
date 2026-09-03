@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Vocal Remover & Karaoke Maker - DOWNLOADYFY.AI</title>
+    <meta name="description" content="Separate vocals and music from any song using advanced AI audio processing. Create instant karaoke and acapella tracks for free.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20">
+    <style>
+        .vocal-hero {
+            text-align: center;
+            padding: 4rem 1rem 2rem;
+        }
+        .vocal-badge {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2));
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            color: #f472b6;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
+        }
+        .vocal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2.5rem;
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+        .vocal-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(236, 72, 153, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+        
+        /* Dropzone */
+        .vocal-dropzone {
+            border: 2px dashed rgba(236, 72, 153, 0.35);
+            border-radius: 20px;
+            padding: 3.5rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.015);
+            position: relative;
+        }
+        .vocal-dropzone:hover, .vocal-dropzone.dragover {
+            border-color: #ec4899;
+            background: rgba(236, 72, 153, 0.05);
+            transform: scale(1.01);
+        }
+        .dropzone-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 2.2rem;
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.25);
+        }
+
+        /* Dual Track Studio */
+        .studio-container {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .track-strip {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+        }
+        .track-strip.vocals-strip {
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+        .track-strip.music-strip {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .track-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+        .vocals-badge { color: #f472b6; }
+        .music-badge { color: #34d399; }
+        
+        .waveform-canvas {
+            width: 100%;
+            height: 80px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+            display: block;
+        }
+
+        .track-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 180px;
+        }
+        .volume-slider {
+            flex: 1;
+            accent-color: #ec4899;
+            cursor: pointer;
+            height: 6px;
+        }
+        .music-slider {
+            accent-color: #10b981;
+        }
+        
+        .quick-btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            border-color: #ec4899;
+        }
+        .quick-btn.active {
+            background: linear-gradient(135deg, #ec4899, #d946ef);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Master Player Controls */
+        .master-controls {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .play-btn-large {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.4rem;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+            box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35);
+        }
+        .play-btn-large:hover {
+            transform: scale(1.1);
+        }
+        
+        .export-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .export-btn {
+            padding: 12px 22px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .export-karaoke {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        .export-vocals {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+        }
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+        }
+
+        /* Nav tools list styling */
+        .nav-links-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .nav-link-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .nav-link-item:hover, .nav-link-item.active {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.06);
+        }
+        .nav-link-item.active {
+            color: #ec4899;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">DOWNLOADYFY<span class="logo-ai">.AI</span></span>
+            </a>
+            
+            <div class="nav-links-menu">
+                <a href="index.html" class="nav-link-item">Downloader</a>
+                <a href="converter.html" class="nav-link-item">Converter</a>
+                <a href="trimmer.html" class="nav-link-item">Trimmer</a>
+                <a href="vocal-remover.html" class="nav-link-item active">Vocal Remover</a>
+                <a href="booster.html" class="nav-link-item">3D Audio Booster</a>
+                <a href="tagger.html" class="nav-link-item">ID3 Tagger</a>
+            </div>
+
+            <div class="nav-controls">
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="vocal-hero">
+            <div class="vocal-badge">🎤 AI Vocal & Stem Remover</div>
+            <h1 class="hero-title">Separate <span class="gradient-text" style="background: linear-gradient(135deg, #ec4899, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Vocals & Music</span></h1>
+            <p class="hero-subtitle">Isolate pristine vocals for remixes or remove vocals to create instant Karaoke / Instrumental tracks with real-time audio playback.</p>
+        </header>
+
+        <section class="vocal-card">
+            <!-- Upload Box -->
+            <div class="vocal-dropzone" id="vocalDropzone">
+                <input type="file" id="vocalFileInput" accept="audio/*,video/*" style="display: none;">
+                <div class="dropzone-icon">🎙️</div>
+                <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: 800;">Drag & Drop Audio or Video File</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.2rem;">Supports MP3, WAV, FLAC, M4A, AAC, MP4, MKV (Up to 150MB)</p>
+                <button type="button" class="glow-button" id="selectFileBtn" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">Choose Media File</button>
+            </div>
+
+            <!-- Processing Loader -->
+            <div id="vocalLoader" class="hidden" style="text-align: center; padding: 3rem 1rem;">
+                <div class="loader-spinner" style="width: 50px; height: 50px; border-width: 4px; border-top-color: #ec4899; margin: 0 auto 1.5rem;"></div>
+                <h3 style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.4rem;">AI Separating Audio Stems...</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;" id="loaderStatusText">Analyzing stereo phase frequencies & isolating vocals...</p>
+            </div>
+
+            <!-- Multi-Track Mixer Studio -->
+            <div id="vocalStudio" class="studio-container hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div>
+                        <h3 id="songTitleDisplay" style="font-weight: 800; font-size: 1.2rem;">Song Title</h3>
+                        <p id="songMetaDisplay" style="color: var(--text-muted); font-size: 0.85rem;">00:00 • 320kbps Stereo</p>
+                    </div>
+                    <button class="quick-btn" id="changeFileBtn">Change File</button>
+                </div>
+
+                <!-- Vocals Track -->
+                <div class="track-strip vocals-strip">
+                    <div class="track-header">
+                        <div class="track-title vocals-badge">
+                            <span>🎤</span> Isolated Vocals (Acapella)
+                        </div>
+                        <div class="track-controls">
+                            <button class="quick-btn" id="muteVocalsBtn">Mute Vocals</button>
+                            <button class="quick-btn" id="soloVocalsBtn">Solo</button>
+                        </div>
+                    </div>
+                    <canvas id="vocalsWaveform" class="waveform-canvas"></canvas>
+                    <div class="track-controls">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #f472b6;">Vocal Level</span>
+                        <div class="slider-group">
+                            <input type="range" id="vocalGain" class="volume-slider" min="0" max="2" step="0.05" value="1">
+                            <span id="vocalGainVal" style="font-size: 0.8rem; font-weight: 700; width: 40px;">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music / Instrumental Track -->
+                <div class="track-strip music-strip">
+                    <div class="track-header">
+                        <div class="track-title music-badge">
+                            <span>🎸</span> Instrumental (Karaoke / Music)
+                        </div>
+                        <div class="track-controls">
+                            <button class="quick-btn" id="muteMusicBtn">Mute Music</button>
+                            <button class="quick-btn" id="soloMusicBtn">Solo</button>
+                        </div>
+                    </div>
+                    <canvas id="musicWaveform" class="waveform-canvas"></canvas>
+                    <div class="track-controls">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #34d399;">Music Level</span>
+                        <div class="slider-group">
+                            <input type="range" id="musicGain" class="volume-slider music-slider" min="0" max="2" step="0.05" value="1">
+                            <span id="musicGainVal" style="font-size: 0.8rem; font-weight: 700; width: 40px;">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Master Controls & Time Bar -->
+                <div class="master-controls">
+                    <div style="display: flex; align-items: center; gap: 1.2rem;">
+                        <button id="masterPlayBtn" class="play-btn-large">▶</button>
+                        <div>
+                            <span id="currentTimeDisplay" style="font-weight: 800; font-size: 1.1rem;">0:00</span>
+                            <span style="color: var(--text-muted); font-size: 0.9rem;"> / </span>
+                            <span id="totalTimeDisplay" style="color: var(--text-muted); font-size: 0.9rem;">0:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Mode Preset Buttons -->
+                    <div style="display: flex; gap: 8px;">
+                        <button class="quick-btn active" id="presetOriginal">Original Mix</button>
+                        <button class="quick-btn" id="presetKaraoke">🎤 Instant Karaoke</button>
+                        <button class="quick-btn" id="presetAcapella">🎙️ Acapella Only</button>
+                    </div>
+
+                    <!-- Export Buttons -->
+                    <div class="export-actions">
+                        <button id="downloadKaraokeBtn" class="export-btn export-karaoke">
+                            <span>⬇</span> Export Karaoke MP3
+                        </button>
+                        <button id="downloadVocalsBtn" class="export-btn export-vocals">
+                            <span>⬇</span> Export Vocals MP3
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="vocal-remover.js"></script>
+</body>
+</html>

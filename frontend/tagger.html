@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Media Metadata & ID3 Cover Art Studio - DOWNLOADYFY.AI</title>
+    <meta name="description" content="Edit ID3 tags, auto-fetch high-res album cover art from Spotify/Apple Music, and embed metadata directly into MP3, FLAC, and M4A audio files.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20">
+    <style>
+        .tagger-hero {
+            text-align: center;
+            padding: 4rem 1rem 2rem;
+        }
+        .tagger-badge {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(253, 224, 71, 0.2));
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            color: #fde047;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.2);
+        }
+        .tagger-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2.5rem;
+            max-width: 960px;
+            margin: 0 auto 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+        .tagger-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(234, 179, 8, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        /* 3D Vinyl Studio Layout */
+        .studio-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2.5rem;
+            margin-top: 1.5rem;
+        }
+        @media (max-width: 800px) {
+            .studio-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Vinyl Disc Container */
+        .vinyl-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .vinyl-disc {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1a1a1a 30%, #0a0a0a 70%, #000 100%);
+            border: 6px solid #111;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 0 4px rgba(255,255,255,0.05), inset 0 0 0 16px #151515, inset 0 0 0 32px #1c1c1c, inset 0 0 0 48px #141414;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+        .vinyl-disc.spinning {
+            animation: spinVinyl 6s linear infinite;
+        }
+        @keyframes spinVinyl {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .vinyl-cover-img {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .vinyl-hole {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #111;
+            position: absolute;
+            border: 2px solid #333;
+        }
+
+        /* Form Inputs */
+        .tag-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+        .form-input {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            border-color: #eab308;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+        }
+
+        /* Auto Search Box */
+        .search-meta-box {
+            background: rgba(234, 179, 8, 0.06);
+            border: 1px dashed rgba(234, 179, 8, 0.35);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .search-results-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+        .meta-result-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            min-width: 220px;
+            transition: all 0.2s ease;
+        }
+        .meta-result-card:hover {
+            border-color: #eab308;
+            transform: translateY(-2px);
+        }
+        .meta-result-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Dropzone */
+        .tagger-dropzone {
+            border: 2px dashed rgba(234, 179, 8, 0.35);
+            border-radius: 20px;
+            padding: 3.5rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.015);
+            margin-bottom: 2rem;
+        }
+        .tagger-dropzone:hover, .tagger-dropzone.dragover {
+            border-color: #eab308;
+            background: rgba(234, 179, 8, 0.05);
+            transform: scale(1.01);
+        }
+
+        .save-tags-btn {
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            color: #000;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 850;
+            font-size: 1.05rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(234, 179, 8, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        .save-tags-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(234, 179, 8, 0.45);
+        }
+
+        .nav-links-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .nav-link-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .nav-link-item:hover, .nav-link-item.active {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.06);
+        }
+        .nav-link-item.active {
+            color: #fde047;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">DOWNLOADYFY<span class="logo-ai">.AI</span></span>
+            </a>
+            
+            <div class="nav-links-menu">
+                <a href="index.html" class="nav-link-item">Downloader</a>
+                <a href="converter.html" class="nav-link-item">Converter</a>
+                <a href="trimmer.html" class="nav-link-item">Trimmer</a>
+                <a href="vocal-remover.html" class="nav-link-item">Vocal Remover</a>
+                <a href="booster.html" class="nav-link-item">3D Audio Booster</a>
+                <a href="tagger.html" class="nav-link-item active">ID3 Tagger</a>
+            </div>
+
+            <div class="nav-controls">
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="tagger-hero">
+            <div class="tagger-badge">🏷️ AI ID3 Metadata & Album Art Studio</div>
+            <h1 class="hero-title">Studio <span class="gradient-text" style="background: linear-gradient(135deg, #eab308, #fef08a); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Cover Art & Tag Editor</span></h1>
+            <p class="hero-subtitle">Auto-fetch official Spotify/iTunes 4K album artwork, customize artist metadata, and embed ID3 tags directly into MP3, FLAC, and M4A tracks.</p>
+        </header>
+
+        <section class="tagger-card">
+            <!-- Upload Box -->
+            <div class="tagger-dropzone" id="taggerDropzone">
+                <input type="file" id="taggerFileInput" accept="audio/*" style="display: none;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">💿</div>
+                <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem; font-weight: 800;">Choose Audio File to Tag</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.2rem;">Supports MP3, FLAC, M4A, AAC, WAV with lossless tag embedding</p>
+                <button type="button" class="glow-button" id="selectTagFileBtn" style="background: linear-gradient(135deg, #eab308, #ca8a04); color: #000;">Select Audio Track</button>
+            </div>
+
+            <!-- Editor Suite -->
+            <div id="taggerStudio" class="hidden">
+                <!-- Auto Search Metadata Box -->
+                <div class="search-meta-box">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="onlineMetaSearch" class="form-input" placeholder="🔍 Search song title or artist to auto-fill metadata..." style="flex: 1;">
+                        <button type="button" id="searchMetaBtn" class="glow-button" style="padding: 0 18px; font-size: 0.9rem; background: linear-gradient(135deg, #eab308, #ca8a04); color: #000;">Auto Fetch</button>
+                    </div>
+                    <div id="metaSearchResults" class="search-results-list hidden"></div>
+                </div>
+
+                <div class="studio-layout">
+                    <!-- Left: 3D Vinyl Disc Preview -->
+                    <div class="vinyl-container">
+                        <div class="vinyl-disc" id="vinylDisc" title="Click to Play / Pause Audio Preview">
+                            <img id="vinylCoverImg" class="vinyl-cover-img" src="https://via.placeholder.com/300x300?text=No+Cover" alt="Cover Art">
+                            <div class="vinyl-hole"></div>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <input type="file" id="coverFileInput" accept="image/*" style="display: none;">
+                            <button type="button" id="uploadCoverBtn" class="quick-btn" style="border-color: #eab308; color: #fde047;">
+                                🖼️ Change Cover Image
+                            </button>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">Click vinyl disc to play audio</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Tag Form Fields -->
+                    <form id="metadataForm" class="tag-form">
+                        <div class="form-group">
+                            <label class="form-label">Song Title</label>
+                            <input type="text" id="tagTitle" class="form-input" placeholder="e.g. Blinding Lights" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Artist / Creator</label>
+                                <input type="text" id="tagArtist" class="form-input" placeholder="e.g. The Weeknd">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Album</label>
+                                <input type="text" id="tagAlbum" class="form-input" placeholder="e.g. After Hours">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Genre</label>
+                                <input type="text" id="tagGenre" class="form-input" placeholder="e.g. Synth-pop / R&B">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Release Year</label>
+                                <input type="text" id="tagYear" class="form-input" placeholder="e.g. 2026">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="saveTagsBtn" class="save-tags-btn">
+                            💾 Save & Download Tagged Master File
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="tagger.js"></script>
+</body>
+</html>
