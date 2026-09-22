@@ -1,4 +1,9 @@
+import sys
 import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import json
 import uuid
 import threading
 from flask import Flask, request, jsonify, send_file
@@ -15,11 +20,6 @@ from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, TIT2, TPE1, APIC, error
 from mutagen.flac import FLAC, Picture
 from mutagen.mp4 import MP4, MP4Cover
-
-try:
-    from backend.spotify_scraper import parse_spotify_url, get_spotify_track_info, get_spotify_playlist_info, get_spotify_album_info
-except ModuleNotFoundError:
-    from spotify_scraper import parse_spotify_url, get_spotify_track_info, get_spotify_playlist_info, get_spotify_album_info
 
 COOKIES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'yt_cookies.txt')
 
@@ -106,27 +106,24 @@ def tag_audio_metadata(file_path, title, artists, cover_url, ext):
         print(f"[METADATA] Error tagging metadata for extension {ext}: {e}")
 
 
+_COOKIE_CACHE = None
+_COOKIE_CACHE_TIME = 0
+
 def get_cookie_args():
-    """Get cookies for yt-dlp. Prioritizes cookies.txt file, then browser extraction."""
-    # First check if a manual cookies.txt file exists
+    """Get cookies for yt-dlp. Uses cookies.txt if provided, avoids blocking browser locks."""
+    global _COOKIE_CACHE, _COOKIE_CACHE_TIME
+    import time
+    now = time.time()
+    if _COOKIE_CACHE is not None and (now - _COOKIE_CACHE_TIME) < 60:
+        return _COOKIE_CACHE
+
     if os.path.exists(COOKIES_FILE) and os.path.getsize(COOKIES_FILE) > 100:
-        print(f"[COOKIES] Using cookies file: {COOKIES_FILE}")
-        return {'cookiefile': COOKIES_FILE}
-    
-    # Try browser extraction (only works when browsers are closed)
-    browsers = ['chrome', 'edge', 'brave', 'firefox', 'opera']
-    for browser in browsers:
-        try:
-            test_opts = {'cookiesfrombrowser': (browser, None, None, None), 'quiet': True, 'no_warnings': True}
-            with yt_dlp.YoutubeDL(test_opts) as ydl:
-                # Force cookie loading to verify access works (e.g. not locked/permission denied)
-                _ = ydl.cookiejar
-            print(f"[COOKIES] Using browser cookies: {browser}")
-            return {'cookiesfrombrowser': (browser, None, None, None)}
-        except Exception:
-            continue
-    
-    print("[COOKIES] No cookies available - YouTube may block requests")
+        _COOKIE_CACHE = {'cookiefile': COOKIES_FILE}
+        _COOKIE_CACHE_TIME = now
+        return _COOKIE_CACHE
+
+    _COOKIE_CACHE = {}
+    _COOKIE_CACHE_TIME = now
     return {}
 
 
@@ -292,82 +289,6 @@ def get_video_info():
         except Exception as pin_err:
             print(f"[PINTEREST] Custom scraper failed: {pin_err}")
 
-    sp_type, sp_id = parse_spotify_url(url)
-    if sp_type and sp_id:
-        try:
-            if sp_type == 'track':
-                track_info = get_spotify_track_info(sp_id)
-                if not track_info:
-                    return jsonify({'error': 'Failed to fetch Spotify track details'}), 404
-                
-                duration = track_info['duration']
-                estimated_size = int(duration * 40000)
-                
-                return jsonify({
-                    'title': f"{track_info['artists']} - {track_info['title']}",
-                    'thumbnail': track_info['thumbnail'],
-                    'uploader': track_info['artists'],
-                    'duration': int(duration),
-                    'url': track_info['url'],
-                    'formats': {
-                        'video': [],
-                        'audio': [
-                            {
-                                'format_id': 'spotify_flac',
-                                'ext': 'flac',
-                                'format_note': 'Lossless FLAC (Super High Quality)',
-                                'filesize': int(duration * 100000)
-                            },
-                            {
-                                'format_id': 'spotify_wav',
-                                'ext': 'wav',
-                                'format_note': 'Uncompressed WAV (Lossless)',
-                                'filesize': int(duration * 176400)
-                            },
-                            {
-                                'format_id': 'spotify_m4a',
-                                'ext': 'm4a',
-                                'format_note': '320kbps M4A/AAC (Best Quality)',
-                                'filesize': int(duration * 40000)
-                            },
-                            {
-                                'format_id': 'spotify_320k',
-                                'ext': 'mp3',
-                                'format_note': '320kbps MP3 (Ultra HQ)',
-                                'filesize': estimated_size
-                            },
-                            {
-                                'format_id': 'spotify_256k',
-                                'ext': 'mp3',
-                                'format_note': '256kbps MP3 (HQ)',
-                                'filesize': int(duration * 32000)
-                            },
-                            {
-                                'format_id': 'spotify_128k',
-                                'ext': 'mp3',
-                                'format_note': '128kbps MP3 (Medium)',
-                                'filesize': int(duration * 16000)
-                            }
-                        ]
-                    }
-                })
-            elif sp_type in ('playlist', 'album'):
-                if sp_type == 'playlist':
-                    playlist_info = get_spotify_playlist_info(sp_id)
-                else:
-                    playlist_info = get_spotify_album_info(sp_id)
-                
-                if not playlist_info:
-                    return jsonify({'error': 'Failed to fetch Spotify details'}), 404
-                
-                return jsonify({
-                    'type': 'playlist',
-                    'title': playlist_info['title'],
-                    'entries': playlist_info['entries']
-                })
-        except Exception as e:
-            return jsonify({'error': f'Spotify parser error: {str(e)}'}), 500
-
     cookie_opts = get_cookie_args()
     ydl_opts = {
         'quiet': True,
@@ -496,27 +417,22 @@ def get_video_info():
             audio_formats = []
             duration = info.get('duration', 0) or 0
 
-            if 'formats' in info:
+            if 'formats' in info and info['formats']:
                 for f in info['formats']:
                     # Video formats
-                    if f.get('vcodec') != 'none' and f.get('acodec') == 'none':
-                        # Video only
+                    if f.get('vcodec') != 'none':
                         height = get_video_height(f.get('resolution'), f.get('height'))
+                        if not height and f.get('height'):
+                            try:
+                                height = int(f.get('height'))
+                            except Exception:
+                                pass
+                        note = f.get('resolution') or f.get('format_note') or (f"{height}p" if height else "Video")
                         video_formats.append({
                             'format_id': f['format_id'],
                             'ext': f.get('ext', 'mp4'),
-                            'resolution': f.get('resolution') or f"{height}p" if height else "Unknown",
-                            'height': height,
-                            'filesize': f.get('filesize') or f.get('filesize_approx')
-                        })
-                    elif f.get('vcodec') != 'none' and f.get('acodec') != 'none':
-                        # Video + Audio
-                        height = get_video_height(f.get('resolution'), f.get('height'))
-                        video_formats.append({
-                            'format_id': f['format_id'],
-                            'ext': f.get('ext', 'mp4'),
-                            'resolution': f.get('resolution') or f"{height}p" if height else "Unknown",
-                            'height': height,
+                            'resolution': note,
+                            'height': height or 0,
                             'filesize': f.get('filesize') or f.get('filesize_approx')
                         })
                     # Audio only
@@ -527,15 +443,6 @@ def get_video_info():
                             'format_note': f.get('format_note') or 'Audio',
                             'filesize': f.get('filesize') or f.get('filesize_approx')
                         })
-            else:
-                # Direct file or simple structure
-                video_formats.append({
-                    'format_id': 'best',
-                    'ext': info.get('ext', 'mp4'),
-                    'resolution': 'Best',
-                    'height': 1080,
-                    'filesize': None
-                })
 
             # Group by height and select the best format for each height
             height_to_format = {}
@@ -547,19 +454,59 @@ def get_video_info():
                     height_to_format[h] = v
                 else:
                     existing = height_to_format[h]
-                    existing_is_mp4 = existing.get('ext') == 'mp4'
-                    current_is_mp4 = v.get('ext') == 'mp4'
-                    
-                    if current_is_mp4 and not existing_is_mp4:
+                    existing_size = existing.get('filesize') or 0
+                    current_size = v.get('filesize') or 0
+                    if current_size > existing_size:
                         height_to_format[h] = v
-                    elif existing_is_mp4 == current_is_mp4:
-                        existing_size = existing.get('filesize') or 0
-                        current_size = v.get('filesize') or 0
-                        if current_size > existing_size:
-                            height_to_format[h] = v
+
+            # Standard resolution display labels
+            def get_res_label(h):
+                if h >= 4320:
+                    return "8K Ultra HD (4320p)"
+                elif h >= 2160:
+                    return "4K Ultra HD (2160p)"
+                elif h >= 1440:
+                    return "2K Quad HD (1440p)"
+                elif h >= 1080:
+                    return "1080p Full HD"
+                elif h >= 720:
+                    return "720p HD"
+                elif h >= 480:
+                    return "480p (SD)"
+                elif h >= 360:
+                    return "360p (SD)"
+                elif h >= 240:
+                    return "240p (SD)"
+                elif h >= 144:
+                    return "144p (SD)"
+                return f"{h}p"
+
+            for h, v in height_to_format.items():
+                v['resolution'] = get_res_label(h)
+                v['ext'] = 'mp4'
 
             # Sort formats by height ascending
             unique_vids = sorted(list(height_to_format.values()), key=lambda x: x.get('height', 0))
+
+            # If unique_vids is empty, provide all standard resolution options including 8K
+            if not unique_vids:
+                default_resolutions = [
+                    (360, '360p (SD)', 'bestvideo[height<=360]+bestaudio/best'),
+                    (480, '480p (SD)', 'bestvideo[height<=480]+bestaudio/best'),
+                    (720, '720p HD', 'bestvideo[height<=720]+bestaudio/best'),
+                    (1080, '1080p Full HD', 'bestvideo[height<=1080]+bestaudio/best'),
+                    (1440, '2K Quad HD (1440p)', 'bestvideo[height<=1440]+bestaudio/best'),
+                    (2160, '4K Ultra HD (2160p)', 'bestvideo[height<=2160]+bestaudio/best'),
+                    (4320, '8K Ultra HD (4320p)', 'bestvideo[height<=4320]+bestaudio/best'),
+                ]
+                for h, res_label, fmt_id in default_resolutions:
+                    unique_vids.append({
+                        'format_id': fmt_id,
+                        'ext': 'mp4',
+                        'resolution': res_label,
+                        'height': h,
+                        'filesize': int(duration * h * 500) if duration > 0 else None
+                    })
 
             # Prepare audio formats.
             # 1. Add MP3 options from 64k to 320k
@@ -703,7 +650,192 @@ def make_progress_hook(job_id):
                 })
     return hook
 
-def run_download_thread(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title):
+def parse_time_to_seconds(val):
+    if val is None:
+        return 0.0
+    s = str(val).strip()
+    if not s:
+        return 0.0
+    if ':' in s:
+        parts = s.split(':')
+        try:
+            if len(parts) == 2:
+                return float(parts[0]) * 60 + float(parts[1])
+            elif len(parts) >= 3:
+                return float(parts[0]) * 3600 + float(parts[1]) * 60 + float(parts[2])
+        except ValueError:
+            return 0.0
+    if '.' in s:
+        parts = s.split('.')
+        if len(parts) == 2 and len(parts[1]) == 2 and parts[1].isdigit() and int(parts[1]) < 60:
+            try:
+                return float(parts[0]) * 60 + float(parts[1])
+            except ValueError:
+                pass
+    try:
+        return float(s)
+    except ValueError:
+        return 0.0
+
+def process_multi_segment_trim(input_filepath, segments, is_video, output_ext):
+    """
+    Given an input media file and list of segments [{'start': '01:04', 'end': '02:00'}, ...],
+    cuts each segment and concatenates all parts into a single seamless output file.
+    """
+    import subprocess
+    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    
+    valid_segments = []
+    if isinstance(segments, list):
+        for seg in segments:
+            if isinstance(seg, dict):
+                s = parse_time_to_seconds(seg.get('start', 0))
+                e = parse_time_to_seconds(seg.get('end', 0))
+                if e > s:
+                    valid_segments.append((s, e))
+                    
+    if not valid_segments:
+        return input_filepath
+        
+    trim_uid = uuid.uuid4().hex[:8]
+    dir_name = os.path.dirname(input_filepath)
+    
+    # If single segment, do direct trim
+    if len(valid_segments) == 1:
+        s, e = valid_segments[0]
+        trimmed_output = os.path.join(dir_name, f"trimmed_{trim_uid}.{output_ext}")
+        if is_video:
+            cmd = [
+                ffmpeg_exe, '-y',
+                '-ss', str(s),
+                '-to', str(e),
+                '-i', input_filepath,
+                '-c:v', 'libx264',
+                '-preset', 'fast',
+                '-crf', '20',
+                '-c:a', 'aac',
+                '-b:a', '192k',
+                '-avoid_negative_ts', 'make_zero',
+                trimmed_output
+            ]
+        else:
+            cmd = [
+                ffmpeg_exe, '-y',
+                '-ss', str(s),
+                '-to', str(e),
+                '-i', input_filepath,
+                '-acodec', 'libmp3lame',
+                '-b:a', '320k',
+                trimmed_output
+            ]
+        try:
+            res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+            if res.returncode == 0 and os.path.exists(trimmed_output):
+                return trimmed_output
+            else:
+                print(f"[TRIM ERROR] Single trim failed: {res.stderr}")
+                return input_filepath
+        except Exception as e:
+            print(f"[TRIM EXCEPTION] {e}")
+            return input_filepath
+
+    # Multiple segments: cut pieces then concat
+    temp_pieces = []
+    concat_list_file = os.path.join(dir_name, f"concat_{trim_uid}.txt")
+    
+    try:
+        for idx, (s, e) in enumerate(valid_segments):
+            piece_path = os.path.join(dir_name, f"piece_{trim_uid}_{idx}.{output_ext}")
+            if is_video:
+                cmd = [
+                    ffmpeg_exe, '-y',
+                    '-ss', str(s),
+                    '-to', str(e),
+                    '-i', input_filepath,
+                    '-c:v', 'libx264',
+                    '-preset', 'veryfast',
+                    '-crf', '20',
+                    '-c:a', 'aac',
+                    '-b:a', '192k',
+                    '-avoid_negative_ts', 'make_zero',
+                    piece_path
+                ]
+            else:
+                cmd = [
+                    ffmpeg_exe, '-y',
+                    '-ss', str(s),
+                    '-to', str(e),
+                    '-i', input_filepath,
+                    '-acodec', 'libmp3lame',
+                    '-b:a', '320k',
+                    piece_path
+                ]
+            res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=120)
+            if res.returncode == 0 and os.path.exists(piece_path):
+                temp_pieces.append(piece_path)
+            else:
+                print(f"[MULTI-TRIM] Error cutting segment {idx} ({s}-{e}): {res.stderr}")
+
+        if not temp_pieces:
+            return input_filepath
+
+        # Create concat demuxer manifest
+        with open(concat_list_file, 'w', encoding='utf-8') as f:
+            for p in temp_pieces:
+                clean_p = os.path.abspath(p).replace('\\', '/')
+                f.write(f"file '{clean_p}'\n")
+
+        final_merged = os.path.join(dir_name, f"merged_trim_{trim_uid}.{output_ext}")
+        
+        # Concat copy attempt
+        concat_cmd = [
+            ffmpeg_exe, '-y',
+            '-f', 'concat',
+            '-safe', '0',
+            '-i', concat_list_file,
+            '-c', 'copy',
+            final_merged
+        ]
+        concat_res = subprocess.run(concat_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+        
+        if concat_res.returncode != 0 or not os.path.exists(final_merged) or os.path.getsize(final_merged) < 1000:
+            # Fallback to re-encode concat
+            if is_video:
+                fallback_cmd = [
+                    ffmpeg_exe, '-y',
+                    '-f', 'concat',
+                    '-safe', '0',
+                    '-i', concat_list_file,
+                    '-c:v', 'libx264',
+                    '-preset', 'veryfast',
+                    '-c:a', 'aac',
+                    final_merged
+                ]
+            else:
+                fallback_cmd = [
+                    ffmpeg_exe, '-y',
+                    '-f', 'concat',
+                    '-safe', '0',
+                    '-i', concat_list_file,
+                    '-acodec', 'libmp3lame',
+                    '-b:a', '320k',
+                    final_merged
+                ]
+            subprocess.run(fallback_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+
+        if os.path.exists(final_merged) and os.path.getsize(final_merged) > 1000:
+            return final_merged
+        return input_filepath
+    finally:
+        if os.path.exists(concat_list_file):
+            try: os.remove(concat_list_file)
+            except: pass
+        for p in temp_pieces:
+            if os.path.exists(p):
+                try: os.remove(p)
+                except: pass
+
+def run_download_thread(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title, segments=None):
     try:
         if media_type == 'image':
             import urllib.request
@@ -732,14 +864,13 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             'quiet': True,
             'no_warnings': True,
             'ffmpeg_location': imageio_ffmpeg.get_ffmpeg_exe(),
-            'js_runtimes': {'node': {}},
             'nocheckcertificate': True,
-            'concurrent_fragment_downloads': 16,
+            'windowsfilenames': True,
+            'overwrites': True,
+            'retries': 25,
+            'fragment_retries': 25,
+            'file_access_retries': 25,
             'buffersize': 1024 * 1024,
-            'http_chunk_size': 10485760,
-            'postprocessor_args': {'ffmpeg': ['-threads', '0']},
-            'socket_timeout': 15,
-            'retries': 10,
             'http_headers': {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -750,6 +881,12 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             **cookie_opts
         }
 
+        # If video download, make sure ffmpeg converts audio stream to universal AAC in MP4
+        if media_type == 'video':
+            ydl_opts['postprocessor_args'] = {
+                'merger': ['-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k']
+            }
+
         # Add postprocessor for MP3/FLAC/WAV/M4A audio conversion with selected bitrate
         if media_type == 'audio' and (format_id.startswith('bestaudio/') or ext in ('mp3', 'flac', 'wav', 'm4a')):
             codec = ext
@@ -759,7 +896,6 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
                 if part.endswith('k') and part[:-1].isdigit():
                     bitrate = part[:-1]
             elif ext == 'mp3':
-                # default fallback
                 bitrate = '320'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
@@ -772,24 +908,35 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
 
         filepath = f"{filepath_without_ext}.{ext}"
         final_path = None
-        if os.path.exists(filepath):
+        if os.path.exists(filepath) and os.path.getsize(filepath) > 1024:
             final_path = filepath
         else:
             # Fallback check
             base_filename = os.path.basename(filepath_without_ext)
             for f in os.listdir(DOWNLOADS_DIR):
-                if f.startswith(base_filename):
-                    final_path = os.path.join(DOWNLOADS_DIR, f)
-                    ext = f.split('.')[-1]
-                    break
+                if f.startswith(base_filename) and not f.endswith('.part') and not f.endswith('.ytdl'):
+                    candidate = os.path.join(DOWNLOADS_DIR, f)
+                    if os.path.exists(candidate) and os.path.getsize(candidate) > 1024:
+                        final_path = candidate
+                        ext = f.split('.')[-1]
+                        break
         
         if final_path and os.path.exists(final_path):
-            # Check and write Spotify metadata
-            job = download_jobs.get(job_id)
-            if job and 'spotify_metadata' in job:
-                meta = job['spotify_metadata']
-                tag_audio_metadata(final_path, meta['title'], meta['artists'], meta['cover_url'], ext)
-                
+            # Process multi-segment trimming ONLY if valid segments were requested
+            if segments and isinstance(segments, list) and len(segments) > 0:
+                download_jobs[job_id].update({
+                    'progress': 96,
+                    'status_text': 'Cutting and merging selected video segments with FFmpeg...'
+                })
+                trimmed_file = process_multi_segment_trim(final_path, segments, (media_type == 'video'), ext)
+                if trimmed_file and os.path.exists(trimmed_file) and trimmed_file != final_path:
+                    try:
+                        os.remove(final_path)
+                    except Exception:
+                        pass
+                    final_path = trimmed_file
+                    safe_title = f"{safe_title}_trimmed"
+
             download_jobs[job_id].update({
                 'status': 'completed',
                 'progress': 100,
@@ -798,15 +945,14 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
                 'filename': f"{safe_title}.{ext}"
             })
         else:
-            raise Exception("Failed to locate downloaded file on server.")
+            raise Exception("Failed to locate completed download file on server.")
     except Exception as e:
         import traceback
         import glob
         import time
-        # Try to heal rename locks (WinError 32)
+        # Try to heal rename locks ONLY for fully merged temp files (WinError 32)
         temp_patterns = [
-            f"{filepath_without_ext}.temp.*",
-            f"{filepath_without_ext}.*.part"
+            f"{filepath_without_ext}.temp.*"
         ]
         temp_files = []
         for p in temp_patterns:
@@ -814,29 +960,26 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
         healed = False
         if temp_files:
             temp_file = temp_files[0]
-            if temp_file.endswith('.part'):
-                final_path = temp_file[:-5]
-                final_ext = final_path.split('.')[-1]
-            else:
-                final_ext = temp_file.split('.')[-1]
-                final_path = f"{filepath_without_ext}.{final_ext}"
-            print(f"[SELF-HEAL] Thread: Found locked file {temp_file}. Retrying rename to {final_path}...")
+            final_ext = temp_file.split('.')[-1]
+            final_path = f"{filepath_without_ext}.{final_ext}"
+            print(f"[SELF-HEAL] Thread: Found locked temp file {temp_file}. Retrying rename to {final_path}...")
             for attempt in range(5):
                 try:
                     time.sleep(1.0)
                     if os.path.exists(final_path):
                         os.remove(final_path)
                     os.rename(temp_file, final_path)
-                    print(f"[SELF-HEAL] Thread: Successfully renamed on attempt {attempt+1}!")
-                    download_jobs[job_id].update({
-                        'status': 'completed',
-                        'progress': 100,
-                        'status_text': 'Download complete!',
-                        'filepath': final_path,
-                        'filename': f"{safe_title}.{final_ext}"
-                    })
-                    healed = True
-                    break
+                    if os.path.exists(final_path) and os.path.getsize(final_path) > 1024:
+                        print(f"[SELF-HEAL] Thread: Successfully renamed on attempt {attempt+1}!")
+                        download_jobs[job_id].update({
+                            'status': 'completed',
+                            'progress': 100,
+                            'status_text': 'Download complete!',
+                            'filepath': final_path,
+                            'filename': f"{safe_title}.{final_ext}"
+                        })
+                        healed = True
+                        break
                 except Exception as rename_err:
                     print(f"[SELF-HEAL] Thread: Attempt {attempt+1} failed: {rename_err}")
         if not healed:
@@ -853,13 +996,6 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
 
 @app.route('/api/download', methods=['GET'])
 def download_video():
-    device_id = request.args.get('device_id')
-    ad_token = request.args.get('ad_token')
-    
-    allowed, method = check_and_consume_device_action(device_id, ad_token)
-    if not allowed:
-        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
-
     url = request.args.get('url')
     format_id = request.args.get('format_id', 'best')
     ext = request.args.get('ext', 'mp4')
@@ -871,32 +1007,6 @@ def download_video():
 
     if not url:
         return jsonify({'error': 'URL is required'}), 400
-
-    sp_type, sp_id = parse_spotify_url(url)
-    if sp_type and sp_id and sp_type == 'track':
-        track_info = get_spotify_track_info(sp_id)
-        if track_info:
-            title = f"{track_info['artists']} - {track_info['title']}"
-            media_type = 'audio'
-            
-            ext = 'mp3'
-            if format_id == 'spotify_flac':
-                ext = 'flac'
-            elif format_id == 'spotify_wav':
-                ext = 'wav'
-            elif format_id == 'spotify_m4a':
-                ext = 'm4a'
-            
-            bitrate_suffix = '320k'
-            if format_id and format_id.startswith('spotify_'):
-                part = format_id[8:]
-                if part.endswith('k') and part[:-1].isdigit():
-                    bitrate_suffix = part
-                elif part.isdigit():
-                    bitrate_suffix = f"{part}k"
-            format_id = f"bestaudio/{bitrate_suffix}"
-            
-            url = f"ytsearch:{track_info['artists']} - {track_info['title']}"
 
     try:
         height = int(height_val) if height_val else 0
@@ -925,18 +1035,15 @@ def download_video():
                 q_enum = VideoQuality['P' + video_quality.rstrip('p')]
                 target_format = map_video_quality_to_format(q_enum)
             except Exception:
-                target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/best"
+                target_format = f"{format_id}+bestaudio/bestvideo+bestaudio/best"
         else:
             if '+bestaudio' not in format_id:
                 if height > 0:
-                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
                 else:
-                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio/bestvideo+bestaudio/best"
             else:
-                if '+bestaudio/best' in format_id and '[ext=m4a]' not in format_id:
-                    target_format = format_id.replace('+bestaudio/best', '+bestaudio[ext=m4a]/') + format_id
-                else:
-                    target_format = format_id
+                target_format = format_id
     else:
         merge_format = None
         if audio_bitrate:
@@ -967,12 +1074,10 @@ def download_video():
         'no_warnings': True,
         'ffmpeg_location': imageio_ffmpeg.get_ffmpeg_exe(),
         'nocheckcertificate': True,
-        'concurrent_fragment_downloads': 16,
-        'buffersize': 1024 * 1024,
-        'http_chunk_size': 10485760,
-        'postprocessor_args': {'ffmpeg': ['-threads', '0']},
-        'socket_timeout': 15,
+        'windowsfilenames': True,
+        'overwrites': True,
         'retries': 10,
+        'fragment_retries': 10,
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -981,6 +1086,12 @@ def download_video():
         },
         **cookie_opts
     }
+
+    # If video download, make sure ffmpeg converts audio stream to universal AAC in MP4
+    if media_type == 'video':
+        ydl_opts['postprocessor_args'] = {
+            'merger': ['-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k']
+        }
 
     # Add postprocessor for MP3/FLAC/WAV/M4A audio conversion with selected bitrate
     if media_type == 'audio' and (format_id.startswith('bestaudio/') or ext in ('mp3', 'flac', 'wav', 'm4a')):
@@ -1004,10 +1115,9 @@ def download_video():
     except Exception as e:
         import glob
         import time
-        # Try to heal rename locks (WinError 32)
+        # Try to heal rename locks ONLY for fully merged temp files (WinError 32)
         temp_patterns = [
-            f"{filepath_without_ext}.temp.*",
-            f"{filepath_without_ext}.*.part"
+            f"{filepath_without_ext}.temp.*"
         ]
         temp_files = []
         for p in temp_patterns:
@@ -1015,12 +1125,8 @@ def download_video():
         healed = False
         if temp_files:
             temp_file = temp_files[0]
-            if temp_file.endswith('.part'):
-                final_path = temp_file[:-5]
-                final_ext = final_path.split('.')[-1]
-            else:
-                final_ext = temp_file.split('.')[-1]
-                final_path = f"{filepath_without_ext}.{final_ext}"
+            final_ext = temp_file.split('.')[-1]
+            final_path = f"{filepath_without_ext}.{final_ext}"
             print(f"[SELF-HEAL] Server: Found locked file {temp_file}. Retrying rename to {final_path}...")
             for attempt in range(5):
                 try:
@@ -1028,11 +1134,12 @@ def download_video():
                     if os.path.exists(final_path):
                         os.remove(final_path)
                     os.rename(temp_file, final_path)
-                    print(f"[SELF-HEAL] Server: Successfully renamed on attempt {attempt+1}!")
-                    filepath = final_path
-                    ext = final_ext
-                    healed = True
-                    break
+                    if os.path.exists(final_path) and os.path.getsize(final_path) > 1024:
+                        print(f"[SELF-HEAL] Server: Successfully renamed on attempt {attempt+1}!")
+                        filepath = final_path
+                        ext = final_ext
+                        healed = True
+                        break
                 except Exception as rename_err:
                     print(f"[SELF-HEAL] Server: Attempt {attempt+1} failed: {rename_err}")
         if not healed:
@@ -1053,11 +1160,6 @@ def download_video():
             ext = os.path.splitext(filepath)[1].lstrip('.')
         else:
             return jsonify({'error': 'Downloaded file not found on server.'}), 500
-
-    if sp_type and sp_id and sp_type == 'track' and ext in ('mp3', 'flac', 'm4a'):
-        track_info = get_spotify_track_info(sp_id)
-        if track_info:
-            tag_audio_metadata(filepath, track_info['title'], track_info['artists'], track_info['thumbnail'], ext)
 
     download_name = f"{safe_title}.{ext}"
 
@@ -1100,8 +1202,8 @@ def download_file(job_id):
     filename = job.get('filename')
     
     if os.path.exists(filepath):
-        # Schedule cleanup after 2 minutes to let browser finish downloading
-        threading.Timer(120.0, cleanup_file, args=[filepath]).start()
+        # Schedule cleanup after 10 minutes to allow large 4K/8K files to finish transferring to browser
+        threading.Timer(600.0, cleanup_file, args=[filepath]).start()
         return send_file(
             filepath,
             as_attachment=True,
@@ -1113,13 +1215,6 @@ def download_file(job_id):
 @app.route('/api/start_download', methods=['POST'])
 def start_download():
     data = request.json or {}
-    device_id = data.get('device_id')
-    ad_token = data.get('ad_token')
-    
-    allowed, method = check_and_consume_device_action(device_id, ad_token)
-    if not allowed:
-        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
-
     url = data.get('url')
     format_id = data.get('format_id', 'best')
     ext = data.get('ext', 'mp4')
@@ -1139,41 +1234,6 @@ def start_download():
             
     if not url:
         return jsonify({'error': 'URL is required'}), 400
-
-    sp_type, sp_id = parse_spotify_url(url)
-    spotify_meta = None
-    if sp_type and sp_id and sp_type == 'track':
-        media_type = 'audio'
-        ext = 'mp3'
-        if format_id == 'spotify_flac':
-            ext = 'flac'
-        elif format_id == 'spotify_wav':
-            ext = 'wav'
-        elif format_id == 'spotify_m4a':
-            ext = 'm4a'
-        
-        bitrate_suffix = '320k'
-        if format_id and format_id.startswith('spotify_'):
-            part = format_id[8:]
-            if part.endswith('k') and part[:-1].isdigit():
-                bitrate_suffix = part
-            elif part.isdigit():
-                bitrate_suffix = f"{part}k"
-        format_id = f"bestaudio/{bitrate_suffix}"
-
-        track_info = get_spotify_track_info(sp_id)
-        if track_info:
-            title = f"{track_info['artists']} - {track_info['title']}"
-            url = f"ytsearch:{track_info['artists']} - {track_info['title']}"
-            spotify_meta = {
-                'title': track_info['title'],
-                'artists': track_info['artists'],
-                'cover_url': track_info['thumbnail']
-            }
-        else:
-            # Fallback to frontend-provided title to avoid DRM block and Spotify embed rate-limit!
-            print(f"[SPOTIFY] Fallback search for {title}")
-            url = f"ytsearch:{title}"
 
     try:
         height = int(height_val) if height_val else 0
@@ -1201,18 +1261,15 @@ def start_download():
                 q_enum = VideoQuality['P' + video_quality.rstrip('p')]
                 target_format = map_video_quality_to_format(q_enum)
             except Exception:
-                target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/best"
+                target_format = f"{format_id}+bestaudio/bestvideo+bestaudio/best"
         else:
             if '+bestaudio' not in format_id:
                 if height > 0:
-                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
                 else:
-                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio/bestvideo+bestaudio/best"
             else:
-                if '+bestaudio/best' in format_id and '[ext=m4a]' not in format_id:
-                    target_format = format_id.replace('+bestaudio/best', '+bestaudio[ext=m4a]/') + format_id
-                else:
-                    target_format = format_id
+                target_format = format_id
     elif media_type == 'image':
         merge_format = None
         target_format = 'best'
@@ -1252,12 +1309,14 @@ def start_download():
         'status_text': 'Preparing download...'
     }
 
-    if spotify_meta:
-        download_jobs[job_id]['spotify_metadata'] = spotify_meta
+    segments = data.get('segments')
+    if segments and isinstance(segments, list) and len(segments) > 0:
+        download_jobs[job_id]['has_trim_segments'] = True
+        download_jobs[job_id]['segments_count'] = len(segments)
 
     t = threading.Thread(
         target=run_download_thread,
-        args=(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title)
+        args=(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title, segments)
     )
     t.daemon = True
     t.start()
@@ -1339,75 +1398,24 @@ def save_registry(registry):
     except Exception as e:
         print(f"Error saving registry: {e}")
 
-def check_and_consume_device_action(device_id, ad_token=None):
-    if not device_id:
-        return True, "fallback"
-        
-    registry = load_registry()
-    devices = registry.setdefault("devices", {})
-    device = devices.setdefault(device_id, {"free_downloads_used": 0, "ad_tokens": []})
-    
-    # Check if they still have free balance
-    if device["free_downloads_used"] < 1:
-        device["free_downloads_used"] += 1
-        save_registry(registry)
-        return True, "free"
-        
-    # Check if they provided a valid ad token
-    tokens_list = device.setdefault("ad_tokens", [])
-    if ad_token and ad_token in tokens_list:
-        tokens_list.remove(ad_token)
-        save_registry(registry)
-        return True, "ad"
-        
-    return False, None
+def check_and_consume_device_action(device_id=None, ad_token=None):
+    return True, "free"
 
 @app.route('/api/device-status', methods=['GET'])
 def device_status():
-    device_id = request.args.get('device_id')
-    if not device_id:
-        return jsonify({'error': 'Device ID is required'}), 400
-        
-    registry = load_registry()
-    devices = registry.setdefault("devices", {})
-    device = devices.get(device_id, {"free_downloads_used": 0})
-    
-    used = device.get("free_downloads_used", 0)
-    remaining = max(0, 1 - used)
+    device_id = request.args.get('device_id') or 'default_device'
     return jsonify({
         'device_id': device_id,
-        'free_downloads_used': used,
-        'free_downloads_remaining': remaining
+        'free_downloads_used': 0,
+        'free_downloads_remaining': 999999
     })
 
 @app.route('/api/register-ad-complete', methods=['POST'])
 def register_ad_complete():
-    data = request.get_json() or {}
-    device_id = data.get('device_id')
-    if not device_id:
-        return jsonify({'success': False, 'message': 'Device ID is required'}), 400
-        
-    registry = load_registry()
-    devices = registry.setdefault("devices", {})
-    device = devices.setdefault(device_id, {"free_downloads_used": 0, "ad_tokens": []})
-    
-    # Mark free downloads as used since they've transitioned to ad-watch mode
-    device["free_downloads_used"] = max(1, device.get("free_downloads_used", 0))
-    
-    new_token = uuid.uuid4().hex
-    device.setdefault("ad_tokens", []).append(new_token)
-    
-    save_registry(registry)
-    return jsonify({'success': True, 'ad_token': new_token})
+    return jsonify({'success': True, 'ad_token': 'unlimited_token'})
 
 @app.route('/api/convert-to-audio', methods=['POST'])
 def convert_to_audio():
-    device_id = request.form.get('device_id')
-    ad_token = request.form.get('ad_token')
-    
-    allowed, method = check_and_consume_device_action(device_id, ad_token)
-    if not allowed:
-        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -1461,12 +1469,6 @@ def convert_to_audio():
 
 @app.route('/api/trim-audio', methods=['POST'])
 def trim_audio():
-    device_id = request.form.get('device_id')
-    ad_token = request.form.get('ad_token')
-    
-    allowed, method = check_and_consume_device_action(device_id, ad_token)
-    if not allowed:
-        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -1518,12 +1520,6 @@ def trim_audio():
 
 @app.route('/api/vocal-remover', methods=['POST'])
 def vocal_remover():
-    device_id = request.form.get('device_id')
-    ad_token = request.form.get('ad_token')
-    
-    allowed, method = check_and_consume_device_action(device_id, ad_token)
-    if not allowed:
-        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -1580,12 +1576,6 @@ def vocal_remover():
 
 @app.route('/api/audio-boost', methods=['POST'])
 def audio_boost():
-    device_id = request.form.get('device_id')
-    ad_token = request.form.get('ad_token')
-    
-    allowed, method = check_and_consume_device_action(device_id, ad_token)
-    if not allowed:
-        return jsonify({'error': 'Ad verification required', 'ad_required': True}), 402
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -1784,5 +1774,169 @@ def edit_tags():
         cleanup_file(audio_path)
         return jsonify({'error': str(e)}), 500
 
+
+def parse_timestamp_to_seconds(ts_val):
+    if ts_val is None:
+        return 0.0
+    ts_str = str(ts_val).strip()
+    if not ts_str:
+        return 0.0
+    try:
+        if ':' in ts_str:
+            parts = [float(p) for p in ts_str.split(':')]
+            if len(parts) == 2:
+                return parts[0] * 60 + parts[1]
+            elif len(parts) == 3:
+                return parts[0] * 3600 + parts[1] * 60 + parts[2]
+        return max(0.0, float(ts_str))
+    except (ValueError, TypeError):
+        return 0.0
+
+
+@app.route('/api/trim-file', methods=['POST'])
+@app.route('/api/trim-audio', methods=['POST'])
+def trim_uploaded_media():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+
+    export_type = request.form.get('export_type', 'auto').lower()
+    raw_segments = request.form.get('segments')
+    
+    segments = []
+    if raw_segments:
+        try:
+            parsed = json.loads(raw_segments)
+            if isinstance(parsed, list):
+                segments = parsed
+        except Exception:
+            pass
+
+    # Fallback to single start and end if no list provided
+    if not segments:
+        s_val = request.form.get('start', '0')
+        e_val = request.form.get('end', '30')
+        segments = [{'start': s_val, 'end': e_val}]
+
+    # Validate segments
+    valid_segments = []
+    for seg in segments:
+        s_sec = parse_timestamp_to_seconds(seg.get('start', 0))
+        e_sec = parse_timestamp_to_seconds(seg.get('end', 30))
+        if e_sec > s_sec:
+            valid_segments.append((s_sec, e_sec))
+
+    if not valid_segments:
+        return jsonify({'error': 'Please provide at least 1 valid segment where End Time is greater than Start Time.'}), 400
+
+    orig_ext = os.path.splitext(file.filename)[1].lower().lstrip('.') or 'mp4'
+    is_video_input = orig_ext in ['mp4', 'mov', 'mkv', 'webm', 'avi', 'flv', 'm4v', 'ts']
+    
+    if export_type == 'auto':
+        target_mode = 'video' if is_video_input else 'audio'
+    elif export_type == 'video':
+        target_mode = 'video'
+    else:
+        target_mode = 'audio'
+
+    uid = uuid.uuid4().hex[:10]
+    input_filename = f"upload_{uid}.{orig_ext}"
+    input_path = os.path.join(DOWNLOADS_DIR, input_filename)
+    file.save(input_path)
+
+    temp_files = [input_path]
+    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+
+    try:
+        segment_files = []
+        for idx, (s_sec, e_sec) in enumerate(valid_segments):
+            dur_sec = e_sec - s_sec
+            if target_mode == 'video':
+                seg_out = os.path.join(DOWNLOADS_DIR, f"seg_{uid}_{idx}.mp4")
+                cmd = [
+                    ffmpeg_exe, '-y',
+                    '-ss', str(s_sec),
+                    '-t', str(dur_sec),
+                    '-i', input_path,
+                    '-c:v', 'libx264',
+                    '-preset', 'fast',
+                    '-crf', '20',
+                    '-c:a', 'aac',
+                    '-b:a', '192k',
+                    seg_out
+                ]
+            else:
+                seg_out = os.path.join(DOWNLOADS_DIR, f"seg_{uid}_{idx}.mp3")
+                cmd = [
+                    ffmpeg_exe, '-y',
+                    '-ss', str(s_sec),
+                    '-t', str(dur_sec),
+                    '-i', input_path,
+                    '-vn',
+                    '-acodec', 'libmp3lame',
+                    '-b:a', '320k',
+                    seg_out
+                ]
+            
+            import subprocess
+            proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=120)
+            if proc.returncode != 0 or not os.path.exists(seg_out):
+                raise Exception(f"FFmpeg trim error on segment {idx + 1}: {proc.stderr}")
+            
+            segment_files.append(seg_out)
+            temp_files.append(seg_out)
+
+        # Merge segments if multiple, or use single
+        final_ext = 'mp4' if target_mode == 'video' else 'mp3'
+        final_output = os.path.join(DOWNLOADS_DIR, f"trimmed_{uid}.{final_ext}")
+        temp_files.append(final_output)
+
+        if len(segment_files) == 1:
+            final_output = segment_files[0]
+        else:
+            # Create concat list
+            concat_list_path = os.path.join(DOWNLOADS_DIR, f"concat_{uid}.txt")
+            temp_files.append(concat_list_path)
+            with open(concat_list_path, 'w', encoding='utf-8') as f:
+                for s_file in segment_files:
+                    f.write(f"file '{os.path.abspath(s_file)}'\n")
+
+            concat_cmd = [
+                ffmpeg_exe, '-y',
+                '-f', 'concat',
+                '-safe', '0',
+                '-i', concat_list_path,
+                '-c', 'copy',
+                final_output
+            ]
+            c_proc = subprocess.run(concat_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+            if c_proc.returncode != 0 or not os.path.exists(final_output):
+                # Fallback re-encode if copy fails
+                if target_mode == 'video':
+                    fallback_cmd = [ffmpeg_exe, '-y', '-f', 'concat', '-safe', '0', '-i', concat_list_path, '-c:v', 'libx264', '-c:a', 'aac', final_output]
+                else:
+                    fallback_cmd = [ffmpeg_exe, '-y', '-f', 'concat', '-safe', '0', '-i', concat_list_path, '-acodec', 'libmp3lame', final_output]
+                subprocess.run(fallback_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+
+        # Schedule temp cleanup
+        for t_file in temp_files:
+            if t_file != final_output:
+                threading.Timer(60.0, cleanup_file, args=[t_file]).start()
+        threading.Timer(180.0, cleanup_file, args=[final_output]).start()
+
+        base_name = os.path.splitext(file.filename)[0]
+        download_name = f"{base_name}_Trimmed.{final_ext}"
+        mimetype = 'video/mp4' if final_ext == 'mp4' else 'audio/mpeg'
+        return send_file(final_output, as_attachment=True, download_name=download_name, mimetype=mimetype)
+
+    except Exception as e:
+        for t_file in temp_files:
+            cleanup_file(t_file)
+        return jsonify({'error': f"Trimming failed: {str(e)}"}), 500
+
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
+

@@ -221,7 +221,7 @@
         }
     </style>
 </head>
-<body class="converter-page">
+<body class="converter-page light-theme">
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo" style="display:flex;align-items:center;gap:0.55rem;text-decoration:none;color:inherit;">
@@ -291,8 +291,8 @@
 
                 <a href="index.html" class="page-back-btn">← Home</a>
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
         </div>
@@ -401,40 +401,15 @@
                 <div class="footer-logo">DOWNLOADYFY<span>.AI</span></div>
                 <p class="footer-copyright">© 2026 DOWNLOADYFY.AI. All rights reserved.</p>
             </div>
-            <div class="footer-right">
-                <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
-            </div>
         </div>
     </footer>
 
-    <!-- Ad Countdown Modal -->
-    <div id="adModal" class="modal-overlay hidden">
-        <div class="modal-card ad-viewer-modal" style="max-width: 500px; text-align: center; gap: 1.5rem; background: #1e1e1e;">
-            <button class="modal-close-btn" id="closeAdModalBtn" disabled style="opacity: 0.3; cursor: not-allowed;">&times;</button>
-            <div class="modal-header">
-                <h2>Support Downloadyfy<span>.AI</span></h2>
-                <p>Watching this ad unlocks <strong>1 free conversion slot</strong>!</p>
-            </div>
-            <div class="ad-player-box" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div class="ad-animation" style="position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #1e1b4b 0%, #030712 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
-                    <div class="spinner" style="width: 44px; height: 44px; border: 3px solid rgba(99,102,241,0.15); border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
-                    <p style="font-weight: 700; color: #ffffff; margin: 0; font-size: 1.1rem;">Grammarly Pro for Students 📝</p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Write documents, check homework, 10x faster!</p>
-                </div>
-                <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; color: #ffffff; z-index: 2;">
-                    Ad ends in: <span id="adTimerVal" style="color: #818cf8;">5</span>s
-                </div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
-                <button class="convert-submit-btn" id="adUpgradeBtn" style="width: 100%; border-radius: 12px;">Support Free Conversions</button>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Or wait for the countdown to unlock your free slot.</p>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Hidden Google Translate Element but rendered for DOM accessibility -->
     <div id="google_translate_element" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none;"></div>
 
+    <script src="sound-effects.js"></script>
     <script src="language.js"></script>
     <script src="converter.js?v=2"></script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Trimmer & Ringtone Creator — DOWNLOADYFY.AI</title>
-    <meta name="description" content="Trim MP3, WAV, M4A audio files to create perfect ringtones and clips. Free, browser-based audio trimmer.">
+    <title>Universal Video & Audio Trimmer — DOWNLOADYFY.AI</title>
+    <meta name="description" content="Trim and cut offline video (MP4, MOV, MKV, WebM) and audio (MP3, WAV, M4A) files with multi-segment concatenation. Free & fast.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=26">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=35">
     <style>
         .page-back-btn {
             display: inline-flex;
@@ -18,229 +18,348 @@
             font-weight: 700;
             color: var(--text-muted);
             text-decoration: none;
-            padding: 0.4rem 1rem;
+            padding: 0.45rem 1rem;
             border-radius: 20px;
             border: 1px solid var(--glass-border);
             background: var(--card-bg);
             transition: all 0.2s ease;
         }
         .page-back-btn:hover {
-            color: #34d399;
-            border-color: #10b981;
+            color: #ff5f00;
+            border-color: #ff5f00;
             transform: translateX(-2px);
         }
 
         .page-header-section {
             text-align: center;
-            padding: 3rem 1rem 2rem;
+            padding: 3rem 1rem 1.8rem;
         }
         .page-header-section h1 {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            margin: 0.8rem 0 0.5rem;
+            font-size: clamp(2.2rem, 5vw, 3.6rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin: 0.5rem 0 0.6rem;
+            color: var(--text-main);
         }
         .page-header-section p {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            margin: 0;
+            font-size: 1.02rem;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
-        .page-icon { font-size: 2.5rem; margin-bottom: 0.3rem; }
+        .page-icon { font-size: 2.6rem; margin-bottom: 0.3rem; }
 
-        /* Mini steps */
-        .mini-how {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 750px;
-            margin: 0 auto 2rem;
-        }
-        .mini-step {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 0.75rem 1.2rem;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .mini-step-num {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        /* Allowance badge */
-        .allowance-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 1rem;
-            background: rgba(16,185,129,0.12);
-            border: 1px solid rgba(16,185,129,0.3);
-            border-radius: 20px;
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: #34d399;
-        }
-
-        /* Trimmer card */
+        /* Trimmer Main Glass Container */
         .trimmer-main-card {
             background: var(--card-bg);
-            border: 1px solid rgba(16,185,129,0.25);
-            border-radius: 28px;
-            padding: 2.5rem;
-            max-width: 700px;
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem 2.2rem;
+            max-width: 820px;
             margin: 0 auto 3rem;
+            box-shadow: 0 16px 45px rgba(0, 0, 0, 0.05);
+            position: relative;
         }
 
-        .trimmer-main-card .drag-zone {
-            border: 2px dashed rgba(16,185,129,0.4);
-            background: rgba(16,185,129,0.03);
-            border-radius: 18px;
-            padding: 3rem 2rem;
+        /* Drag Zone */
+        .trim-drag-zone {
+            border: 2px dashed rgba(255, 95, 0, 0.4);
+            background: rgba(255, 95, 0, 0.03);
+            border-radius: 20px;
+            padding: 2.8rem 2rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             margin-bottom: 1.5rem;
         }
-        .trimmer-main-card .drag-zone:hover,
-        .trimmer-main-card .drag-zone.dragover {
-            border-color: #10b981;
-            background: rgba(16,185,129,0.08);
+        .trim-drag-zone:hover,
+        .trim-drag-zone.dragover {
+            border-color: #ff5f00;
+            background: rgba(255, 95, 0, 0.08);
             transform: scale(1.01);
         }
-        .trimmer-main-card .drag-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-        .trimmer-main-card .drag-text { font-size: 0.95rem; color: var(--text-muted); margin: 0; }
-        .trimmer-main-card .browse-link { color: #34d399; text-decoration: underline; cursor: pointer; }
+        .trim-drag-zone .drag-icon { font-size: 3.2rem; margin-bottom: 0.6rem; }
+        .trim-drag-zone .drag-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem; }
+        .trim-drag-zone .drag-text { font-size: 0.92rem; color: var(--text-muted); margin: 0; }
+        .trim-drag-zone .browse-link { color: #ff5f00; text-decoration: underline; font-weight: 700; cursor: pointer; }
 
         .selected-file-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 14px;
+            padding: 0.75rem 1.2rem;
+            margin-bottom: 1.5rem;
+            color: #ea580c;
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+        body.dark-theme .selected-file-chip {
+            background: rgba(255, 95, 0, 0.12);
+            border-color: rgba(255, 95, 0, 0.3);
+            color: #ff7b00;
+        }
+
+        /* Media Export Selector Pills */
+        .media-mode-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .media-mode-pills {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .mode-toggle-btn {
+            padding: 0.55rem 1.1rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 750;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .mode-toggle-btn.active {
+            background: #ff5f00;
+            color: #ffffff;
+            border-color: #ff5f00;
+            box-shadow: 0 4px 12px rgba(255, 95, 0, 0.3);
+        }
+
+        /* Multi-Segment Cards Grid / Container */
+        .segments-outer-section {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.6rem;
+        }
+        body.dark-theme .segments-outer-section {
+            background: rgba(0, 0, 0, 0.25);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .segments-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .segments-title {
+            font-size: 1.05rem;
+            font-weight: 850;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .segments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Individual Segment Box (Exact 2nd Image Reference) */
+        .segment-card-box {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease;
+        }
+        body.dark-theme .segment-card-box {
+            background: rgba(30, 30, 30, 0.8);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .segment-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+        .segment-tag-badge {
+            background: rgba(255, 95, 0, 0.12);
+            color: #ff5f00;
+            font-weight: 800;
+            font-size: 0.78rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.3px;
+        }
+        .segment-delete-btn {
+            background: rgba(244, 63, 94, 0.08);
+            color: #f43f5e;
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            border-radius: 8px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .segment-delete-btn:hover {
+            background: #f43f5e;
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        /* Inputs pair row */
+        .segment-inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+        .segment-input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .segment-input-field label {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #64748b;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .segment-input-field input {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            color: #0f172a;
+            outline: none;
+            font-size: 1.15rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        body.dark-theme .segment-input-field input {
+            background: #141414;
+            border-color: #334155;
+            color: #ffffff;
+        }
+        .segment-input-field input:focus {
+            border-color: #ff5f00;
+            box-shadow: 0 0 0 3px rgba(255, 95, 0, 0.15);
+        }
+
+        .segment-duration-text {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .segment-duration-text strong {
+            color: #10b981;
+            font-weight: 800;
+        }
+
+        /* Segment Action Buttons */
+        .segment-actions-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+        }
+        .add-segment-btn {
+            background: #fff7ed;
+            border: 1.5px dashed #ea580c;
+            color: #ea580c;
+            padding: 0.65rem 1.4rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(16,185,129,0.12);
-            border: 1px solid rgba(16,185,129,0.3);
+        }
+        .add-segment-btn:hover {
+            background: #ea580c;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.25);
+        }
+        .reset-segments-btn {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 0.65rem 1.2rem;
             border-radius: 12px;
-            padding: 0.4rem 0.9rem;
-            font-size: 0.82rem;
-            color: #34d399;
-            margin-bottom: 1.2rem;
-        }
-
-        /* Time range control */
-        .trim-range-section {
-            background: rgba(16,185,129,0.05);
-            border: 1px solid rgba(16,185,129,0.15);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .trim-range-section h4 {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--text-main);
-            margin: 0 0 1rem;
-        }
-        .trim-inputs-row {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-        .trim-field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-        .trim-field label {
-            font-size: 0.78rem;
+            font-size: 0.88rem;
             font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-        .trim-field input {
-            background: var(--card-bg);
-            border: 2px solid rgba(16,185,129,0.3);
-            padding: 0.6rem 0.9rem;
-            border-radius: 10px;
-            color: var(--text-main);
-            width: 100px;
-            outline: none;
-            font-size: 1rem;
-            font-weight: 700;
-            transition: border-color 0.2s ease;
-        }
-        .trim-field input:focus { border-color: #10b981; }
-        .duration-preview {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-        .duration-preview strong { color: #34d399; }
-
-        /* Submit button */
-        .trim-submit-btn {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 800;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            transition: all 0.2s ease;
+        }
+        .reset-segments-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-muted);
+        }
+
+        /* Submit Button */
+        .trim-submit-btn {
+            background: linear-gradient(135deg, #ff5f00 0%, #ff7b00 100%);
+            color: #ffffff;
+            border: none;
+            padding: 0.9rem 2rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 850;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            min-width: 160px;
             justify-content: center;
+            gap: 0.6rem;
             width: 100%;
+            box-shadow: 0 6px 25px rgba(255, 95, 0, 0.35);
         }
         .trim-submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(16,185,129,0.4);
+            box-shadow: 0 10px 30px rgba(255, 95, 0, 0.5);
         }
         .trim-submit-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* Ringtone presets */
-        .preset-chips {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            margin-bottom: 0.5rem;
-        }
-        .preset-chip {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.2);
-            color: #34d399;
-            font-size: 0.78rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .preset-chip:hover {
-            background: rgba(16,185,129,0.2);
-            border-color: #10b981;
+        @media (max-width: 600px) {
+            .trimmer-main-card {
+                padding: 1.4rem 1rem;
+            }
+            .segment-inputs-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            .segment-input-field input {
+                font-size: 1rem;
+                padding: 0.65rem 0.8rem;
+            }
         }
     </style>
 </head>
-<body>
+<body class="light-theme">
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo" style="display:flex;align-items:center;gap:0.55rem;text-decoration:none;color:inherit;">
@@ -250,46 +369,18 @@
 
             <div class="nav-links-menu">
                 <a href="index.html" class="nav-link-item nav-downloader"><span class="nav-icon">⚡</span><span>Downloader</span></a>
-                <a href="booster.html" class="nav-link-item nav-booster"><span class="nav-icon">🔊</span><span>3D Booster</span><span class="nav-badge">8D</span></a>
-                <a href="tagger.html" class="nav-link-item nav-tagger"><span class="nav-icon">🏷️</span><span>ID3 Tagger</span><span class="nav-badge">PRO</span></a>
-                <a href="vocal-remover.html" class="nav-link-item nav-vocal"><span class="nav-icon">🎤</span><span>Vocal Remover</span><span class="nav-badge">AI</span></a>
-                <a href="converter.html" class="nav-link-item nav-converter"><span class="nav-icon">🔄</span><span>Converter</span></a>
-                <a href="trimmer.html" class="nav-link-item active nav-trimmer"><span class="nav-icon">✂️</span><span>Trimmer</span></a>
+                <a href="trimmer.html" class="nav-link-item active nav-trimmer"><span class="nav-icon">✂️</span><span>Video Trim</span></a>
             </div>
 
             <div class="nav-actions">
                 <!-- Language Selector Dropdown -->
                 <div class="language-selector-wrapper">
                     <select id="languageSelect" class="lang-select-dropdown" aria-label="Select Language">
-                        <!-- Popular/User requested -->
                         <option value="en">🇺🇸 US / 🇬🇧 UK (English)</option>
                         <option value="hi">🇮🇳 India (हिंदी)</option>
                         <option value="ne">🇳🇵 Nepal (नेपाली)</option>
                         <option value="ur">🇵🇰 Pakistan (اردو)</option>
                         <option value="ja">🇯🇵 Japan (日本語)</option>
-                        <option value="lb">🇱🇺 Luxembourg (Lëtzebuergesch)</option>
-
-                        <!-- Afghanistan to Burkina Faso -->
-                        <option value="ps">🇦🇫 Afghanistan (Pashto)</option>
-                        <option value="sq">🇦🇱 Albania (Shqip)</option>
-                        <option value="ar">🇩🇿 Algeria / Bahrain (العربية)</option>
-                        <option value="ca">🇦🇩 Andorra (Català)</option>
-                        <option value="pt">🇦🇴 Angola / Brazil (Português)</option>
-                        <option value="es">🇦🇷 Argentina / Bolivia (Español)</option>
-                        <option value="hy">🇦🇲 Armenia (Հայերեն)</option>
-                        <option value="de">🇦🇹 Austria / Germany (Deutsch)</option>
-                        <option value="az">🇦🇿 Azerbaijan (Azərbaycanca)</option>
-                        <option value="en">🇧🇸 Bahamas / Belize / Barbados (English)</option>
-                        <option value="bn">🇧🇩 Bangladesh (বাংলা)</option>
-                        <option value="be">🇧🇾 Belarus (Беларуская)</option>
-                        <option value="nl">🇧🇪 Belgium / Netherlands (Nederlands)</option>
-                        <option value="fr">🇧🇯 Benin / France / Burkina Faso (Français)</option>
-                        <option value="dz">🇧🇹 Bhutan (རྫོང་ཁ)</option>
-                        <option value="bs">🇧🇦 Bosnia (Bosanski)</option>
-                        <option value="ms">🇧🇳 Brunei (Melayu)</option>
-                        <option value="bg">🇧🇬 Bulgaria (Български)</option>
-
-                        <!-- Other major world languages -->
                         <option value="it">🇮🇹 Italy (Italiano)</option>
                         <option value="ko">🇰🇷 Korea (한국어)</option>
                         <option value="ru">🇷🇺 Russia (Русский)</option>
@@ -297,133 +388,105 @@
                         <option value="tr">🇹🇷 Turkey (Türkçe)</option>
                         <option value="vi">🇻🇳 Vietnam (Tiếng Việt)</option>
                     </select>
-                    <span class="select-arrow" style="
-                        position: absolute;
-                        right: 10px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        color: var(--text-muted);
-                        pointer-events: none;
-                        font-size: 0.7rem;
-                    ">▼</span>
+                    <span class="select-arrow" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; font-size: 0.7rem;">▼</span>
                 </div>
 
                 <a href="index.html" class="page-back-btn">← Home</a>
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
         </div>
     </nav>
 
     <div class="background-elements">
-        <div class="blob blob-1" style="background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%);"></div>
-        <div class="blob blob-2" style="background: radial-gradient(circle, rgba(5,150,105,0.15) 0%, transparent 70%);"></div>
+        <div class="blob blob-1" style="background: radial-gradient(circle, rgba(255,95,0,0.15) 0%, transparent 70%);"></div>
+        <div class="blob blob-2" style="background: radial-gradient(circle, rgba(255,140,0,0.1) 0%, transparent 70%);"></div>
     </div>
 
     <main class="container">
         <header class="page-header-section">
             <div class="page-icon">✂️</div>
-            <h1 style="background: linear-gradient(135deg, #34d399, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Audio Trimmer & Ringtone Creator</h1>
-            <p>Trim any audio file to the perfect length — ideal for ringtones, clips, and podcast snippets</p>
+            <h1>Universal Video &amp; Audio Trimmer</h1>
+            <p>Upload any offline video or audio file — add multiple trim ranges, cut out unwanted parts, and download merged output with crystal clear quality!</p>
         </header>
-
-        <!-- Mini How-to steps -->
-        <div class="mini-how">
-            <div class="mini-step"><div class="mini-step-num">1</div>Upload audio file</div>
-            <div class="mini-step"><div class="mini-step-num">2</div>Set start & end time</div>
-            <div class="mini-step"><div class="mini-step-num">3</div>Trim & download MP3</div>
-        </div>
 
         <!-- Main Trimmer Card -->
         <div class="trimmer-main-card">
             <form id="trimForm">
-                <!-- Drag Zone -->
-                <div class="drag-zone" id="audioDragZone">
-                    <div class="drag-icon">🎵</div>
-                    <p class="drag-text">Drag & Drop audio here or <span class="browse-link">Browse files</span></p>
-                    <p class="drag-text" style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">Supports: MP3, WAV, M4A, FLAC, OGG, AAC</p>
-                    <input type="file" id="audioFileInput" accept="audio/*" style="display: none;" required>
+                <!-- Drag Zone for Video & Audio -->
+                <div class="trim-drag-zone" id="mediaDragZone">
+                    <div class="drag-icon">🎬</div>
+                    <div class="drag-title">Drag &amp; Drop Video or Audio here</div>
+                    <p class="drag-text">or <span class="browse-link">Browse files on your device</span></p>
+                    <p class="drag-text" style="font-size: 0.8rem; margin-top: 6px; color: var(--text-muted);">Supports: MP4, MOV, MKV, WebM, AVI, MP3, WAV, M4A, FLAC, AAC</p>
+                    <input type="file" id="mediaFileInput" accept="video/*,audio/*,.mp4,.mov,.mkv,.webm,.avi,.m4v,.mp3,.wav,.m4a,.flac,.aac" style="display: none;" required>
                 </div>
 
-                <!-- Selected file chip -->
+                <!-- Selected File Info -->
                 <div class="selected-file-chip hidden" id="trimFileInfo">
-                    <span>🎶</span>
-                    <span class="file-name" id="trimFileName">audio.mp3</span>
-                    <span style="color: var(--text-muted);">·</span>
-                    <span class="file-size" id="trimFileSize">0 MB</span>
+                    <div style="display:flex; align-items:center; gap:0.6rem; overflow:hidden;">
+                        <span id="fileTypeIcon" style="font-size:1.2rem;">🎬</span>
+                        <span class="file-name" id="trimFileName" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:320px;">video.mp4</span>
+                        <span style="color: var(--text-muted);">·</span>
+                        <span class="file-size" id="trimFileSize">0 MB</span>
+                    </div>
+                    <button type="button" id="removeFileBtn" style="background:none; border:none; color:#ea580c; font-weight:800; cursor:pointer; font-size:1.1rem;">✕</button>
                 </div>
 
-                <!-- Trim Range -->
-                <div class="trim-range-section">
-                    <h4>✂️ Set Trim Range</h4>
-
-                    <!-- Preset chips -->
-                    <div style="margin-bottom: 1rem;">
-                        <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase;">Quick Presets</div>
-                        <div class="preset-chips">
-                            <div class="preset-chip" onclick="applyPreset(0, 30)">📱 30s Ringtone</div>
-                            <div class="preset-chip" onclick="applyPreset(0, 15)">🔔 15s Alert</div>
-                            <div class="preset-chip" onclick="applyPreset(0, 60)">⏱️ 1 min Clip</div>
-                            <div class="preset-chip" onclick="applyPreset(0, 20)">🎹 20s Notif.</div>
-                        </div>
+                <!-- Export Mode Selection -->
+                <div class="media-mode-toggle-wrapper">
+                    <div style="font-size: 0.9rem; font-weight: 800; color: var(--text-main);">
+                        Export Format:
                     </div>
-
-                    <div class="trim-inputs-row">
-                        <div class="trim-field">
-                            <label for="trimStartInput">Start (seconds)</label>
-                            <input type="number" id="trimStartInput" min="0" step="0.1" value="0.0">
-                        </div>
-                        <div class="trim-field">
-                            <label for="trimEndInput">End (seconds)</label>
-                            <input type="number" id="trimEndInput" min="0.1" step="0.1" value="30.0">
-                        </div>
-                    </div>
-
-                    <div class="duration-preview">
-                        Duration: <strong id="trimDurationPreview">30.0s</strong>
+                    <div class="media-mode-pills">
+                        <button type="button" class="mode-toggle-btn active" id="modeVideoBtn" data-mode="video">🎬 Full HD Video (MP4)</button>
+                        <button type="button" class="mode-toggle-btn" id="modeAudioBtn" data-mode="audio">🎵 Audio Only (MP3 320k)</button>
                     </div>
                 </div>
 
+                <!-- Multi-Segment Trimming Section -->
+                <div class="segments-outer-section">
+                    <div class="segments-header-row">
+                        <div class="segments-title">
+                            <span>✂️ Set Trim Segments</span>
+                            <span style="font-size: 0.78rem; font-weight: 600; color: #64748b;">(All segments will be merged together)</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Segments List Container -->
+                    <div class="segments-list" id="segmentsListContainer">
+                        <!-- Populated by trimmer.js -->
+                    </div>
+
+                    <!-- Add Segment & Reset Action Bar -->
+                    <div class="segment-actions-footer">
+                        <button type="button" class="add-segment-btn" id="addSegmentBtn">
+                            <span>+</span>
+                            <span>Add Another Segment</span>
+                        </button>
+                        <button type="button" class="reset-segments-btn" id="resetSegmentsBtn">
+                            Reset to Default
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Primary Trim & Download Button -->
                 <button type="submit" class="trim-submit-btn" id="trimBtn" disabled>
-                    <span class="trim-btn-text">✂️ Trim & Export MP3</span>
-                    <div class="loader-spinner hidden" id="trimLoader" style="width: 16px; height: 16px; border-color: rgba(255,255,255,0.2); border-top-color: #fff;"></div>
+                    <span class="trim-btn-text" id="trimBtnText">✂️ Trim &amp; Download Merged Video</span>
+                    <div class="loader-spinner hidden" id="trimLoader" style="width: 20px; height: 20px; border-color: rgba(255,255,255,0.3); border-top-color: #fff;"></div>
                 </button>
             </form>
 
-            <!-- Status Box -->
+            <!-- Status & Progress Box -->
             <div class="status-box hidden" id="trimStatus" style="margin-top: 1.5rem;">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="trimProgressFill" style="width: 0%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                    <div class="progress-fill" id="trimProgressFill" style="width: 0%; background: linear-gradient(90deg, #ff5f00, #ff8c00);"></div>
                 </div>
-                <div class="terminal-log-wrapper" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
-                    <span class="terminal-prompt">></span> <span id="trimStatusText">Uploading audio file...</span>
+                <div class="terminal-log-wrapper" style="padding: 0.6rem 1rem; font-size: 0.88rem;">
+                    <span class="terminal-prompt">></span> <span id="trimStatusText">Uploading file to server...</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Use Case Cards -->
-        <div style="max-width: 700px; margin: 0 auto 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
-            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">📱</div>
-                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Ringtones</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Cut perfect 30s clips</div>
-            </div>
-            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🔔</div>
-                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Notifications</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Short alert sounds</div>
-            </div>
-            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🎙️</div>
-                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Podcast Clips</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Highlight segments</div>
-            </div>
-            <div style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem; text-align: center;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">🎵</div>
-                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Music Clips</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Best drops & choruses</div>
             </div>
         </div>
 
@@ -438,60 +501,12 @@
                 <div class="footer-logo">DOWNLOADYFY<span>.AI</span></div>
                 <p class="footer-copyright">© 2026 DOWNLOADYFY.AI. All rights reserved.</p>
             </div>
-            <div class="footer-right">
-                <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
-            </div>
         </div>
     </footer>
 
-    <!-- Ad Countdown Modal -->
-    <div id="adModal" class="modal-overlay hidden">
-        <div class="modal-card ad-viewer-modal" style="max-width: 500px; text-align: center; gap: 1.5rem; background: #1e1e1e;">
-            <button class="modal-close-btn" id="closeAdModalBtn" disabled style="opacity: 0.3; cursor: not-allowed;">&times;</button>
-            <div class="modal-header">
-                <h2>Support Downloadyfy<span>.AI</span></h2>
-                <p>Watching this ad unlocks <strong>1 free trim slot</strong>!</p>
-            </div>
-            <div class="ad-player-box" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div class="ad-animation" style="position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #064e3b 0%, #030712 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
-                    <div class="spinner" style="width: 44px; height: 44px; border: 3px solid rgba(16,185,129,0.15); border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
-                    <p style="font-weight: 700; color: #ffffff; margin: 0; font-size: 1.1rem;">Grammarly Pro for Students 📝</p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Write documents, check homework, 10x faster!</p>
-                </div>
-                <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; color: #ffffff; z-index: 2;">
-                    Ad ends in: <span id="adTimerVal" style="color: #34d399;">5</span>s
-                </div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
-                <button class="trim-submit-btn" id="adUpgradeBtn">Support Free Trims</button>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Or wait for the countdown to unlock your free slot.</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function applyPreset(start, end) {
-            document.getElementById('trimStartInput').value = start;
-            document.getElementById('trimEndInput').value = end;
-            updateDurationPreview();
-        }
-
-        function updateDurationPreview() {
-            const start = parseFloat(document.getElementById('trimStartInput').value) || 0;
-            const end = parseFloat(document.getElementById('trimEndInput').value) || 30;
-            const dur = Math.max(0, end - start).toFixed(1);
-            const el = document.getElementById('trimDurationPreview');
-            if (el) el.textContent = `${dur}s`;
-        }
-
-        document.getElementById('trimStartInput').addEventListener('input', updateDurationPreview);
-        document.getElementById('trimEndInput').addEventListener('input', updateDurationPreview);
-    </script>
-    <!-- Hidden Google Translate Element but rendered for DOM accessibility -->
-    <div id="google_translate_element" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none;"></div>
-
+    <script src="sound-effects.js"></script>
     <script src="language.js"></script>
-    <script src="trimmer.js?v=2"></script>
+    <script src="trimmer.js?v=10"></script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

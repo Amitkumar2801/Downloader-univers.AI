@@ -1,88 +1,228 @@
-// === Audio Effects Engine (Web Audio API) ===
+// === Super Rich Audio Effects Engine (Web Audio API) ===
 const SoundFX = {
     audioCtx: null,
+    muted: false,
 
     init() {
         if (!this.audioCtx) {
-            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+                this.audioCtx = new AudioContextClass();
+            }
         }
     },
 
-    playScan() {
+    resume() {
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume();
+        }
+    },
+
+    // 1. Crisp Micro Click (Buttons, Links, Quality Tabs)
+    playClick() {
+        if (this.muted) return;
         try {
             this.init();
             const ctx = this.audioCtx;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (!ctx) return;
+            this.resume();
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, now);
+            osc.frequency.exponentialRampToValueAtTime(400, now + 0.04);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.04);
+        } catch (e) {}
+    },
 
+    // 2. Soft Pop / Expand (Drawer Open, Adding Segment, Tab Switch)
+    playPop() {
+        if (this.muted) return;
+        try {
+            this.init();
+            const ctx = this.audioCtx;
+            if (!ctx) return;
+            this.resume();
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.exponentialRampToValueAtTime(750, now + 0.08);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } catch (e) {}
+    },
+
+    // 3. Delete / Whoosh (Remove segment, close modal)
+    playDelete() {
+        if (this.muted) return;
+        try {
+            this.init();
+            const ctx = this.audioCtx;
+            if (!ctx) return;
+            this.resume();
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(450, now);
+            osc.frequency.exponentialRampToValueAtTime(120, now + 0.1);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } catch (e) {}
+    },
+
+    // 4. Futuristic AI Parser / Telemetry Sweep
+    playScan() {
+        if (this.muted) return;
+        try {
+            this.init();
+            const ctx = this.audioCtx;
+            if (!ctx) return;
+            this.resume();
             const now = ctx.currentTime;
             
-            // Modern sci-fi sweep sound (synth rise + filter sweep)
             const osc = ctx.createOscillator();
             const gainNode = ctx.createGain();
             const filter = ctx.createBiquadFilter();
 
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampToValueAtTime(800, now + 1.2);
+            osc.frequency.setValueAtTime(160, now);
+            osc.frequency.exponentialRampToValueAtTime(950, now + 1.1);
 
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(200, now);
-            filter.frequency.exponentialRampToValueAtTime(1500, now + 1.0);
+            filter.frequency.setValueAtTime(220, now);
+            filter.frequency.exponentialRampToValueAtTime(1800, now + 0.9);
 
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(0.15, now + 0.1);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+            gainNode.gain.linearRampToValueAtTime(0.18, now + 0.1);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
 
             osc.connect(filter);
             filter.connect(gainNode);
             gainNode.connect(ctx.destination);
 
             osc.start(now);
-            osc.stop(now + 1.2);
-        } catch (e) {
-            console.warn('Audio play failed:', e);
-        }
+            osc.stop(now + 1.1);
+        } catch (e) {}
     },
 
-    playSuccess() {
+    // 5. Rocket / Launch Start (Download Started)
+    playStartDownload() {
+        if (this.muted) return;
         try {
             this.init();
             const ctx = this.audioCtx;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (!ctx) return;
+            this.resume();
+            const now = ctx.currentTime;
+            
+            const notes = [523.25, 659.25, 783.99];
+            notes.forEach((freq, idx) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                const t = now + idx * 0.08;
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, t);
+                gain.gain.setValueAtTime(0.12, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(t);
+                osc.stop(t + 0.25);
+            });
+        } catch (e) {}
+    },
 
+    // 6. Crystal Success Harmony (Completion Chime)
+    playSuccess() {
+        if (this.muted) return;
+        try {
+            this.init();
+            const ctx = this.audioCtx;
+            if (!ctx) return;
+            this.resume();
             const now = ctx.currentTime;
 
-            // Premium double chime (ding-ding)
-            // First note (E5)
-            const osc1 = ctx.createOscillator();
-            const gain1 = ctx.createGain();
-            osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(659.25, now); // E5
-            gain1.gain.setValueAtTime(0, now);
-            gain1.gain.linearRampToValueAtTime(0.2, now + 0.05);
-            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-            osc1.connect(gain1);
-            gain1.connect(ctx.destination);
-            osc1.start(now);
-            osc1.stop(now + 0.6);
+            const chords = [659.25, 830.61, 987.77, 1318.51];
+            chords.forEach((freq, idx) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                const t = now + idx * 0.09;
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, t);
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.16, t + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(t);
+                osc.stop(t + 0.7);
+            });
+        } catch (e) {}
+    },
 
-            // Second note (A5) played slightly later
-            const delay = 0.12;
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(880.00, now + delay); // A5
-            gain2.gain.setValueAtTime(0, now + delay);
-            gain2.gain.linearRampToValueAtTime(0.2, now + delay + 0.05);
-            gain2.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.8);
-            osc2.connect(gain2);
-            gain2.connect(ctx.destination);
-            osc2.start(now + delay);
-            osc2.stop(now + delay + 0.8);
+    // 7. Error / Alert Sound
+    playError() {
+        if (this.muted) return;
+        try {
+            this.init();
+            const ctx = this.audioCtx;
+            if (!ctx) return;
+            this.resume();
+            const now = ctx.currentTime;
 
-        } catch (e) {
-            console.warn('Audio play failed:', e);
-        }
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.setValueAtTime(170, now + 0.12);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } catch (e) {}
+    },
+
+    // 8. Mode / Theme Toggle Sound
+    playToggle() {
+        if (this.muted) return;
+        try {
+            this.init();
+            const ctx = this.audioCtx;
+            if (!ctx) return;
+            this.resume();
+            const now = ctx.currentTime;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(600, now + 0.07);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.07);
+        } catch (e) {}
     }
 };
 
@@ -131,6 +271,143 @@ document.addEventListener('DOMContentLoaded', () => {
     const playlistItems = document.getElementById('playlistItems');
     const demoSection = document.getElementById('demoSection');
     const telemetryStatus = document.getElementById('telemetryStatus');
+
+    // Master Hero Interactive Elements
+    const btnPasteClipboard = document.getElementById('btnPasteClipboard');
+    const btnClearUrl = document.getElementById('btnClearUrl');
+    const detectedPlatformIcon = document.getElementById('detectedPlatformIcon');
+    const platformChips = document.querySelectorAll('.platform-chip');
+
+    // Platform SVG definitions
+    const PLATFORM_ICONS = {
+        default: `<svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`,
+        youtube: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
+        instagram: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
+        facebook: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
+        tiktok: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#00f2fe"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>`,
+        pinterest: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#e60023"><path d="M12 0a12 12 0 0 0-4.37 23.18c-.05-.98-.1-2.48.02-3.55.11-.96.72-6.14.72-6.14s-.18-.37-.18-.92c0-.86.5-1.5 1.13-1.5.53 0 .79.4.79.88 0 .54-.34 1.34-.52 2.08-.15.62.31 1.12.92 1.12 1.1 0 1.95-1.16 1.95-2.84 0-1.48-1.07-2.52-2.59-2.52-1.77 0-2.8 1.33-2.8 2.7 0 .54.2.1.13.48.05.2.06.33.02.5-.06.26-.2.83-.23.95-.04.16-.13.2-.3.12-.9-.42-1.46-1.74-1.46-2.8 0-2.28 1.66-4.38 4.78-4.38 2.51 0 4.46 1.79 4.46 4.18 0 2.5-1.57 4.51-3.76 4.51-.73 0-1.43-.38-1.66-.83l-.45 1.73c-.16.63-.6 1.42-.9 1.89A12 12 0 1 0 12 0z"/></svg>`
+    };
+
+    function updateUrlInputState(val) {
+        val = (val || '').trim();
+        if (btnClearUrl) {
+            if (val.length > 0) {
+                btnClearUrl.classList.remove('hidden');
+            } else {
+                btnClearUrl.classList.add('hidden');
+            }
+        }
+
+        const lower = val.toLowerCase();
+        let detected = 'default';
+        let statusText = 'AI PARSER STATE: READY // PASTE URL TO BEGIN';
+
+        if (lower.includes('youtube.com') || lower.includes('youtu.be') || lower.includes('/shorts/')) {
+            detected = 'youtube';
+            statusText = 'AI PARSER STATE: MATCHED // YOUTUBE CORE EXTRACTOR ONLINE';
+        } else if (lower.includes('instagram.com') || lower.includes('instagr.am')) {
+            detected = 'instagram';
+            statusText = 'AI PARSER STATE: MATCHED // INSTAGRAM MEDIA EXTRACTOR ONLINE';
+        } else if (lower.includes('facebook.com') || lower.includes('fb.watch') || lower.includes('fb.com')) {
+            detected = 'facebook';
+            statusText = 'AI PARSER STATE: MATCHED // FACEBOOK REEL & VIDEO PARSER ONLINE';
+        } else if (lower.includes('tiktok.com') || lower.includes('douyin.com')) {
+            detected = 'tiktok';
+            statusText = 'AI PARSER STATE: MATCHED // TIKTOK WATERMARK-FREE EXTRACTOR ONLINE';
+        } else if (lower.includes('pinterest.com') || lower.includes('pin.it')) {
+            detected = 'pinterest';
+            statusText = 'AI PARSER STATE: MATCHED // PINTEREST HD ASSET ENGINE ONLINE';
+        } else if (val.length > 5) {
+            statusText = 'AI PARSER STATE: ANALYZING CUSTOM MEDIA STREAM...';
+        }
+
+        if (detectedPlatformIcon) {
+            detectedPlatformIcon.innerHTML = PLATFORM_ICONS[detected] || PLATFORM_ICONS.default;
+        }
+
+        if (telemetryStatus) {
+            telemetryStatus.textContent = statusText;
+        }
+
+        // Highlight matching platform chip
+        platformChips.forEach(chip => {
+            const p = chip.dataset.platform;
+            if (detected === p) {
+                chip.classList.add('active');
+            } else if (detected !== 'default') {
+                chip.classList.remove('active');
+            }
+        });
+    }
+
+    if (urlInput) {
+        urlInput.addEventListener('input', (e) => {
+            updateUrlInputState(e.target.value);
+        });
+    }
+
+    if (btnClearUrl) {
+        btnClearUrl.addEventListener('click', () => {
+            if (urlInput) {
+                urlInput.value = '';
+                urlInput.focus();
+                updateUrlInputState('');
+            }
+        });
+    }
+
+    if (btnPasteClipboard) {
+        btnPasteClipboard.addEventListener('click', async () => {
+            try {
+                if (typeof SoundFX !== 'undefined' && SoundFX.playPop) {
+                    SoundFX.playPop();
+                }
+                
+                let text = '';
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    text = await navigator.clipboard.readText();
+                } else {
+                    // Fallback for some mobile webviews
+                    text = prompt("Paste your link here:") || '';
+                }
+                
+                if (text && text.trim()) {
+                    if (urlInput) {
+                        urlInput.value = text.trim();
+                        updateUrlInputState(text.trim());
+                        urlInput.focus();
+                    }
+                    // Visual feedback on paste button
+                    const originalHTML = btnPasteClipboard.innerHTML;
+                    btnPasteClipboard.innerHTML = `<span>✓</span><span class="btn-text">Pasted!</span>`;
+                    setTimeout(() => {
+                        btnPasteClipboard.innerHTML = originalHTML;
+                    }, 1500);
+                } else {
+                    if (urlInput) urlInput.focus();
+                }
+            } catch (err) {
+                console.warn('Clipboard read error:', err);
+                if (urlInput) urlInput.focus();
+            }
+        });
+    }
+
+    // Platform chips switcher
+    platformChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            platformChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            const placeholder = chip.dataset.placeholder;
+            if (urlInput && placeholder) {
+                urlInput.placeholder = placeholder;
+                urlInput.focus();
+            }
+            if (typeof SoundFX !== 'undefined' && SoundFX.playPop) {
+                SoundFX.playPop();
+            }
+        });
+    });
 
     // Premium active state, ads toggle and upgrade modals
     const premiumModal = document.getElementById('premiumModal');
@@ -283,6 +560,133 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Multi-Segment Trim Interactive Listeners ---
+    const closeTrimPanelBtn = document.getElementById('closeTrimPanelBtn');
+    if (closeTrimPanelBtn) {
+        closeTrimPanelBtn.addEventListener('click', () => switchDownloadMode('full'));
+    }
+
+    const modeFullBtn = document.getElementById('modeFullBtn');
+    const modeTrimBtn = document.getElementById('modeTrimBtn');
+    if (modeFullBtn) {
+        modeFullBtn.addEventListener('click', () => switchDownloadMode('full'));
+    }
+    if (modeTrimBtn) {
+        modeTrimBtn.addEventListener('click', () => switchDownloadMode('trim'));
+    }
+
+    const trimTypeVideo = document.getElementById('trimTypeVideo');
+    const trimTypeAudio = document.getElementById('trimTypeAudio');
+    const trimBtnText = document.getElementById('trimBtnText');
+
+    if (trimTypeVideo) {
+        trimTypeVideo.addEventListener('click', () => {
+            trimTypeVideo.classList.add('active');
+            if (trimTypeAudio) trimTypeAudio.classList.remove('active');
+            currentTrimMediaType = 'video';
+            if (trimBtnText) trimBtnText.textContent = 'Trim & Download Merged Video';
+            if (currentVideoData) populateTrimQualityDropdown(currentVideoData);
+        });
+    }
+    if (trimTypeAudio) {
+        trimTypeAudio.addEventListener('click', () => {
+            trimTypeAudio.classList.add('active');
+            if (trimTypeVideo) trimTypeVideo.classList.remove('active');
+            currentTrimMediaType = 'audio';
+            if (trimBtnText) trimBtnText.textContent = 'Trim & Download Merged Audio';
+            if (currentVideoData) populateTrimQualityDropdown(currentVideoData);
+        });
+    }
+
+    const addSegmentBtn = document.getElementById('addSegmentBtn');
+    if (addSegmentBtn) {
+        addSegmentBtn.addEventListener('click', () => {
+            if (currentTrimSegments.length >= 20) {
+                showError("Maximum of 20 segments reached per trim session.");
+                return;
+            }
+            const lastSeg = currentTrimSegments[currentTrimSegments.length - 1];
+            const lastEndSec = parseInputTimeToSeconds(lastSeg ? lastSeg.end : '00:00') || 0;
+            const nextStartSec = lastEndSec + 5;
+            const nextEndSec = nextStartSec + 30;
+            
+            currentTrimSegments.push({
+                start: formatSecondsToDisplay(nextStartSec),
+                end: formatSecondsToDisplay(nextEndSec)
+            });
+            renderTrimSegmentRows();
+        });
+    }
+
+    const resetSegmentsBtn = document.getElementById('resetSegmentsBtn');
+    if (resetSegmentsBtn) {
+        resetSegmentsBtn.addEventListener('click', () => {
+            const videoDur = (currentVideoData && currentVideoData.duration) || 120;
+            const defaultEnd = Math.min(60, videoDur);
+            currentTrimSegments = [
+                { start: '00:00', end: formatSecondsToDisplay(defaultEnd) }
+            ];
+            renderTrimSegmentRows();
+        });
+    }
+
+    const startTrimDownloadBtn = document.getElementById('startTrimDownloadBtn');
+    if (startTrimDownloadBtn) {
+        startTrimDownloadBtn.addEventListener('click', async () => {
+            if (!currentVideoData || !currentVideoData.url) {
+                showError("Please analyze a video link first.");
+                return;
+            }
+            
+            // Validate segments
+            const validatedSegments = [];
+            for (let i = 0; i < currentTrimSegments.length; i++) {
+                const seg = currentTrimSegments[i];
+                const sSec = parseInputTimeToSeconds(seg.start);
+                const eSec = parseInputTimeToSeconds(seg.end);
+                
+                if (sSec === null || eSec === null || isNaN(sSec) || isNaN(eSec)) {
+                    showError(`Segment #${i + 1} contains an invalid timestamp. Please enter in MM:SS or seconds (e.g. 1:04 or 4:21).`);
+                    return;
+                }
+                if (sSec < 0 || eSec <= sSec) {
+                    showError(`Segment #${i + 1} Start Time (${seg.start}) must be before End Time (${seg.end}).`);
+                    return;
+                }
+                validatedSegments.push({ start: seg.start, end: seg.end });
+            }
+            
+            if (validatedSegments.length === 0) {
+                showError("Please specify at least 1 valid segment to trim.");
+                return;
+            }
+            
+            const qualitySelect = document.getElementById('trimQualitySelect');
+            const format_id = qualitySelect ? qualitySelect.value : 'best';
+            const selectedOption = qualitySelect ? qualitySelect.selectedOptions[0] : null;
+            const ext = (selectedOption && selectedOption.dataset.ext) ? selectedOption.dataset.ext : (currentTrimMediaType === 'video' ? 'mp4' : 'mp3');
+            const height = (selectedOption && selectedOption.dataset.height) ? parseInt(selectedOption.dataset.height) : null;
+            
+            try {
+                await initiateDownload(
+                    currentVideoData.url,
+                    format_id,
+                    ext,
+                    currentVideoData.title,
+                    currentTrimMediaType,
+                    null,
+                    height,
+                    null,
+                    null,
+                    validatedSegments
+                );
+            } catch (err) {
+                console.error("Trim download error:", err);
+                showError(err.message || "Failed to start trim download.");
+            }
+        });
+    }
+
     // Legal modal terms & policies texts
     const termsText = `
         <h3>1. Personal and Educational Purpose</h3>
@@ -374,10 +778,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const sunIcon = document.querySelector('.sun-icon');
     const moonIcon = document.querySelector('.moon-icon');
 
-    // Load saved theme choice
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
+    // Load saved theme choice (default: light mode)
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        body.classList.remove('light-theme');
+        body.classList.add('dark-theme');
+        if (sunIcon) sunIcon.classList.add('hidden');
+        if (moonIcon) moonIcon.classList.remove('hidden');
+    } else {
         body.classList.add('light-theme');
+        body.classList.remove('dark-theme');
         if (sunIcon) sunIcon.classList.remove('hidden');
         if (moonIcon) moonIcon.classList.add('hidden');
     }
@@ -386,6 +796,11 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('light-theme');
             const isLight = body.classList.contains('light-theme');
+            if (isLight) {
+                body.classList.remove('dark-theme');
+            } else {
+                body.classList.add('dark-theme');
+            }
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             
             if (isLight) {
@@ -550,6 +965,269 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioContainer.children.length === 0) {
             audioContainer.innerHTML = '<p class="text-muted">No audio formats available.</p>';
         }
+
+        // Initialize smart multi-segment trim panel for this media
+        setupTrimPanel(data);
+    }
+
+    // --- SMART MULTI-SEGMENT TRIM & MERGE LOGIC ---
+    let currentTrimSegments = [];
+    let currentTrimMediaType = 'video'; // 'video' or 'audio'
+
+    function formatSecondsToDisplay(totalSecs) {
+        if (isNaN(totalSecs) || totalSecs < 0) return '0:00';
+        const hrs = Math.floor(totalSecs / 3600);
+        const mins = Math.floor((totalSecs % 3600) / 60);
+        const secs = Math.floor(totalSecs % 60);
+        if (hrs > 0) {
+            return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function parseInputTimeToSeconds(inputStr) {
+        if (inputStr === null || inputStr === undefined) return null;
+        let s = String(inputStr).trim();
+        if (!s) return null;
+        
+        // Support dot notation: "1.04" -> 1 min 4 sec = 64s
+        if (/^\d+\.\d+$/.test(s)) {
+            const parts = s.split('.');
+            const m = parseInt(parts[0], 10);
+            const sec = parseInt(parts[1], 10);
+            return m * 60 + sec;
+        }
+        // Support "MM:SS" or "HH:MM:SS"
+        if (s.includes(':')) {
+            const parts = s.split(':').map(p => parseFloat(p));
+            if (parts.some(isNaN)) return null;
+            if (parts.length === 2) {
+                return parts[0] * 60 + parts[1];
+            } else if (parts.length === 3) {
+                return parts[0] * 3600 + parts[1] * 60 + parts[2];
+            }
+        }
+        // Support raw numeric seconds
+        const num = parseFloat(s);
+        return isNaN(num) ? null : num;
+    }
+
+    function setupTrimPanel(data) {
+        // Reset to full download mode by default
+        switchDownloadMode('full');
+        
+        // Initialize default initial segment
+        const videoDur = data.duration || 120;
+        const defaultEnd = Math.min(60, videoDur);
+        currentTrimSegments = [
+            { start: '00:00', end: formatSecondsToDisplay(defaultEnd) }
+        ];
+        
+        // Populate Quality dropdown
+        populateTrimQualityDropdown(data);
+        
+        // Render the segment rows
+        renderTrimSegmentRows();
+    }
+
+    function switchDownloadMode(mode) {
+        const fullBtn = document.getElementById('modeFullBtn');
+        const trimBtn = document.getElementById('modeTrimBtn');
+        const fullPanel = document.getElementById('fullDownloadPanel');
+        const trimPanel = document.getElementById('trimDownloadPanel');
+        
+        if (mode === 'trim') {
+            if (trimBtn) trimBtn.classList.add('active');
+            if (fullBtn) fullBtn.classList.remove('active');
+            if (trimPanel) {
+                trimPanel.classList.remove('hidden');
+                trimPanel.style.display = 'block';
+            }
+            if (fullPanel) {
+                fullPanel.classList.add('hidden');
+                fullPanel.style.display = 'none';
+            }
+            if (currentVideoData) {
+                populateTrimQualityDropdown(currentVideoData);
+            }
+            renderTrimSegmentRows();
+        } else {
+            if (fullBtn) fullBtn.classList.add('active');
+            if (trimBtn) trimBtn.classList.remove('active');
+            if (fullPanel) {
+                fullPanel.classList.remove('hidden');
+                fullPanel.style.display = 'block';
+            }
+            if (trimPanel) {
+                trimPanel.classList.add('hidden');
+                trimPanel.style.display = 'none';
+            }
+        }
+    }
+
+    function populateTrimQualityDropdown(data) {
+        const select = document.getElementById('trimQualitySelect');
+        if (!select) return;
+        select.innerHTML = '';
+        
+        if (currentTrimMediaType === 'video') {
+            if (data.formats && data.formats.video && data.formats.video.length > 0) {
+                const seen = new Set();
+                data.formats.video.forEach(fmt => {
+                    const h = fmt.height || parseInt(fmt.resolution) || 720;
+                    const label = getQualityLabel(String(h)) || `${h}p`;
+                    const key = `${h}-${fmt.ext}`;
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        const opt = document.createElement('option');
+                        opt.value = fmt.format_id;
+                        opt.dataset.ext = fmt.ext || 'mp4';
+                        opt.dataset.height = h;
+                        opt.textContent = `🎬 ${label} (${h}p ${fmt.ext.toUpperCase()})`;
+                        if (h === 1080 || (h <= 1080 && select.children.length === 0)) {
+                            opt.selected = true;
+                        }
+                        select.appendChild(opt);
+                    }
+                });
+            }
+            if (select.children.length === 0) {
+                const fallbackOpt = document.createElement('option');
+                fallbackOpt.value = 'best';
+                fallbackOpt.dataset.ext = 'mp4';
+                fallbackOpt.textContent = '🎬 Best Available Quality (MP4)';
+                select.appendChild(fallbackOpt);
+            }
+        } else {
+            const audioOptions = [
+                { id: '320k', label: '🎵 320kbps MP3 (Ultra High Quality)', ext: 'mp3' },
+                { id: '256k', label: '🎵 256kbps MP3 (High Quality)', ext: 'mp3' },
+                { id: '192k', label: '🎵 192kbps MP3 (Standard)', ext: 'mp3' },
+                { id: '128k', label: '🎵 128kbps MP3 (Compact)', ext: 'mp3' },
+                { id: 'flac', label: '🎵 Lossless FLAC (Studio Master)', ext: 'flac' },
+                { id: 'wav', label: '🎵 Uncompressed WAV (Lossless Audio)', ext: 'wav' }
+            ];
+            audioOptions.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.dataset.ext = a.ext;
+                opt.textContent = a.label;
+                if (a.id === '320k') opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+    }
+
+    function renderTrimSegmentRows() {
+        const container = document.getElementById('trimSegmentsList');
+        const totalDurationEl = document.getElementById('trimTotalDurationSummary');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        let totalCutSeconds = 0;
+        
+        currentTrimSegments.forEach((seg, idx) => {
+            const row = document.createElement('div');
+            row.className = 'trim-segment-row';
+            
+            const startSec = parseInputTimeToSeconds(seg.start);
+            const endSec = parseInputTimeToSeconds(seg.end);
+            let rowDurationText = '--';
+            if (startSec !== null && endSec !== null && endSec > startSec) {
+                const diff = endSec - startSec;
+                totalCutSeconds += diff;
+                rowDurationText = formatSecondsToDisplay(diff);
+            }
+            
+            row.innerHTML = `
+                <div class="segment-badge-col">
+                    <span class="segment-number-badge">#${idx + 1}</span>
+                </div>
+                <div class="segment-input-col">
+                    <div class="segment-field">
+                        <label>Start Time</label>
+                        <input type="text" class="segment-time-input seg-start-input" data-index="${idx}" value="${seg.start}" placeholder="e.g. 1:04">
+                    </div>
+                    <span class="segment-arrow-icon">➔</span>
+                    <div class="segment-field">
+                        <label>End Time</label>
+                        <input type="text" class="segment-time-input seg-end-input" data-index="${idx}" value="${seg.end}" placeholder="e.g. 2:00">
+                    </div>
+                </div>
+                <div class="segment-preview-col">
+                    <span class="seg-duration-pill">⏱️ ${rowDurationText}</span>
+                </div>
+                <div class="segment-action-col">
+                    <button type="button" class="delete-segment-btn" data-index="${idx}" title="Remove this segment" ${currentTrimSegments.length === 1 ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>
+                        🗑️
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(row);
+        });
+        
+        // Attach event listeners to input fields and delete buttons
+        container.querySelectorAll('.seg-start-input').forEach(inp => {
+            inp.addEventListener('input', (e) => {
+                const i = parseInt(e.target.dataset.index, 10);
+                if (currentTrimSegments[i]) {
+                    currentTrimSegments[i].start = e.target.value;
+                    updateTrimSummaryOnly();
+                }
+            });
+        });
+        
+        container.querySelectorAll('.seg-end-input').forEach(inp => {
+            inp.addEventListener('input', (e) => {
+                const i = parseInt(e.target.dataset.index, 10);
+                if (currentTrimSegments[i]) {
+                    currentTrimSegments[i].end = e.target.value;
+                    updateTrimSummaryOnly();
+                }
+            });
+        });
+        
+        container.querySelectorAll('.delete-segment-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const i = parseInt(e.currentTarget.dataset.index, 10);
+                if (currentTrimSegments.length > 1) {
+                    currentTrimSegments.splice(i, 1);
+                    renderTrimSegmentRows();
+                }
+            });
+        });
+        
+        if (totalDurationEl) {
+            totalDurationEl.textContent = `Total Trimmed Duration: ${formatSecondsToDisplay(totalCutSeconds)} (${currentTrimSegments.length} clip${currentTrimSegments.length > 1 ? 's' : ''} merged)`;
+        }
+    }
+
+    function updateTrimSummaryOnly() {
+        let totalCutSeconds = 0;
+        const container = document.getElementById('trimSegmentsList');
+        if (!container) return;
+        
+        currentTrimSegments.forEach((seg, idx) => {
+            const startSec = parseInputTimeToSeconds(seg.start);
+            const endSec = parseInputTimeToSeconds(seg.end);
+            const row = container.children[idx];
+            if (row) {
+                const pill = row.querySelector('.seg-duration-pill');
+                if (startSec !== null && endSec !== null && endSec > startSec) {
+                    const diff = endSec - startSec;
+                    totalCutSeconds += diff;
+                    if (pill) pill.textContent = `⏱️ ${formatSecondsToDisplay(diff)}`;
+                } else {
+                    if (pill) pill.textContent = '⏱️ Invalid';
+                }
+            }
+        });
+        
+        const totalDurationEl = document.getElementById('trimTotalDurationSummary');
+        if (totalDurationEl) {
+            totalDurationEl.textContent = `Total Trimmed Duration: ${formatSecondsToDisplay(totalCutSeconds)} (${currentTrimSegments.length} clip${currentTrimSegments.length > 1 ? 's' : ''} merged)`;
+        }
     }
 
     function getQualityLabel(resolution) {
@@ -578,8 +1256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createFormatButton(format, url, type) {
-        const btn = document.createElement('button');
-        btn.className = 'format-btn';
+        const row = document.createElement('div');
+        row.className = 'format-card-row';
         
         const sizeText = format.filesize ? `${(format.filesize / 1024 / 1024).toFixed(1)} MB` : 'Size Unknown';
         
@@ -587,16 +1265,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'video') {
             const label = getQualityLabel(resText);
             if (label) {
-                resText = `<strong style="color:var(--secondary);">${label}</strong> <span style="font-size:0.85em; opacity:0.8;">(${resText})</span>`;
+                resText = `<strong class="res-badge">${label}</strong> <span class="res-sub">(${resText})</span>`;
             }
+        } else {
+            const label = format.format_note || format.format_id || 'Audio';
+            resText = `<strong class="res-badge">${label}</strong>`;
         }
 
-        btn.innerHTML = `
-            <span class="format-label">${resText} <span style="opacity:0.6; font-size:0.8em; margin-left:6px; text-transform:uppercase;">${format.ext}</span></span>
-            <span class="format-size">${sizeText}</span>
+        row.innerHTML = `
+            <div class="format-card-left">
+                <span class="format-label">${resText} <span class="format-ext-pill">${format.ext}</span></span>
+                <span class="format-size">${sizeText}</span>
+            </div>
+            <div class="format-card-actions">
+                <button type="button" class="btn-direct-download" title="Direct download full file in this quality">
+                    <span class="action-icon">⬇️</span>
+                    <span class="action-text">Download</span>
+                </button>
+                <button type="button" class="btn-open-trim" title="Trim & cut specific parts before downloading in this quality">
+                    <span class="action-icon">✂️</span>
+                    <span class="action-text">Trim</span>
+                </button>
+            </div>
         `;
 
-        btn.addEventListener('click', async () => {
+        // Direct download click
+        const dlBtn = row.querySelector('.btn-direct-download');
+        dlBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
             try {
                 await initiateDownload(url, format.format_id, format.ext, currentVideoData.title, type, format.filesize, format.height);
             } catch (err) {
@@ -604,14 +1300,46 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        return btn;
+        // Open Trim mode with this quality pre-selected
+        const trimBtn = row.querySelector('.btn-open-trim');
+        trimBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Switch to trim mode tab
+            switchDownloadMode('trim');
+            
+            // Switch output media type (video/audio)
+            if (type === 'video') {
+                const tv = document.getElementById('trimTypeVideo');
+                if (tv) tv.click();
+            } else {
+                const ta = document.getElementById('trimTypeAudio');
+                if (ta) ta.click();
+            }
+            
+            // Select this format in dropdown if present
+            const select = document.getElementById('trimQualitySelect');
+            if (select) {
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === format.format_id) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            // Smoothly scroll to trim panel
+            const trimPanel = document.getElementById('trimDownloadPanel');
+            if (trimPanel) {
+                trimPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        return row;
     }
 
     function populatePlaylistCard(data) {
         document.getElementById('playlistTitle').textContent = data.title || 'Unknown Playlist';
-        
-        const isSpotifyPlaylist = data.entries.length > 0 && data.entries[0].url && data.entries[0].url.includes('spotify.com');
-        document.getElementById('playlistCount').textContent = `${data.entries.length} ${isSpotifyPlaylist ? 'tracks' : 'videos'} found`;
+        document.getElementById('playlistCount').textContent = `${data.entries.length} videos / tracks found`;
         
         const playlistItems = document.getElementById('playlistItems');
         playlistItems.innerHTML = '';
@@ -620,26 +1348,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'playlist-item';
             
-            let optionsHTML = '';
-            if (isSpotifyPlaylist) {
-                optionsHTML = `
-                    <option value="spotify_flac">Lossless FLAC (Super High Quality)</option>
-                    <option value="spotify_wav">Uncompressed WAV (Lossless)</option>
-                    <option value="spotify_m4a">320kbps M4A/AAC (Best Quality)</option>
-                    <option value="spotify_320k" selected>320kbps MP3 (Ultra HQ)</option>
-                    <option value="spotify_256k">256kbps MP3 (HQ)</option>
-                    <option value="spotify_128k">128kbps MP3 (Medium)</option>
-                `;
-            } else {
-                optionsHTML = `
-                    <option value="bestvideo[height<=2160]+bestaudio[ext=m4a]/bestvideo[height<=2160]+bestaudio/best">4K Ultra HD (2160p)</option>
-                    <option value="bestvideo[height<=1440]+bestaudio[ext=m4a]/bestvideo[height<=1440]+bestaudio/best">2K Quad HD (1440p)</option>
-                    <option value="bestvideo[height<=1080]+bestaudio[ext=m4a]/bestvideo[height<=1080]+bestaudio/best" selected>1080p Full HD</option>
-                    <option value="bestvideo[height<=720]+bestaudio[ext=m4a]/bestvideo[height<=720]+bestaudio/best">720p HD</option>
-                    <option value="bestvideo[height<=480]+bestaudio[ext=m4a]/bestvideo[height<=480]+bestaudio/best">480p SD</option>
-                    <option value="bestaudio/best">Audio Only (MP3)</option>
-                `;
-            }
+            const optionsHTML = `
+                <option value="bestvideo[height<=2160]+bestaudio[ext=m4a]/bestvideo[height<=2160]+bestaudio/best">4K Ultra HD (2160p)</option>
+                <option value="bestvideo[height<=1440]+bestaudio[ext=m4a]/bestvideo[height<=1440]+bestaudio/best">2K Quad HD (1440p)</option>
+                <option value="bestvideo[height<=1080]+bestaudio[ext=m4a]/bestvideo[height<=1080]+bestaudio/best" selected>1080p Full HD</option>
+                <option value="bestvideo[height<=720]+bestaudio[ext=m4a]/bestvideo[height<=720]+bestaudio/best">720p HD</option>
+                <option value="bestvideo[height<=480]+bestaudio[ext=m4a]/bestvideo[height<=480]+bestaudio/best">480p SD</option>
+                <option value="bestaudio/best">Audio Only (MP3)</option>
+            `;
             
             itemDiv.innerHTML = `
                 <img src="${entry.thumbnail || 'https://via.placeholder.com/120x68?text=Video'}" alt="Thumbnail">
@@ -666,18 +1382,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const title = btn.getAttribute('data-title');
                 const index = btn.getAttribute('data-index');
                 const format_id = document.getElementById(`quality-${index}`).value;
-                const type = (format_id.includes('video') && !format_id.startsWith('spotify_')) ? 'video' : 'audio';
-                
-                let ext = 'mp3';
-                if (format_id === 'spotify_flac') {
-                    ext = 'flac';
-                } else if (format_id === 'spotify_wav') {
-                    ext = 'wav';
-                } else if (format_id === 'spotify_m4a') {
-                    ext = 'm4a';
-                } else if (type === 'video') {
-                    ext = 'mp4';
-                }
+                const type = format_id.includes('video') ? 'video' : 'audio';
+                const ext = (type === 'video') ? 'mp4' : 'mp3';
                 
                 try {
                     await initiateDownload(url, format_id, ext, title, type, null, null, index);
@@ -731,18 +1437,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const title = btn.getAttribute('data-title');
                     const index = btn.getAttribute('data-index');
                     const format_id = document.getElementById(`quality-${index}`).value;
-                    const type = (format_id.includes('video') && !format_id.startsWith('spotify_')) ? 'video' : 'audio';
-                    
-                    let ext = 'mp3';
-                    if (format_id === 'spotify_flac') {
-                        ext = 'flac';
-                    } else if (format_id === 'spotify_wav') {
-                        ext = 'wav';
-                    } else if (format_id === 'spotify_m4a') {
-                        ext = 'm4a';
-                    } else if (type === 'video') {
-                        ext = 'mp4';
-                    }
+                    const type = format_id.includes('video') ? 'video' : 'audio';
+                    const ext = (type === 'video') ? 'mp4' : 'mp3';
                     
                     let success = false;
                     let retries = 2; // Auto-retry up to 2 times
@@ -757,7 +1453,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (retries === 0) {
                                 failedCount++;
                             } else {
-                                // Wait 2 seconds before retrying
                                 await new Promise(r => setTimeout(r, 2000));
                             }
                             retries--;
@@ -784,7 +1479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex = null, token = null) {
+    function initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex = null, token = null, segments = null) {
         return new Promise(async (resolve, reject) => {
             const isPlaylist = !playlistCard.classList.contains('hidden');
             const statusBox = isPlaylist ? document.getElementById('playlistStatus') : document.getElementById('downloadStatus');
@@ -834,29 +1529,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // Start background download job
+                const payload = { url, format_id, ext, title, type, height, device_id: deviceId, ad_token: token };
+                if (segments && Array.isArray(segments) && segments.length > 0) {
+                    payload.segments = segments;
+                }
+
                 const startRes = await fetch(`${API_URL}/start_download`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, format_id, ext, title, type, height, device_id: deviceId, ad_token: token })
+                    body: JSON.stringify(payload)
                 });
-
-                if (startRes.status === 402) {
-                    // Intercept and watch ad
-                    if (itemBtn) {
-                        itemBtn.disabled = false;
-                        itemBtn.textContent = 'Download';
-                    }
-                    if (itemProgress) itemProgress.classList.add('hidden');
-                    statusBox.classList.add('hidden');
-                    stopCanvasParticles();
-                    
-                    showAdModalFlow((newToken) => {
-                        initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex, newToken)
-                            .then(resolve)
-                            .catch(reject);
-                    });
-                    return;
-                }
 
                 if (!startRes.ok) {
                     const errData = await startRes.json().catch(() => ({ error: 'Could not connect to backend.' }));
@@ -1017,13 +1699,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const particles = [];
         const particleCount = 35;
         
-        const isSpotify = document.body.classList.contains('theme-spotify');
         const isInstagram = document.body.classList.contains('theme-instagram');
         for (let i = 0; i < particleCount; i++) {
             let pColor = Math.random() > 0.5 ? '#2dd4bf' : '#6d28d9';
-            if (isSpotify) {
-                pColor = Math.random() > 0.5 ? '#1db954' : '#1ed760';
-            } else if (isInstagram) {
+            if (isInstagram) {
                 pColor = Math.random() > 0.5 ? '#e1306c' : '#fd1d1d';
             }
             particles.push({
@@ -1080,14 +1759,12 @@ document.addEventListener('DOMContentLoaded', () => {
         errorToast.classList.add('hidden');
     }
 
-    // === Instagram & Spotify Theme and Rendering Functions ===
+    // === Instagram Theme and Rendering Functions ===
     function checkUrlTheme() {
         const url = urlInput.value.trim().toLowerCase();
         const isInstagram = url.includes('instagram.com');
-        const isSpotify = url.includes('spotify.com');
         
         document.body.classList.toggle('theme-instagram', isInstagram);
-        document.body.classList.toggle('theme-spotify', isSpotify && !isInstagram);
 
         const logoText = document.querySelector('.navbar .logo .logo-text');
         const subtitle = document.querySelector('.hero-subtitle');
@@ -1095,9 +1772,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isInstagram) {
                 logoText.innerHTML = 'InstaSave<span>.AI</span>';
                 subtitle.textContent = 'Premium Downloader for Instagram Reels, Posts & Stories';
-            } else if (isSpotify) {
-                logoText.innerHTML = 'SpotifySave<span>.AI</span>';
-                subtitle.textContent = 'Premium Downloader for Spotify Songs & Playlists';
             } else {
                 logoText.innerHTML = 'Downloadyfy<span>.AI</span>';
                 subtitle.textContent = 'Downloadyfy.AI – Smart AI Downloads Made Simple';
@@ -1109,18 +1783,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 telemetryStatus.textContent = 'AI PARSER STATE: IDLE // AWAITING URL INPUT';
             } else if (isInstagram) {
                 telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // INSTAGRAM REEL DEEP-SCRAPER ENGAGED';
-            } else if (isSpotify) {
-                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // SPOTIFY METADATA & COVER-ART ENGINE ACTIVE';
             } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
                 telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // YOUTUBE CORE EXTRACTOR ONLINE';
-            } else if (url.includes('twitter.com') || url.includes('x.com')) {
-                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // X-TWITTER MEDIA PARSER READY';
             } else if (url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com')) {
                 telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // FACEBOOK VIDEO PARSER LOADED';
             } else if (url.includes('tiktok.com')) {
                 telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // TIKTOK MEDIA EXTRACTOR ENGAGED';
-            } else if (url.includes('soundcloud.com')) {
-                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // SOUNDCLOUD HQ AUDIO SCRAPER ONLINE';
+            } else if (url.includes('pinterest.com') || url.includes('pin.it')) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // PINTEREST MEDIA EXTRACTOR READY';
             } else if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('www.')) {
                 telemetryStatus.textContent = 'AI PARSER STATE: SCANNING // GENERIC WEB PARSER INITIALIZED';
             } else {
@@ -1285,17 +1955,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ url, format_id, ext, title, type, device_id: deviceId, ad_token: token })
             });
 
-            if (startRes.status === 402) {
-                // Intercept and watch ad
-                statusBox.classList.add('hidden');
-                stopCanvasParticles();
-                
-                showAdModalFlow((newToken) => {
-                    initiateInstagramDownload(url, format_id, ext, title, type, newToken);
-                });
-                return;
-            }
-
             if (!startRes.ok) {
                 const errData = await startRes.json().catch(() => ({ error: 'Could not connect to backend.' }));
                 throw new Error(errData.error || `Server error ${startRes.status}`);
@@ -1448,84 +2107,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // === Direct Access (No Ad Gating) ===
     function runWithAdGating(onAuthorizedCallback) {
-        // Query server balance
-        fetch(`${API_URL}/device-status?device_id=${deviceId}`)
-            .then(res => res.json())
-            .then(data => {
-                const remaining = data.free_downloads_remaining;
-                if (remaining > 0 || adToken) {
-                    onAuthorizedCallback(adToken);
-                    adToken = null; // Consume token
-                } else {
-                    showAdModalFlow(onAuthorizedCallback);
-                }
-            })
-            .catch(() => {
-                // Offline fallback
-                onAuthorizedCallback(null);
-            });
-    }
-
-    function showAdModalFlow(onAuthorizedCallback) {
-        if (!adModal) return;
-        
-        adModal.classList.remove('hidden');
-        if (closeAdModalBtn) {
-            closeAdModalBtn.disabled = true;
-            closeAdModalBtn.style.opacity = '0.3';
-            closeAdModalBtn.style.cursor = 'not-allowed';
-            closeAdModalBtn.innerHTML = '&times;';
-        }
-        
-        let seconds = 5;
-        if (adTimerVal) adTimerVal.textContent = seconds.toString();
-        
-        const adInterval = setInterval(() => {
-            seconds--;
-            if (adTimerVal) adTimerVal.textContent = seconds.toString();
-            
-            if (seconds <= 0) {
-                clearInterval(adInterval);
-                if (adTimerVal) adTimerVal.textContent = "Ready!";
-                if (closeAdModalBtn) {
-                    closeAdModalBtn.disabled = false;
-                    closeAdModalBtn.style.opacity = '1';
-                    closeAdModalBtn.style.cursor = 'pointer';
-                    closeAdModalBtn.innerHTML = '&times; Close & Continue';
-                }
-            }
-        }, 1000);
-
-        // Bind close button handler
-        closeAdModalBtn.onclick = async () => {
-            adModal.classList.add('hidden');
-            try {
-                const regRes = await fetch(`${API_URL}/register-ad-complete`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ device_id: deviceId })
-                });
-                const regData = await regRes.json();
-                if (regData.success) {
-                    adToken = regData.ad_token;
-                    showError("Ad Watched! Extraction slot unlocked.");
-                    onAuthorizedCallback(adToken);
-                    adToken = null; // Consume immediately
-                    checkDeviceAllowance();
-                } else {
-                    showError("Ad verification failed. Please try again.");
-                }
-            } catch (err) {
-                showError("Ad verification failed. Please try again.");
-            }
-        };
-    }
-    
-    if (adUpgradeBtn) {
-        adUpgradeBtn.addEventListener('click', () => {
-            showError("Billing is disabled. Ad support helps keep Downloadyfy.AI free for everyone!");
-        });
+        onAuthorizedCallback('unlimited_token');
     }
 
     function startVideoToAudioConversion(file, token) {

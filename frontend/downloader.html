@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Link Downloader — DOWNLOADYFY.AI</title>
-    <meta name="description" content="Download YouTube, Instagram, Spotify, TikTok, Reddit videos and audio. Paste any URL and click Analyze.">
+    <meta name="description" content="Download YouTube, Instagram, TikTok, Facebook, Pinterest videos and audio. Paste any URL and click Analyze.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=17">
+    <link rel="stylesheet" href="styles.css?v=35">
     <style>
         .page-back-btn {
             display: inline-flex;
@@ -48,7 +48,7 @@
         }
     </style>
 </head>
-<body>
+<body class="light-theme">
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo" style="display:flex;align-items:center;gap:0.55rem;text-decoration:none;color:inherit;">
@@ -121,8 +121,8 @@
                 </div>
                 <a href="index.html" class="page-back-btn">← Home</a>
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
         </div>
@@ -134,44 +134,123 @@
     </div>
 
     <main class="container">
-        <header class="page-header-section">
-            <div class="page-icon">🔗</div>
-            <h1><span class="gradient-text">Link Downloader</span></h1>
-            <p>Paste any public URL from 9+ platforms — download video up to 8K or audio up to 320kbps FLAC</p>
+        <!-- Master Hero Header Section -->
+        <header class="hero-main-container">
+            <!-- Platform Switcher Chips Bar -->
+            <div class="platform-chips-scroll" role="tablist" aria-label="Supported Video Platforms">
+                <button type="button" class="platform-chip chip-youtube active" data-platform="youtube" data-placeholder="Paste YouTube Video or Shorts URL...">
+                    <span class="chip-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </span>
+                    <span>YouTube</span>
+                    <span class="chip-tag">8K / 4K / MP3</span>
+                </button>
+                <button type="button" class="platform-chip chip-instagram" data-platform="instagram" data-placeholder="Paste Instagram Reel, Story or Post URL...">
+                    <span class="chip-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </span>
+                    <span>Instagram</span>
+                    <span class="chip-tag">Reels / Audio</span>
+                </button>
+                <button type="button" class="platform-chip chip-facebook" data-platform="facebook" data-placeholder="Paste Facebook Video or Watch URL...">
+                    <span class="chip-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </span>
+                    <span>Facebook</span>
+                    <span class="chip-tag">Full HD 1080p</span>
+                </button>
+                <button type="button" class="platform-chip chip-tiktok" data-platform="tiktok" data-placeholder="Paste TikTok Video or Sound URL...">
+                    <span class="chip-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                    </span>
+                    <span>TikTok</span>
+                    <span class="chip-tag">No Watermark</span>
+                </button>
+                <button type="button" class="platform-chip chip-pinterest" data-platform="pinterest" data-placeholder="Paste Pinterest Pin or Video URL...">
+                    <span class="chip-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0a12 12 0 0 0-4.37 23.18c-.05-.98-.1-2.48.02-3.55.11-.96.72-6.14.72-6.14s-.18-.37-.18-.92c0-.86.5-1.5 1.13-1.5.53 0 .79.4.79.88 0 .54-.34 1.34-.52 2.08-.15.62.31 1.12.92 1.12 1.1 0 1.95-1.16 1.95-2.84 0-1.48-1.07-2.52-2.59-2.52-1.77 0-2.8 1.33-2.8 2.7 0 .54.2.1.13.48.05.2.06.33.02.5-.06.26-.2.83-.23.95-.04.16-.13.2-.3.12-.9-.42-1.46-1.74-1.46-2.8 0-2.28 1.66-4.38 4.78-4.38 2.51 0 4.46 1.79 4.46 4.18 0 2.5-1.57 4.51-3.76 4.51-.73 0-1.43-.38-1.66-.83l-.45 1.73c-.16.63-.6 1.42-.9 1.89A12 12 0 1 0 12 0z"/></svg>
+                    </span>
+                    <span>Pinterest</span>
+                    <span class="chip-tag">HD Media</span>
+                </button>
+            </div>
+
+            <!-- Bold High-Impact Headline -->
+            <div class="hero-headline-wrapper">
+                <h1 class="master-hero-title">
+                    Universal Video &amp; Audio Downloader<br>
+                    <span class="hero-gradient-highlight">Free in 8K, 4K &amp; 320kbps MP3</span>
+                </h1>
+                <p class="master-hero-subtitle">
+                    Paste any link from YouTube, Instagram, Facebook, TikTok or Pinterest to download complete full videos with high-definition crystal clear audio.
+                </p>
+            </div>
         </header>
 
+        <!-- Master Downloader Capsule Box -->
         <section class="downloader-section">
-            <div class="input-glass">
+            <div class="master-input-capsule">
                 <form id="fetchForm">
-                    <div class="input-wrapper">
-                        <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        <input type="url" id="videoUrl" placeholder="Paste your link here (e.g. YouTube, Instagram Reel, X/Twitter...)" required autocomplete="off">
+                    <div class="master-input-row">
+                        <!-- Left Input Field with Dynamic Detected Icon & Actions -->
+                        <div class="capsule-field-wrapper">
+                            <div class="detected-platform-icon" id="detectedPlatformIcon">
+                                <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            </div>
+                            <input type="url" id="videoUrl" class="capsule-input" placeholder="Paste YouTube, Instagram Reel, TikTok, Facebook or Pinterest link..." required autocomplete="off">
+                            <div class="capsule-actions-group">
+                                <button type="button" class="capsule-action-btn btn-clear-url hidden" id="btnClearUrl" title="Clear link">
+                                    ✕
+                                </button>
+                                <button type="button" class="capsule-action-btn btn-paste-clipboard" id="btnPasteClipboard" title="Paste from clipboard">
+                                    <span>📋</span>
+                                    <span class="btn-text">Paste</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Primary Analyze / Download Button -->
+                        <button type="submit" class="master-download-btn glow-button" id="fetchBtn">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-text" data-translate="analyze_btn">Download</span>
+                            <div class="loader-spinner hidden" id="fetchLoader"></div>
+                        </button>
                     </div>
-                    <button type="submit" class="glow-button" id="fetchBtn">
-                        <span class="btn-text">Analyze Link</span>
-                        <div class="loader-spinner hidden" id="fetchLoader"></div>
-                    </button>
                 </form>
                 
                 <!-- AI Live Telemetry Parser -->
                 <div class="ai-telemetry-bar">
                     <span class="telemetry-tag">AI CORE V4.8</span>
                     <span class="telemetry-bracket">[</span>
-                    <span class="telemetry-status" id="telemetryStatus">AI PARSER STATE: IDLE // AWAITING URL INPUT</span>
+                    <span class="telemetry-status" id="telemetryStatus" data-translate="telemetry_idle">AI PARSER STATE: READY // PASTE URL TO BEGIN</span>
                     <span class="telemetry-cursor">_</span>
                     <span class="telemetry-bracket">]</span>
+                </div>
+
+                <!-- 4 Trust Badges Strip Under Input -->
+                <div class="trust-badges-strip">
+                    <div class="trust-badge-item">
+                        <span class="badge-icon">⚡</span>
+                        <span><strong>8K / 4K / 1080p</strong> Ultra HD</span>
+                    </div>
+                    <div class="trust-badge-item">
+                        <span class="badge-icon">🎵</span>
+                        <span><strong>320kbps</strong> Crystal Audio</span>
+                    </div>
+                    <div class="trust-badge-item">
+                        <span class="badge-icon">✂️</span>
+                        <span><strong>Multi-Cut</strong> Video Trimmer</span>
+                    </div>
+                    <div class="trust-badge-item">
+                        <span class="badge-icon">🔒</span>
+                        <span><strong>100% Free</strong> &amp; No Ads</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Disclaimer Box -->
-            <div class="legal-disclaimer">
-                <p>⚠️ <strong>Disclaimer:</strong> Downloadyfy.AI is intended for personal and educational use only. We do not support downloading private or copyrighted content. Users are responsible for ensuring compliance with platform terms and copyright laws.</p>
-            </div>
-            <!-- Simulated Ad Banner -->
-            <div id="adBanner" class="ad-banner-wrapper">
-                <div class="ad-badge">SPONSORED AD</div>
-                <p class="ad-text">💡 Support free downloads by watching a short ad when prompted. <a href="#" id="adUpgradeLink" class="ad-link">Learn More</a></p>
-                <button type="button" class="close-ad-btn" id="closeAdBtn">&times;</button>
+            <div class="legal-disclaimer" style="margin-top: 1.5rem;">
+                <p data-translate="disclaimer">⚠️ <strong>Disclaimer:</strong> Downloadyfy.AI is intended for personal and educational use only. We do not support downloading private or copyrighted content. Users are responsible for ensuring compliance with platform terms and copyright laws.</p>
             </div>
         </section>
 
@@ -212,17 +291,78 @@
                     </div>
                 </div>
                 <div class="download-options">
-                    <h3>Select Quality / Format</h3>
-                    <div class="format-grid">
-                        <div class="format-column">
-                            <h4>🎬 Video</h4>
-                            <div class="btn-group" id="videoFormats"></div>
-                        </div>
-                        <div class="format-column">
-                            <h4>🎵 Audio</h4>
-                            <div class="btn-group" id="audioFormats"></div>
+                    <!-- Format Selection Grid -->
+                    <div id="fullDownloadPanel">
+                        <h3 style="margin-bottom: 1.25rem; font-size: 1.2rem; font-weight: 800;">Select Quality / Format</h3>
+                        <div class="format-grid">
+                            <div class="format-column">
+                                <h4>🎬 Video</h4>
+                                <div class="btn-group" id="videoFormats"></div>
+                            </div>
+                            <div class="format-column">
+                                <h4>🎵 Audio</h4>
+                                <div class="btn-group" id="audioFormats"></div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Smart Multi-Segment Trim & Merge Panel -->
+                    <div id="trimDownloadPanel" class="hidden">
+                        <div class="trim-panel-header">
+                            <div class="trim-panel-title">
+                                <h4>✂️ Multi-Segment Video & Audio Cutter</h4>
+                                <p>Cut multiple parts from this video (e.g. 1:04-2:00, 4:21-4:50). All segments will be merged into <strong>1 single download file</strong> in your selected quality.</p>
+                            </div>
+                            <button type="button" class="close-trim-btn" id="closeTrimPanelBtn">
+                                ✕ Back to Formats
+                            </button>
+                        </div>
+
+                        <!-- Output Format & Quality Selector -->
+                        <div class="trim-config-bar">
+                            <div class="trim-config-item">
+                                <label>Output Type:</label>
+                                <div class="trim-type-toggle">
+                                    <button type="button" class="trim-type-pill active" id="trimTypeVideo" data-type="video">🎬 Video (MP4)</button>
+                                    <button type="button" class="trim-type-pill" id="trimTypeAudio" data-type="audio">🎵 Audio (MP3)</button>
+                                </div>
+                            </div>
+                            <div class="trim-config-item">
+                                <label>Quality:</label>
+                                <select id="trimQualitySelect" class="trim-quality-dropdown">
+                                    <!-- Dynamically filled with analyzed qualities -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Segments List -->
+                        <div class="trim-segments-container">
+                            <div class="trim-segments-header">
+                                <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">Cut Segments:</span>
+                                <span id="trimTotalDurationSummary" class="trim-duration-badge">Total Trimmed Duration: 0:00</span>
+                            </div>
+                            <div id="trimSegmentsList" class="trim-segments-list">
+                                <!-- Dynamic segment rows rendered by app.js -->
+                            </div>
+                            <div class="trim-segments-actions">
+                                <button type="button" class="add-segment-btn" id="addSegmentBtn">
+                                    <span>➕ Add Another Segment</span>
+                                </button>
+                                <button type="button" class="reset-segments-btn" id="resetSegmentsBtn">
+                                    <span>↺ Reset</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Trim Start Action Button -->
+                        <div class="trim-submit-wrapper">
+                            <button type="button" class="glow-button trim-submit-btn" id="startTrimDownloadBtn">
+                                <span class="trim-btn-icon">✂️</span>
+                                <span id="trimBtnText">Trim & Download Merged Video</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="status-box hidden" id="downloadStatus">
                         <canvas id="downloadCanvas" class="download-canvas"></canvas>
                         <div class="download-animation-container">
@@ -392,36 +532,10 @@
                     <a href="#" id="openPrivacyBtn" class="footer-link">Privacy Policy</a>
                 </div>
             </div>
-            <div class="footer-right">
-                <span class="developer-credit">Designed & Developed by <span class="credit-name">AMIT KUMAR</span></span>
-            </div>
         </div>
     </footer>
 
-    <!-- Ad Countdown Modal -->
-    <div id="adModal" class="modal-overlay hidden">
-        <div class="modal-card ad-viewer-modal" style="max-width: 500px; text-align: center; gap: 1.5rem; background: #1e1e1e;">
-            <button class="modal-close-btn" id="closeAdModalBtn" disabled style="opacity: 0.3; cursor: not-allowed;">&times;</button>
-            <div class="modal-header">
-                <h2>Support Downloadyfy<span>.AI</span></h2>
-                <p>Watching this ad unlocks <strong>1 free download slot</strong>!</p>
-            </div>
-            <div class="ad-player-box" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 20px rgba(255,255,255,0.05);">
-                <div class="ad-animation" style="position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #1e1b4b 0%, #030712 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
-                    <div class="spinner" style="width: 44px; height: 44px; border: 3px solid rgba(255,95,0,0.1); border-top-color: var(--accent-orange); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
-                    <p style="font-weight: 700; color: #ffffff; margin: 0; font-size: 1.1rem; letter-spacing: -0.5px;">Grammarly Pro for Students 📝</p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Write documents, check homework, 10x faster!</p>
-                </div>
-                <div class="ad-countdown-overlay" style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; color: #ffffff; z-index: 2; border: 1px solid rgba(255,255,255,0.1);">
-                    Ad ends in: <span id="adTimerVal" style="color: var(--accent-orange); font-size: 0.9rem;">5</span>s
-                </div>
-            </div>
-            <div class="ad-modal-footer" style="display: flex; flex-direction: column; gap: 0.8rem;">
-                <button class="glow-button" id="adUpgradeBtn" style="width: 100%;">Support Downloadyfy.AI Free</button>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Or wait for the countdown to unlock your free download slot.</p>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Terms & Privacy Modal -->
     <div id="legalModal" class="modal-overlay hidden">
@@ -438,8 +552,9 @@
     <!-- Hidden Google Translate Element but rendered for DOM accessibility -->
     <div id="google_translate_element" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none;"></div>
 
+    <script src="sound-effects.js"></script>
     <script src="language.js"></script>
-    <script src="app.js?v=10"></script>
+    <script src="app.js?v=15"></script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

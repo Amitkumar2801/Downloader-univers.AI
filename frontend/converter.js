@@ -99,9 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('themeToggle');
     const sunIcon = document.querySelector('.sun-icon');
     const moonIcon = document.querySelector('.moon-icon');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        document.body.classList.remove('light-theme');
+        document.body.classList.add('dark-theme');
+        if (sunIcon) sunIcon.classList.add('hidden');
+        if (moonIcon) moonIcon.classList.remove('hidden');
+    } else {
         document.body.classList.add('light-theme');
+        document.body.classList.remove('dark-theme');
         if (sunIcon) sunIcon.classList.remove('hidden');
         if (moonIcon) moonIcon.classList.add('hidden');
     }
@@ -109,6 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('light-theme');
             const isLight = document.body.classList.contains('light-theme');
+            if (isLight) {
+                document.body.classList.remove('dark-theme');
+            } else {
+                document.body.classList.add('dark-theme');
+            }
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             if (sunIcon) sunIcon.classList.toggle('hidden', !isLight);
             if (moonIcon) moonIcon.classList.toggle('hidden', isLight);
@@ -165,84 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === Ad Gating ===
+    // === Direct Access (No Ad Gating) ===
     function runWithAdGating(onAuthorizedCallback) {
-        fetch(`${API_URL}/device-status?device_id=${deviceId}`)
-            .then(res => res.json())
-            .then(data => {
-                const remaining = data.free_downloads_remaining;
-                if (remaining > 0 || adToken) {
-                    onAuthorizedCallback(adToken);
-                    adToken = null;
-                } else {
-                    showAdModalFlow(onAuthorizedCallback);
-                }
-            })
-            .catch(() => onAuthorizedCallback(null));
+        onAuthorizedCallback('unlimited_token');
     }
-
-    function showAdModalFlow(onAuthorizedCallback) {
-        if (!adModal) return;
-        adModal.classList.remove('hidden');
-        if (closeAdModalBtn) {
-            closeAdModalBtn.disabled = true;
-            closeAdModalBtn.style.opacity = '0.3';
-            closeAdModalBtn.style.cursor = 'not-allowed';
-            closeAdModalBtn.innerHTML = '&times;';
-        }
-        let seconds = 5;
-        if (adTimerVal) adTimerVal.textContent = seconds.toString();
-        const adInterval = setInterval(() => {
-            seconds--;
-            if (adTimerVal) adTimerVal.textContent = seconds.toString();
-            if (seconds <= 0) {
-                clearInterval(adInterval);
-                if (adTimerVal) adTimerVal.textContent = 'Ready!';
-                if (closeAdModalBtn) {
-                    closeAdModalBtn.disabled = false;
-                    closeAdModalBtn.style.opacity = '1';
-                    closeAdModalBtn.style.cursor = 'pointer';
-                    closeAdModalBtn.innerHTML = '&times; Close & Continue';
-                }
-            }
-        }, 1000);
-
-        closeAdModalBtn.onclick = async () => {
-            adModal.classList.add('hidden');
-            try {
-                const regRes = await fetch(`${API_URL}/register-ad-complete`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ device_id: deviceId })
-                });
-                const regData = await regRes.json();
-                if (regData.success) {
-                    adToken = regData.ad_token;
-                    showError('Ad Watched! Extraction slot unlocked.');
-                    onAuthorizedCallback(adToken);
-                    adToken = null;
-                    checkDeviceAllowance();
-                } else {
-                    showError('Ad verification failed. Please try again.');
-                }
-            } catch (err) {
-                showError('Ad verification failed. Please try again.');
-            }
-        };
-    }
-
-    if (adUpgradeBtn) {
-        adUpgradeBtn.addEventListener('click', () => {
-            showError('Ad support helps keep Downloadyfy.AI free for everyone!');
-        });
-    }
-
-    window.addEventListener('click', (e) => {
-        if (e.target === adModal) {
-            const timerVal = adTimerVal ? adTimerVal.textContent : '';
-            if (timerVal === 'Ready!') adModal.classList.add('hidden');
-        }
-    });
 
     // === Form Submit ===
     if (convertForm) {

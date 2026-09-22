@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Media Metadata & ID3 Cover Art Studio - DOWNLOADYFY.AI</title>
-    <meta name="description" content="Edit ID3 tags, auto-fetch high-res album cover art from Spotify/Apple Music, and embed metadata directly into MP3, FLAC, and M4A audio files.">
+    <meta name="description" content="Edit ID3 tags, auto-fetch high-res album cover art from iTunes / Apple Music, and embed metadata directly into MP3, FLAC, and M4A audio files.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -248,7 +248,7 @@
         }
     </style>
 </head>
-<body>
+<body class="light-theme">
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
@@ -268,8 +268,8 @@
 
             <div class="nav-controls">
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <svg class="sun-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
         </div>
@@ -279,7 +279,7 @@
         <header class="tagger-hero">
             <div class="tagger-badge">🏷️ AI ID3 Metadata & Album Art Studio</div>
             <h1 class="hero-title">Studio <span class="gradient-text" style="background: linear-gradient(135deg, #eab308, #fef08a); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Cover Art & Tag Editor</span></h1>
-            <p class="hero-subtitle">Auto-fetch official Spotify/iTunes 4K album artwork, customize artist metadata, and embed ID3 tags directly into MP3, FLAC, and M4A tracks.</p>
+            <p class="hero-subtitle">Auto-fetch official iTunes / Apple Music 4K album artwork, customize artist metadata, and embed ID3 tags directly into MP3, FLAC, and M4A tracks.</p>
         </header>
 
         <section class="tagger-card">
@@ -358,6 +358,7 @@
         </section>
     </main>
 
+    <script src="sound-effects.js"></script>
     <script src="tagger.js"></script>
 </body>
 </html>
