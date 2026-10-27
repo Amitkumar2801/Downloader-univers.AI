@@ -1264,8 +1264,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let resText = format.resolution || format.format_note || 'Auto';
         if (type === 'video') {
             const label = getQualityLabel(resText);
-            if (label) {
+            if (label && resText && !resText.toLowerCase().includes(label.toLowerCase())) {
                 resText = `<strong class="res-badge">${label}</strong> <span class="res-sub">(${resText})</span>`;
+            } else {
+                resText = `<strong class="res-badge">${resText || label || 'Auto'}</strong>`;
             }
         } else {
             const label = format.format_note || format.format_id || 'Audio';
@@ -1289,14 +1291,20 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Direct download click
+        // Direct download click with instant visual feedback
         const dlBtn = row.querySelector('.btn-direct-download');
         dlBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
             try {
-                await initiateDownload(url, format.format_id, format.ext, currentVideoData.title, type, format.filesize, format.height);
+                dlBtn.disabled = true;
+                dlBtn.innerHTML = '<span class="action-icon">⏳</span> <span class="action-text">Starting...</span>';
+                dlBtn.classList.add('btn-downloading');
+                await initiateDownload(url, format.format_id, format.ext, currentVideoData.title, type, format.filesize, format.height, null, null, null, dlBtn);
             } catch (err) {
                 console.error("Single track download error:", err);
+                dlBtn.disabled = false;
+                dlBtn.innerHTML = '<span class="action-icon">⬇️</span> <span class="action-text">Download</span>';
+                dlBtn.classList.remove('btn-downloading');
             }
         });
 
@@ -1479,7 +1487,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex = null, token = null, segments = null) {
+    function initiateDownload(url, format_id, ext, title, type, filesize, height, itemIndex = null, token = null, segments = null, triggeringBtn = null) {
         return new Promise(async (resolve, reject) => {
             const isPlaylist = !playlistCard.classList.contains('hidden');
             const statusBox = isPlaylist ? document.getElementById('playlistStatus') : document.getElementById('downloadStatus');
@@ -1507,9 +1515,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Show status panel
+            // Show status panel and smoothly scroll into user's view
             statusBox.classList.remove('completed', 'failed', 'hidden');
             progressFill.style.width = '0%';
+            statusBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
             // Set animation mode
             const animContainer = statusBox.querySelector('.download-animation-container');
@@ -1571,6 +1580,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (itemBtn) {
                                 itemBtn.textContent = `${job.progress}%`;
                             }
+                            if (triggeringBtn) {
+                                triggeringBtn.innerHTML = `<span class="action-icon">⬇️</span> <span class="action-text">${job.progress}%</span>`;
+                            }
 
                             // Update stats
                             if (speedEl) speedEl.textContent = job.speed;
@@ -1615,9 +1627,20 @@ document.addEventListener('DOMContentLoaded', () => {
                                 itemBtn.disabled = true;
                                 itemBtn.setAttribute('data-status', 'completed');
                             }
+                            if (triggeringBtn) {
+                                triggeringBtn.innerHTML = '<span class="action-icon">✅</span> <span class="action-text">Saved!</span>';
+                                triggeringBtn.classList.add('success-btn');
+                                triggeringBtn.classList.remove('btn-downloading');
+                                setTimeout(() => {
+                                    triggeringBtn.disabled = false;
+                                    triggeringBtn.innerHTML = '<span class="action-icon">⬇️</span> <span class="action-text">Download</span>';
+                                    triggeringBtn.classList.remove('success-btn');
+                                }, 8000);
+                            }
                             
                             statusBox.classList.add('completed');
-                            statusText.textContent = '🎉 Download complete! Sending file to your browser...';
+                            const fileDownloadUrl = `${API_URL}/download_file/${jobId}`;
+                            statusText.innerHTML = `🎉 <strong>Download complete!</strong> File sent to Chrome (Check top-right or Ctrl+J). <a href="${fileDownloadUrl}" style="color:#ff7a00;text-decoration:underline;margin-left:8px;font-weight:600;">Manual Download</a>`;
                             stopCanvasParticles();
                             
                             // Play success chime
@@ -1625,7 +1648,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             // Trigger client-side download by creating a temporary link (concurrency safe)
                             const downloadLink = document.createElement('a');
-                            downloadLink.href = `${API_URL}/download_file/${jobId}`;
+                            downloadLink.href = fileDownloadUrl;
                             downloadLink.setAttribute('download', job.filename || '');
                             downloadLink.style.display = 'none';
                             document.body.appendChild(downloadLink);
@@ -1637,7 +1660,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 statusBox.classList.add('hidden');
                                 statusBox.classList.remove('completed');
                                 progressFill.style.width = '0%';
-                            }, 5000);
+                            }, 10000);
 
                             resolve(job);
 

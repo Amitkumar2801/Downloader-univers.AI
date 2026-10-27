@@ -143,6 +143,54 @@ def cleanup_file(filepath):
     except Exception as e:
         print(f"Error cleaning up file: {e}")
 
+def classify_video_tier(f):
+    """
+    Correctly classify video resolution tier (144p, 240p, 360p, 480p, 720p, 1080p, 1440p, 2160p, 4320p)
+    accounting for widescreen aspect ratios (e.g. 1280x684 is 720p, 1920x800 is 1080p, etc.).
+    """
+    format_note = str(f.get('format_note') or '').lower()
+    width = f.get('width') or 0
+    height = f.get('height') or 0
+    res_str = str(f.get('resolution') or '')
+    
+    if 'x' in res_str:
+        try:
+            parts = res_str.split('x')
+            w_val = int(parts[0])
+            h_val = int(parts[1])
+            if not width: width = w_val
+            if not height: height = h_val
+        except Exception:
+            pass
+
+    import re
+    match = re.search(r'(\d+)p', format_note)
+    note_h = int(match.group(1)) if match else 0
+    if not note_h:
+        match_res = re.search(r'(\d+)p', res_str)
+        if match_res:
+            note_h = int(match_res.group(1))
+
+    if note_h >= 4320 or '8k' in format_note or width >= 7680 or height >= 3800:
+        return 4320, "8K Ultra HD (4320p)"
+    elif note_h >= 2160 or '4k' in format_note or width >= 3840 or height >= 1900:
+        return 2160, "4K Ultra HD (2160p)"
+    elif note_h >= 1440 or '2k' in format_note or width >= 2560 or height >= 1300:
+        return 1440, "2K Quad HD (1440p)"
+    elif note_h >= 1080 or width >= 1800 or height >= 950:
+        return 1080, "1080p Full HD"
+    elif note_h >= 720 or width >= 1200 or height >= 600:
+        return 720, "720p HD"
+    elif note_h >= 480 or width >= 800 or height >= 420:
+        return 480, "480p (SD)"
+    elif note_h >= 360 or width >= 600 or height >= 320:
+        return 360, "360p (SD)"
+    elif note_h >= 240 or width >= 400 or height >= 200:
+        return 240, "240p (SD)"
+    elif note_h >= 144 or height > 0 or width > 0:
+        return 144, "144p (SD)"
+    return 360, "360p (SD)"
+
 def get_video_height(resolution_str, height_val):
     if height_val and isinstance(height_val, (int, float)):
         return int(height_val)
@@ -421,18 +469,12 @@ def get_video_info():
                 for f in info['formats']:
                     # Video formats
                     if f.get('vcodec') != 'none':
-                        height = get_video_height(f.get('resolution'), f.get('height'))
-                        if not height and f.get('height'):
-                            try:
-                                height = int(f.get('height'))
-                            except Exception:
-                                pass
-                        note = f.get('resolution') or f.get('format_note') or (f"{height}p" if height else "Video")
+                        tier_height, tier_label = classify_video_tier(f)
                         video_formats.append({
                             'format_id': f['format_id'],
-                            'ext': f.get('ext', 'mp4'),
-                            'resolution': note,
-                            'height': height or 0,
+                            'ext': 'mp4',
+                            'resolution': tier_label,
+                            'height': tier_height,
                             'filesize': f.get('filesize') or f.get('filesize_approx')
                         })
                     # Audio only
@@ -444,7 +486,7 @@ def get_video_info():
                             'filesize': f.get('filesize') or f.get('filesize_approx')
                         })
 
-            # Group by height and select the best format for each height
+            # Group by standard tier height and select the best format for each tier
             height_to_format = {}
             for v in video_formats:
                 h = v.get('height', 0)
@@ -458,32 +500,6 @@ def get_video_info():
                     current_size = v.get('filesize') or 0
                     if current_size > existing_size:
                         height_to_format[h] = v
-
-            # Standard resolution display labels
-            def get_res_label(h):
-                if h >= 4320:
-                    return "8K Ultra HD (4320p)"
-                elif h >= 2160:
-                    return "4K Ultra HD (2160p)"
-                elif h >= 1440:
-                    return "2K Quad HD (1440p)"
-                elif h >= 1080:
-                    return "1080p Full HD"
-                elif h >= 720:
-                    return "720p HD"
-                elif h >= 480:
-                    return "480p (SD)"
-                elif h >= 360:
-                    return "360p (SD)"
-                elif h >= 240:
-                    return "240p (SD)"
-                elif h >= 144:
-                    return "144p (SD)"
-                return f"{h}p"
-
-            for h, v in height_to_format.items():
-                v['resolution'] = get_res_label(h)
-                v['ext'] = 'mp4'
 
             # Sort formats by height ascending
             unique_vids = sorted(list(height_to_format.values()), key=lambda x: x.get('height', 0))
@@ -635,11 +651,11 @@ def make_progress_hook(job_id):
                     combined_progress = 70
                 else:
                     if media_type == 'video' and has_two_streams:
-                        status_text = "Merging video and audio tracks... This may take a moment."
+                        status_text = "⚡ Instant fast merging video & audio tracks... Chrome download starting..."
                     elif media_type == 'audio':
-                        status_text = "Post-processing audio... Please wait."
+                        status_text = "⚡ Instant audio conversion... Chrome download starting..."
                     else:
-                        status_text = "Finalizing media file... Please wait."
+                        status_text = "Finalizing media file... Chrome download starting..."
                     combined_progress = 95
 
                 job.update({
@@ -870,6 +886,7 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             'retries': 25,
             'fragment_retries': 25,
             'file_access_retries': 25,
+            'concurrent_fragment_downloads': 8,
             'buffersize': 1024 * 1024,
             'http_headers': {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -881,10 +898,10 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             **cookie_opts
         }
 
-        # If video download, make sure ffmpeg converts audio stream to universal AAC in MP4
+        # If video download, use instant stream copy merging without slow CPU re-encoding
         if media_type == 'video':
             ydl_opts['postprocessor_args'] = {
-                'merger': ['-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k']
+                'merger': ['-c', 'copy']
             }
 
         # Add postprocessor for MP3/FLAC/WAV/M4A audio conversion with selected bitrate
@@ -1039,9 +1056,9 @@ def download_video():
         else:
             if '+bestaudio' not in format_id:
                 if height > 0:
-                    target_format = f"{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/best"
                 else:
-                    target_format = f"{format_id}+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo+bestaudio[ext=m4a]/bestvideo+bestaudio/best"
             else:
                 target_format = format_id
     else:
@@ -1078,6 +1095,8 @@ def download_video():
         'overwrites': True,
         'retries': 10,
         'fragment_retries': 10,
+        'concurrent_fragment_downloads': 8,
+        'buffersize': 1024 * 1024,
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -1087,10 +1106,10 @@ def download_video():
         **cookie_opts
     }
 
-    # If video download, make sure ffmpeg converts audio stream to universal AAC in MP4
+    # If video download, use instant stream copy merging without slow CPU re-encoding
     if media_type == 'video':
         ydl_opts['postprocessor_args'] = {
-            'merger': ['-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k']
+            'merger': ['-c', 'copy']
         }
 
     # Add postprocessor for MP3/FLAC/WAV/M4A audio conversion with selected bitrate
@@ -1265,9 +1284,9 @@ def start_download():
         else:
             if '+bestaudio' not in format_id:
                 if height > 0:
-                    target_format = f"{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo[height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/best"
                 else:
-                    target_format = f"{format_id}+bestaudio/bestvideo+bestaudio/best"
+                    target_format = f"{format_id}+bestaudio[ext=m4a]/{format_id}+bestaudio/bestvideo+bestaudio[ext=m4a]/bestvideo+bestaudio/best"
             else:
                 target_format = format_id
     elif media_type == 'image':
