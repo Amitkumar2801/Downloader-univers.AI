@@ -100,26 +100,5 @@ class ApiService {
       throw Exception('Conversion failed');
     }
   }
-
-  // Trim local audio file
-  Future<File> trimAudio(File audioFile, double start, double end) async {
-    final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/api/trim-audio'));
-    request.fields['device_id'] = 'flutter_app_client';
-    request.fields['start'] = start.toString();
-    request.fields['end'] = end.toString();
-    request.files.add(await http.MultipartFile.fromPath('file', audioFile.path));
-
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
-
-    if (response.statusCode == 200) {
-      final dir = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
-      final outName = 'trimmed_${DateTime.now().millisecondsSinceEpoch}.mp3';
-      final file = File('${dir.path}/$outName');
-      await file.writeAsBytes(response.bodyBytes);
-      return file;
-    } else {
-      throw Exception('Trimming failed');
-    }
-  }
+}
 }

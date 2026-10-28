@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/downloader_screen.dart';
 import 'screens/converter_screen.dart';
-import 'screens/trimmer_screen.dart';
 
 void main() {
   runApp(const DownloaderApp());
@@ -70,7 +69,6 @@ class _DownloaderAppState extends State<DownloaderApp> {
         '/': (context) => const HomeScreen(),
         '/downloader': (context) => const DownloaderScreen(),
         '/converter': (context) => const ConverterScreen(),
-        '/trimmer': (context) => const TrimmerScreen(),
       },
     );
   }
@@ -87,8 +85,6 @@ class AppTranslations {
       'downloader_desc': 'Download high-quality videos and mp3 audio from YouTube, Spotify, and more.',
       'converter_title': 'Video → Audio',
       'converter_desc': 'Extract high-quality audio files from your local videos.',
-      'trimmer_title': 'Audio Trimmer',
-      'trimmer_desc': 'Upload and trim audio clips into custom ringtones.',
       'home': 'Home',
       'settings': 'Settings',
       'backend_url': 'Backend Server URL',
@@ -100,7 +96,6 @@ class AppTranslations {
       'language': 'Language',
       'select_file': 'Select File',
       'convert_btn': 'Convert Now',
-      'trim_btn': 'Trim Audio',
       'start_time': 'Start Time (sec)',
       'end_time': 'End Time (sec)',
       'supported_platforms': 'Supported Platforms',
@@ -113,8 +108,6 @@ class AppTranslations {
       'downloader_desc': 'यूट्यूब, स्पॉटिफ़ाई और अन्य से उच्च गुणवत्ता वाले वीडियो और एमपी3 डाउनलोड करें।',
       'converter_title': 'वीडियो → ऑडियो',
       'converter_desc': 'अपने स्थानीय वीडियो से उच्च गुणवत्ता वाली ऑडियो फाइलें निकालें।',
-      'trimmer_title': 'ऑडियो ट्रिमर',
-      'trimmer_desc': 'कस्टम रिंगटोन बनाने के लिए ऑडियो क्लिप को अपलोड और ट्रिम करें।',
       'home': 'होम',
       'settings': 'सेटिंग्स',
       'backend_url': 'बैकएंड सर्वर यूआरएल',
@@ -126,7 +119,6 @@ class AppTranslations {
       'language': 'भाषा',
       'select_file': 'फ़ाइल चुनें',
       'convert_btn': 'अभी कनवर्ट करें',
-      'trim_btn': 'ऑडियो ट्रिम करें',
       'start_time': 'शुरू होने का समय (सेकंड)',
       'end_time': 'समाप्त होने का समय (सेकंड)',
       'supported_platforms': 'समर्थित प्लेटफ़ॉर्म',
@@ -139,8 +131,6 @@ class AppTranslations {
       'downloader_desc': 'यूट्यूब, स्पोटिफाई र थपबाट उच्च-गुणस्तरका भिडियोहरू र mp3 अडियो डाउनलोड गर्नुहोस्।',
       'converter_title': 'भिडियो → अडियो',
       'converter_desc': 'तपाईंको स्थानीय भिडियोहरूबाट उच्च-गुणस्तरको अडियो फाइलहरू निकाल्नुहोस्।',
-      'trimmer_title': 'अडियो ट्रिमर',
-      'trimmer_desc': 'अडियो क्लिपहरू अपलोड र ट्रिम गरी अनुकूलन रिङटोन बनाउनुहोस्।',
       'home': 'गृहपृष्ठ',
       'settings': 'सेटिङहरू',
       'backend_url': 'ब्याकइन्ड सर्भर URL',
@@ -152,7 +142,6 @@ class AppTranslations {
       'language': 'भाषा',
       'select_file': 'फाइल चयन गर्नुहोस्',
       'convert_btn': 'अहिले कनवर्ट गर्नुहोस्',
-      'trim_btn': 'अडियो ट्रिम गर्नुहोस्',
       'start_time': 'सुरु हुने समय (सेकेन्ड)',
       'end_time': 'अन्त्य हुने समय (सेकेन्ड)',
       'supported_platforms': 'समर्थित प्लेटफर्महरू',
@@ -165,8 +154,6 @@ class AppTranslations {
       'downloader_desc': 'یوٹیوب، اسپاٹیفائی اور مزید سے اعلی معیار کی ویڈیوز اور ایم پی 3 ڈاؤن لوڈ کریں۔',
       'converter_title': 'ویڈیو ← آڈیو',
       'converter_desc': 'اپنے مقامی ویڈیوز سے اعلیٰ معیار کی آڈیو فائلیں نکالیں۔',
-      'trimmer_title': 'آڈیو ٹرمر',
-      'trimmer_desc': 'رنگ ٹونز بنانے کے لیے آڈیو کلپس اپ لوڈ اور ٹرم کریں۔',
       'home': 'ہوم',
       'settings': 'ترتیبات',
       'backend_url': 'بیک اینڈ سرور یو آر ایل',
@@ -178,7 +165,6 @@ class AppTranslations {
       'language': 'زبان',
       'select_file': 'فائل منتخب کریں',
       'convert_btn': 'ابھی تبدیل کریں',
-      'trim_btn': 'آڈیو ٹرم کریں',
       'start_time': 'شروع کا وقت (سیکنڈ)',
       'end_time': 'ختم ہونے کا وقت (سیکنڈ)',
       'supported_platforms': 'سپورٹڈ پلیٹ فارمز',

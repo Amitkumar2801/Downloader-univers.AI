@@ -212,15 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     colors: [const Color(0xFF6366F1), const Color(0xFF4F46E5)],
                     route: '/converter',
                   ),
-                  const SizedBox(height: 20),
-                  _buildToolCard(
-                    context,
-                    title: AppTranslations.translate(context, 'trimmer_title'),
-                    desc: AppTranslations.translate(context, 'trimmer_desc'),
-                    icon: Icons.content_cut,
-                    colors: [const Color(0xFF10B981), const Color(0xFF059669)],
-                    route: '/trimmer',
-                  ),
 
                   const SizedBox(height: 48),
 

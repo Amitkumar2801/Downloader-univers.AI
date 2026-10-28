@@ -1,7 +1,7 @@
-# ⚡ DOWNLOADYFY.AI — Universal Media Downloader & Trimmer
+# ⚡ DOWNLOADYFY.AI — Universal Media Downloader & Converter
 
 > **A modern, fast, and free universal media downloader for YouTube (8K/4K/MP3), Instagram (Reels & Posts), Facebook, TikTok (No Watermark), and Pinterest.**  
-> Includes a built-in multi-cut video & audio trimmer, 1-click clipboard paste, and complete high-definition audio merging.
+> Includes 1-click clipboard paste, fast concurrent downloads, and complete high-definition audio merging.
 
 ---
 
@@ -9,7 +9,7 @@
 - 🎬 **Ultra HD Downloads**: Download YouTube videos in **8K, 4K, 1440p, 1080p, 720p, 480p, and 360p** with crystal-clear universal AAC audio merged.
 - 🎵 **High-Quality MP3 & FLAC**: Extract full songs and soundtracks in **320kbps MP3** or lossless formats.
 - 📱 **Multi-Platform Support**: Works seamlessly with **YouTube, Instagram Reels, Facebook Videos, TikTok (No Watermark), and Pinterest**.
-- ✂️ **Offline Video & Audio Multi-Segment Trimmer**: Upload any video (MP4, MOV, MKV, WebM) or audio file, set multiple trim boxes (Segment #1, #2, #3...), and automatically concatenate them into a single high-quality merged file!
+- 🔄 **Offline Media Converter**: Convert local MP4, MKV, WebM, MOV, and AVI files to 320kbps MP3, WAV, FLAC, or AAC.
 - 📋 **1-Click Paste & Clear**: Mobile & Desktop friendly clipboard paste button for frictionless workflow.
 - 🚫 **No Node.js / NPM Required**: Pure lightweight **Python Backend** and **Vanilla HTML/CSS/JS Frontend**. No complex node build tools or `npm install` needed.
 
@@ -168,7 +168,6 @@ Downloader-univers.AI/
 │   ├── index.html            # Main home page
 │   ├── downloader.html       # Universal video downloader tool
 │   ├── converter.html        # Video to audio converter
-│   ├── trimmer.html          # Multi-cut audio/video trimmer
 │   ├── styles.css            # Responsive CSS stylesheet
 │   ├── app.js                # Frontend client logic & clipboard paste handlers
 │   └── sound-effects.js      # Interactive audio sound effects
