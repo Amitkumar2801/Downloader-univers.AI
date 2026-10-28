@@ -252,13 +252,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = e.target.closest('button, .nav-link-item, .demo-card, .tool-card, .plan-card, .tab-btn, .action-btn');
         if (target) {
             // Check specific classes for tailored sounds
-            if (target.classList.contains('delete-segment-btn') || target.classList.contains('close-ad-btn') || target.classList.contains('close-btn') || target.classList.contains('close-trim-btn')) {
+            if (target.classList.contains('close-ad-btn') || target.classList.contains('close-btn')) {
                 UniversalSoundFX.playDelete();
-            } else if (target.classList.contains('add-segment-btn') || target.classList.contains('btn-open-trim')) {
-                UniversalSoundFX.playPop();
-            } else if (target.classList.contains('btn-direct-download') || target.classList.contains('download-single-btn') || target.id === 'startTrimDownloadBtn') {
+            } else if (target.classList.contains('btn-direct-download') || target.classList.contains('download-single-btn')) {
                 UniversalSoundFX.playStartDownload();
-            } else if (target.id === 'themeToggle' || target.classList.contains('trim-type-pill')) {
+            } else if (target.id === 'themeToggle') {
                 UniversalSoundFX.playToggle();
             } else {
                 UniversalSoundFX.playClick();
