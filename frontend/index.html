@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -178,16 +178,16 @@
 
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1.1rem;
             width: 100%;
-            max-width: 1100px;
+            max-width: 1240px;
             margin: 0 auto;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(22, 25, 38, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.09);
             border-radius: 24px;
             padding: 2rem 1.5rem;
             display: flex;
@@ -311,14 +311,18 @@
 
         /* Light theme adjustments */
         body.light-theme .stat-card {
-            background: rgba(0, 0, 0, 0.02);
-            border-color: rgba(0, 0, 0, 0.06);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
         }
         body.light-theme .stat-icon-wrapper {
-            background: rgba(0, 0, 0, 0.03);
-            border-color: rgba(0, 0, 0, 0.06);
-            color: rgba(0, 0, 0, 0.6);
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #ff5f00;
+        }
+        body.light-theme .stat-lbl {
+            color: #64748b;
+            font-weight: 800;
         }
 
         /* === Premium How It Works Section === */
@@ -334,18 +338,18 @@
         }
         .hiw-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 2.2rem;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1.1rem;
             width: 100%;
-            max-width: 1200px;
-            margin-top: 3rem;
+            max-width: 1240px;
+            margin-top: 2.2rem;
             position: relative;
         }
         .hiw-card {
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 28px;
-            padding: 3rem 2rem 2.5rem;
+            background: rgba(22, 25, 38, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 20px;
+            padding: 1.8rem 1rem 1.4rem;
             text-align: center;
             position: relative;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -364,38 +368,38 @@
         }
         
         .hiw-card-icon-wrapper {
-            width: 68px;
-            height: 68px;
-            border-radius: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             justify-content: center;
             color: rgba(255, 255, 255, 0.75);
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 0.9rem;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
         }
         .hiw-card-icon {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             stroke-width: 1.8px;
             transition: transform 0.4s ease;
         }
         
         .hiw-num {
             position: absolute;
-            top: 1rem;
-            right: 1.25rem;
-            width: 32px;
-            height: 32px;
+            top: 0.75rem;
+            right: 0.85rem;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
             color: rgba(255, 255, 255, 0.4);
             font-weight: 800;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -409,16 +413,15 @@
             background: rgba(255, 95, 0, 0.15);
             border: 1px solid rgba(255, 95, 0, 0.3);
             color: var(--accent-orange);
-            font-size: 0.72rem;
+            font-size: 0.64rem;
             font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.05em;
+            padding: 2px 7px;
+            border-radius: 12px;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
-            margin-bottom: 1rem;
+            margin-bottom: 0.6rem;
             box-shadow: 0 0 10px rgba(255, 95, 0, 0.15);
         }
-
         /* Hover animations and color themes */
         .hiw-card:hover {
             transform: translateY(-10px) scale(1.02);
@@ -455,102 +458,91 @@
         .hiw-card:nth-child(4):hover .hiw-num { border-color: rgba(56, 189, 248, 0.3); color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 
         .hiw-card h4 {
-            font-size: 1.25rem;
+            font-size: 1.02rem;
             font-weight: 800;
             color: var(--text-main);
-            margin: 0 0 0.75rem;
-            letter-spacing: -0.5px;
+            margin: 0 0 0.45rem;
+            letter-spacing: -0.3px;
         }
         .hiw-card p {
-            font-size: 0.88rem;
+            font-size: 0.78rem;
             color: var(--text-muted);
-            line-height: 1.6;
+            line-height: 1.45;
             margin: 0;
         }
 
         /* Light theme adjustments */
         body.light-theme .hiw-card {
-            background: rgba(0, 0, 0, 0.02);
-            border-color: rgba(0, 0, 0, 0.06);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
         }
         body.light-theme .hiw-card-icon-wrapper {
-            background: rgba(0, 0, 0, 0.03);
-            border-color: rgba(0, 0, 0, 0.06);
-            color: rgba(0, 0, 0, 0.6);
+            background: #fff7ed;
+            border-color: #fed7aa;
+            color: #ff5f00;
         }
         body.light-theme .hiw-num {
-            background: rgba(0, 0, 0, 0.03);
-            border-color: rgba(0, 0, 0, 0.05);
-            color: rgba(0, 0, 0, 0.4);
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+        body.light-theme .hiw-card h4 {
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0 0 0.45rem;
+            letter-spacing: -0.3px;
+        }
+        body.light-theme .hiw-card p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin: 0;
         }
     </style>
 </head>
 <body class="light-theme">
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:0.55rem;text-decoration:none;color:inherit;">
-                <img src="assets/logo.png" alt="DOWNLOADYFY.AI Logo" style="width:34px;height:34px;border-radius:9px;object-fit:cover;flex-shrink:0;">
+            <!-- 1. Logo -->
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;">
+                <img src="assets/logo.png" alt="DOWNLOADYFY.AI Logo" class="logo-icon-img" style="width:30px;height:30px;border-radius:8px;object-fit:cover;flex-shrink:0;">
                 <span class="logo-text">DOWNLOADYFY<span>.AI</span></span>
             </a>
-            
+
+            <!-- 2. Tool Navigation Island Tabs -->
             <div class="nav-links-menu">
                 <a href="index.html" class="nav-link-item active nav-downloader"><span class="nav-icon">⚡</span><span>Downloader</span></a>
+                <a href="booster.html" class="nav-link-item nav-booster"><span class="nav-icon">🔊</span><span>3D Booster</span><span class="nav-badge">8D</span></a>
+                <a href="converter.html" class="nav-link-item nav-converter"><span class="nav-icon">🔄</span><span>Converter</span></a>
+                <a href="tagger.html" class="nav-link-item nav-tagger"><span class="nav-icon">🏷️</span><span>ID3 Tagger</span></a>
+                <a href="vocal-remover.html" class="nav-link-item nav-vocal"><span class="nav-icon">🎤</span><span>Vocal Split</span></a>
             </div>
 
+            <!-- 3. Actions: Language & Theme -->
             <div class="nav-actions">
-                <!-- Language Selector Dropdown -->
                 <div class="language-selector-wrapper">
                     <select id="languageSelect" class="lang-select-dropdown" aria-label="Select Language">
-                        <!-- Popular/User requested -->
-                        <option value="en">🇺🇸 US / 🇬🇧 UK (English)</option>
-                        <option value="hi">🇮🇳 India (हिंदी)</option>
-                        <option value="ne">🇳🇵 Nepal (नेपाली)</option>
-                        <option value="ur">🇵🇰 Pakistan (اردو)</option>
-                        <option value="ja">🇯🇵 Japan (日本語)</option>
-                        <option value="lb">🇱🇺 Luxembourg (Lëtzebuergesch)</option>
-
-                        <!-- Afghanistan to Burkina Faso -->
-                        <option value="ps">🇦𝒇 Afghanistan (Pashto)</option>
-                        <option value="sq">🇦🇱 Albania (Shqip)</option>
-                        <option value="ar">🇩🇿 Algeria / Bahrain (العربية)</option>
-                        <option value="ca">🇦🇩 Andorra (Català)</option>
-                        <option value="pt">🇦🇴 Angola / Brazil (Português)</option>
-                        <option value="es">🇦🇷 Argentina / Bolivia (Español)</option>
-                        <option value="hy">🇦🇲 Armenia (Հայերեն)</option>
-                        <option value="de">🇦🇹 Austria / Germany (Deutsch)</option>
-                        <option value="az">🇦🇿 Azerbaijan (Azərbaycanca)</option>
-                        <option value="en">🇧🇸 Bahamas / Belize / Barbados (English)</option>
-                        <option value="bn">🇧🇩 Bangladesh (বাংলা)</option>
-                        <option value="be">🇧🇾 Belarus (Беларуская)</option>
-                        <option value="nl">🇧🇪 Belgium / Netherlands (Nederlands)</option>
-                        <option value="fr">🇧🇯 Benin / France / Burkina Faso (Français)</option>
-                        <option value="dz">🇧🇹 Bhutan (རྫོང་ཁ)</option>
-                        <option value="bs">🇧🇦 Bosnia (Bosanski)</option>
-                        <option value="ms">🇧🇳 Brunei (Melayu)</option>
-                        <option value="bg">🇧🇬 Bulgaria (Български)</option>
-
-                        <!-- Other major world languages -->
-                        <option value="it">🇮🇹 Italy (Italiano)</option>
-                        <option value="ko">🇰🇷 Korea (한국어)</option>
-                        <option value="ru">🇷🇺 Russia (Русский)</option>
-                        <option value="zh-CN">🇨🇳 China (简体中文)</option>
-                        <option value="tr">🇹🇷 Turkey (Türkçe)</option>
-                        <option value="vi">🇻🇳 Vietnam (Tiếng Việt)</option>
+                        <option value="en">🇺🇸 EN</option>
+                        <option value="hi">🇮🇳 HI</option>
+                        <option value="ne">🇳🇵 NE</option>
+                        <option value="ur">🇵🇰 UR</option>
+                        <option value="ja">🇯🇵 JA</option>
+                        <option value="de">🇩🇪 DE</option>
+                        <option value="es">🇪🇸 ES</option>
+                        <option value="fr">🇫🇷 FR</option>
+                        <option value="pt">🇧🇷 PT</option>
+                        <option value="ru">🇷🇺 RU</option>
+                        <option value="ar">🇦🇪 AR</option>
+                        <option value="zh-CN">🇨🇳 ZH</option>
                     </select>
-                    <span class="select-arrow" style="
-                        position: absolute;
-                        right: 10px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        color: var(--text-muted);
-                        pointer-events: none;
-                        font-size: 0.7rem;
-                    ">▼</span>
+                    <span class="select-arrow" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:0.6rem;">▼</span>
                 </div>
+
                 <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
         </div>
@@ -601,17 +593,32 @@
                     <span>Pinterest</span>
                     <span class="chip-tag">HD Media</span>
                 </button>
+                
             </div>
 
             <!-- Bold High-Impact Headline -->
             <div class="hero-headline-wrapper">
+                <div class="hero-badge-pill">
+                    <span class="badge-dot-pulse"></span>
+                    <span class="badge-text">⚡ Universal Media AI Engine</span>
+                    <span class="badge-sub">Free &amp; Unlimited</span>
+                </div>
+                
                 <h1 class="master-hero-title">
-                    Universal Video &amp; Audio Downloader<br>
+                    <span class="hero-title-main">Universal Video &amp; Audio Downloader</span>
                     <span class="hero-gradient-highlight">Free in 8K, 4K &amp; 320kbps MP3</span>
                 </h1>
+                
                 <p class="master-hero-subtitle">
-                    Paste any link from YouTube, Instagram, Facebook, TikTok or Pinterest to download complete full videos with high-definition crystal clear audio.
+                    Paste any link from <span class="highlight-platform yt">YouTube</span>, <span class="highlight-platform ig">Instagram</span>, <span class="highlight-platform fb">Facebook</span>, <span class="highlight-platform tt">TikTok</span> or <span class="highlight-platform pin">Pinterest</span> to download high-definition media in seconds.
                 </p>
+
+                <div class="hero-feature-pills">
+                    <span class="hero-pill"><span class="pill-dot glow-orange"></span> 8K / 4K Ultra HD</span>
+                    <span class="hero-pill"><span class="pill-dot glow-green"></span> 320kbps MP3 &amp; FLAC</span>
+                    <span class="hero-pill"><span class="pill-dot glow-cyan"></span> No Watermark</span>
+                    <span class="hero-pill"><span class="pill-dot glow-blue"></span> 100% Free &amp; Fast</span>
+                </div>
             </div>
         </header>
  
@@ -625,7 +632,7 @@
                             <div class="detected-platform-icon" id="detectedPlatformIcon">
                                 <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                             </div>
-                            <input type="url" id="videoUrl" class="capsule-input" placeholder="Paste YouTube, Instagram Reel, TikTok, Facebook or Pinterest link..." required autocomplete="off">
+                            <input type="text" id="videoUrl" class="capsule-input" placeholder="Paste YouTube, Instagram Reel, TikTok, Facebook or Pinterest link..." autocomplete="off">
                             <div class="capsule-actions-group">
                                 <button type="button" class="capsule-action-btn btn-clear-url hidden" id="btnClearUrl" title="Clear link">
                                     ✕
@@ -944,34 +951,132 @@
 
 
 
-        <!-- Demo Section -->
-        <section class="demo-section" id="demoSection" style="margin-top: 3rem;">
-            <h2 class="section-title" data-translate="demo_title">Experience the Premium Speed</h2>
-            <p class="section-subtitle" data-translate="demo_subtitle">A high-fidelity universal media downloader with cover art mapping and zero configuration.</p>
+        <!-- Visual Engine Showcase & Platforms Section -->
+        <section class="demo-section" id="demoSection">
+            <div class="demo-header-badge">
+                <span class="demo-badge-dot"></span>
+                <span>STUDIO EXTRACTION SHOWCASE</span>
+            </div>
+            <h2 class="section-title">
+                Experience Next-Gen <span class="gradient-text-orange">Media Fidelity</span>
+            </h2>
+            <p class="section-subtitle">
+                Native 8K UHD video streams, 320kbps audiophile MP3s, and instant audio extraction with automatic ID3 cover art.
+            </p>
+
             <div class="demo-grid">
-                <div class="demo-card">
+                <!-- 1. YouTube Showcase Card -->
+                <div class="demo-card demo-card-youtube" onclick="document.getElementById('videoUrl').focus(); window.scrollTo({top: 0, behavior: 'smooth'});">
                     <div class="demo-img-wrapper">
-                        <img src="assets/youtube_demo.png" alt="YouTube Downloader Preview">
+                        <img src="assets/youtube_demo.png" alt="YouTube 8K and MP3 Downloader Preview" loading="lazy">
+                        <div class="demo-overlay-badge badge-yt">
+                            <span class="badge-dot"></span> 8K UHD • 60 FPS
+                        </div>
                     </div>
                     <div class="demo-card-info">
-                        <span class="demo-tag youtube-tag">YouTube 8K &amp; MP3</span>
-                        <h3>FHD Video &amp; HQ Audio Extracts</h3>
+                        <div class="demo-card-top-row">
+                            <span class="demo-tag youtube-tag">YouTube 8K &amp; Audio</span>
+                            <span class="demo-speed-tag">⚡ Ultra Fast</span>
+                        </div>
+                        <h3>Ultra HD Video &amp; 320kbps MP3 Audio</h3>
+                        <p class="demo-card-desc">Lossless audio extraction, full playlist demuxing, chapters, and 4320p 8K video capture at full network line rate.</p>
+                        <div class="demo-micro-features">
+                            <span class="micro-pill">8K UHD</span>
+                            <span class="micro-pill">320kbps MP3</span>
+                            <span class="micro-pill">Chapters</span>
+                        </div>
+                        <div class="demo-card-action">
+                            <span>Download YouTube Media</span>
+                            <svg class="demo-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
                     </div>
                 </div>
-                <div class="demo-card">
+
+                <!-- 2. Facebook Video Showcase Card -->
+                <div class="demo-card demo-card-facebook" onclick="document.getElementById('videoUrl').focus(); window.scrollTo({top: 0, behavior: 'smooth'});">
                     <div class="demo-img-wrapper">
-                        <img src="assets/instagram_demo.png" alt="Instagram Reels Downloader Preview">
+                        <img src="assets/youtube_demo.png" alt="Facebook HD Video Downloader Preview" loading="lazy" style="filter: hue-rotate(190deg);">
+                        <div class="demo-overlay-badge badge-fb">
+                            <span class="badge-dot"></span> Full HD • Watch
+                        </div>
                     </div>
                     <div class="demo-card-info">
-                        <span class="demo-tag instagram-tag">Instagram Reels</span>
-                        <h3>Download Carousel Posts &amp; Audio Tracks</h3>
+                        <div class="demo-card-top-row">
+                            <span class="demo-tag facebook-tag">Facebook HD &amp; Reels</span>
+                            <span class="demo-speed-tag tag-fb">⚡ Fast Grab</span>
+                        </div>
+                        <h3>HD Video Streams &amp; Public Reels</h3>
+                        <p class="demo-card-desc">Download Facebook videos, public group clips, and watch reels in full resolution with high-fidelity stereo audio.</p>
+                        <div class="demo-micro-features">
+                            <span class="micro-pill">1080p HD</span>
+                            <span class="micro-pill">Public Reels</span>
+                            <span class="micro-pill">HQ Audio</span>
+                        </div>
+                        <div class="demo-card-action">
+                            <span>Download Facebook Media</span>
+                            <svg class="demo-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Instagram Reels Showcase Card -->
+                <div class="demo-card demo-card-instagram" onclick="document.getElementById('videoUrl').focus(); window.scrollTo({top: 0, behavior: 'smooth'});">
+                    <div class="demo-img-wrapper">
+                        <img src="assets/instagram_demo.png" alt="Instagram Reels and Carousels Downloader Preview" loading="lazy">
+                        <div class="demo-overlay-badge badge-ig">
+                            <span class="badge-dot"></span> Full HD • Carousels
+                        </div>
+                    </div>
+                    <div class="demo-card-info">
+                        <div class="demo-card-top-row">
+                            <span class="demo-tag instagram-tag">Instagram Reels &amp; Slides</span>
+                            <span class="demo-speed-tag tag-ig">📸 Original Res</span>
+                        </div>
+                        <h3>HD Reels, Multi-Slide Carousels &amp; Audio</h3>
+                        <p class="demo-card-desc">Grab complete carousel galleries, full resolution video reels, and isolate clean background audio tracks instantly.</p>
+                        <div class="demo-micro-features">
+                            <span class="micro-pill">1080p Reels</span>
+                            <span class="micro-pill">All Slide Photos</span>
+                            <span class="micro-pill">Audio Stems</span>
+                        </div>
+                        <div class="demo-card-action">
+                            <span>Download Instagram Media</span>
+                            <svg class="demo-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. TikTok & Multi-Platform Showcase Card -->
+                <div class="demo-card demo-card-tiktok" onclick="document.getElementById('videoUrl').focus(); window.scrollTo({top: 0, behavior: 'smooth'});">
+                    <div class="demo-img-wrapper">
+                        <img src="assets/tiktok_demo.png" alt="TikTok and Social Clips Downloader Preview" loading="lazy">
+                        <div class="demo-overlay-badge badge-tk">
+                            <span class="badge-dot"></span> No Watermark • 60fps
+                        </div>
+                    </div>
+                    <div class="demo-card-info">
+                        <div class="demo-card-top-row">
+                            <span class="demo-tag tiktok-tag">TikTok &amp; Multi-Platform</span>
+                            <span class="demo-speed-tag tag-clean">✨ Clean HD</span>
+                        </div>
+                        <h3>Watermark-Free Clips &amp; Viral Sounds</h3>
+                        <p class="demo-card-desc">Download TikTok shorts, Facebook videos, Pinterest pins and X clips without watermarks or quality degradation.</p>
+                        <div class="demo-micro-features">
+                            <span class="micro-pill">Zero Watermark</span>
+                            <span class="micro-pill">Soundtrack MP3</span>
+                            <span class="micro-pill">Facebook &amp; Pins</span>
+                        </div>
+                        <div class="demo-card-action">
+                            <span>Download Social Media</span>
+                            <svg class="demo-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- AI Media Processing Engine Visualizer -->
-        <section class="engine-section reveal" id="engineSection">
+        <section class="engine-section reveal active" id="engineSection">
             <h2 class="section-title">AI Media Processing Engine</h2>
             <p class="section-subtitle">Real-time pipeline orchestration for decryption, stream splitting, metadata tagging, and high-speed packet delivery.</p>
             <div class="engine-grid">
@@ -1032,7 +1137,7 @@
         </section>
 
         <!-- How It Works -->
-        <section class="hiw-section reveal" id="howItWorksSection">
+        <section class="hiw-section reveal active" id="howItWorksSection">
             <div style="text-align: center;">
                 <h2 class="section-title" data-translate="hiw_title">How Downloadyfy<span>.AI</span> Works</h2>
                 <p class="section-subtitle" data-translate="hiw_subtitle">Follow these simple steps to download, extract, and manage your media.</p>
@@ -1080,7 +1185,7 @@
         </section>
 
         <!-- Stats Section -->
-        <section class="stats-section reveal" id="statsSection">
+        <section class="stats-section reveal active" id="statsSection">
             <div class="stats-container">
                 <div class="stat-card">
                     <div class="stat-icon-wrapper">
@@ -1160,3 +1265,5 @@
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
+
+

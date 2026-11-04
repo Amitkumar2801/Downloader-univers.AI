@@ -21,18 +21,24 @@ echo [2/3] Installing/verifying backend dependencies...
 pip install -r backend/requirements.txt --quiet
 
 echo.
-echo [3/3] Launching Backend and Frontend servers...
+echo [3/3] Killing any old servers on ports 5000 and 8000...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :5000 ^| findstr LISTENING') do taskkill /F /PID %%a >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000 ^| findstr LISTENING') do taskkill /F /PID %%a >nul 2>&1
+
 echo.
 echo =======================================================
 echo   Backend Server:  http://127.0.0.1:5000
 echo   Frontend Website: http://localhost:8000
 echo =======================================================
 echo.
-echo Opening website in your default browser...
-start http://localhost:8000
 
 :: Start Frontend server in a separate background window
-start "DOWNLOADYFY Frontend (Port 8000)" cmd /k "python -m http.server 8000 --directory frontend"
+start "DOWNLOADYFY Frontend (Port 8000)" cmd /k "cd /d %~dp0 && python -m http.server 8000 --directory frontend"
+
+:: Wait 2 seconds for frontend to init, then open browser
+timeout /t 2 /nobreak >nul
+echo Opening website in your default browser...
+start http://localhost:8000/index.html
 
 :: Run Backend server in the current window
 echo Starting Flask Backend Server (Do not close this window!)...
