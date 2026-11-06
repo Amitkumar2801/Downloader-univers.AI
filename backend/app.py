@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,6 +13,16 @@ try:
     from backend.quality_options import VideoQuality, AudioBitrate, map_video_quality_to_format, map_audio_bitrate_to_format
 except ModuleNotFoundError:
     from quality_options import VideoQuality, AudioBitrate, map_video_quality_to_format, map_audio_bitrate_to_format
+try:
+    from backend.spotify_service import (
+        is_spotify_url, handle_spotify_info, fetch_spotify_track,
+        apply_lofi_audio_filter, parse_spotify_url
+    )
+except ModuleNotFoundError:
+    from spotify_service import (
+        is_spotify_url, handle_spotify_info, fetch_spotify_track,
+        apply_lofi_audio_filter, parse_spotify_url
+    )
 import imageio_ffmpeg
 import re as _re
 import requests
@@ -223,6 +233,13 @@ def get_video_info():
     url = data.get('url')
     if not url:
         return jsonify({'error': 'URL is required'}), 400
+
+    # Custom Spotify extractor
+    if is_spotify_url(url):
+        try:
+            return jsonify(handle_spotify_info(url))
+        except Exception as sp_err:
+            return jsonify({'error': f"Spotify resolution error: {str(sp_err)}"}), 400
 
     # Custom Pinterest extractor fallback
     is_pinterest = 'pinterest.com' in url.lower() or 'pin.it' in url.lower()
@@ -666,7 +683,7 @@ def make_progress_hook(job_id):
                 })
     return hook
 
-def run_download_thread(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title):
+def run_download_thread(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title, is_lofi=False, spotify_data=None):
     try:
         if media_type == 'image':
             import urllib.request
@@ -686,6 +703,57 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
                 'filename': f"{safe_title}.{ext}"
             })
             return
+
+        is_spotify = is_spotify_url(url)
+        track_info = spotify_data or {}
+        
+        song_title = safe_title
+        artist = ''
+        album = ''
+        cover_url = None
+        clean_final_name = safe_title
+        download_url = url
+
+        if is_spotify:
+            if not track_info.get('song_title') or not track_info.get('artist'):
+                try:
+                    item_type, item_id = parse_spotify_url(url)
+                    if item_type in ('track', 'episode'):
+                        track_info = fetch_spotify_track(item_id, url)
+                except Exception as sp_e:
+                    print(f"[SPOTIFY] Thread track fetch error: {sp_e}")
+
+            song_title = track_info.get('song_title') or safe_title
+            artist = track_info.get('artist') or ''
+            album = track_info.get('album') or ''
+            cover_url = track_info.get('thumbnail')
+            
+            search_query = track_info.get('search_query')
+            if not search_query:
+                if artist and album and album != 'Single':
+                    search_query = f"{song_title} {artist} {album} official audio"
+                elif artist:
+                    search_query = f"{artist} - {song_title} official audio"
+                else:
+                    search_query = f"{song_title} official audio"
+            
+            download_url = f"ytsearch1:{search_query}"
+            target_format = 'bestaudio/best'
+            media_type = 'audio'
+
+            if is_lofi:
+                final_display_title = f"{artist} - {song_title} (Lo-Fi Chill)" if artist else f"{song_title} (Lo-Fi Chill)"
+            else:
+                final_display_title = f"{artist} - {song_title}" if artist else song_title
+
+            clean_final_name = "".join([c for c in final_display_title if c.isalnum() or c in ' -_()']).strip() or safe_title
+            download_jobs[job_id].update({
+                'status_text': f"Locating studio audio for '{song_title}'...",
+                'progress': 10
+            })
+        else:
+            if is_lofi:
+                clean_final_name = f"{safe_title} (Lo-Fi Chill)"
 
         cookie_opts = get_cookie_args()
         ydl_opts = {
@@ -736,7 +804,7 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
             }]
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+            ydl.download([download_url])
 
         filepath = f"{filepath_without_ext}.{ext}"
         final_path = None
@@ -753,16 +821,38 @@ def run_download_thread(job_id, url, target_format, merge_format, filepath_witho
                         ext = f.split('.')[-1]
                         break
         
-        if final_path and os.path.exists(final_path):
-            download_jobs[job_id].update({
-                'status': 'completed',
-                'progress': 100,
-                'status_text': 'Download complete!',
-                'filepath': final_path,
-                'filename': f"{safe_title}.{ext}"
-            })
-        else:
+        if not final_path or not os.path.exists(final_path):
             raise Exception("Failed to locate completed download file on server.")
+
+        # If Lo-Fi effect is requested, apply authentic Lo-Fi Chill DSP filter
+        if is_lofi and media_type == 'audio':
+            download_jobs[job_id].update({
+                'status_text': '☕ Applying Lo-Fi Chill DSP (Slowed + Reverb + Warmth)...',
+                'progress': 92
+            })
+            lofi_path = f"{filepath_without_ext}_lofi.mp3"
+            ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+            apply_lofi_audio_filter(final_path, lofi_path, ffmpeg_exe, bitrate='320k')
+            cleanup_file(final_path)
+            final_path = lofi_path
+            ext = 'mp3'
+
+        # Tag audio metadata with cover art & ID3
+        if media_type == 'audio' and (is_spotify or is_lofi or cover_url):
+            download_jobs[job_id].update({
+                'status_text': '🎨 Embedding studio artwork and ID3 tags...',
+                'progress': 98
+            })
+            tag_title = f"{song_title} (Lo-Fi Chill Edition)" if is_lofi else song_title
+            tag_audio_metadata(final_path, tag_title, artist, cover_url, ext)
+
+        download_jobs[job_id].update({
+            'status': 'completed',
+            'progress': 100,
+            'status_text': 'Download complete!',
+            'filepath': final_path,
+            'filename': f"{clean_final_name}.{ext}"
+        })
     except Exception as e:
         import traceback
         import glob
@@ -930,7 +1020,7 @@ def download_video():
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+            ydl.download([download_url])
     except Exception as e:
         import glob
         import time
@@ -1011,8 +1101,16 @@ def get_download_status(job_id):
         return jsonify({'error': 'Job not found'}), 404
     return jsonify(job)
 
-@app.route('/api/download_file/<job_id>', methods=['GET'])
+@app.route('/api/download_file/<job_id>', methods=['GET', 'OPTIONS'])
 def download_file(job_id):
+    if request.method == 'OPTIONS':
+        resp = app.make_default_options_response()
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        resp.headers['Access-Control-Expose-Headers'] = 'Content-Disposition'
+        return resp
+
     job = download_jobs.get(job_id)
     if not job or job.get('status') != 'completed':
         return jsonify({'error': 'File not found or download not completed.'}), 404
@@ -1023,11 +1121,15 @@ def download_file(job_id):
     if os.path.exists(filepath):
         # Schedule cleanup after 10 minutes to allow large 4K/8K files to finish transferring to browser
         threading.Timer(600.0, cleanup_file, args=[filepath]).start()
-        return send_file(
+        from flask import make_response
+        resp = make_response(send_file(
             filepath,
             as_attachment=True,
             download_name=filename
-        )
+        ))
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Access-Control-Expose-Headers'] = 'Content-Disposition'
+        return resp
     else:
         return jsonify({'error': 'File has been deleted or is missing.'}), 404
 
@@ -1128,9 +1230,12 @@ def start_download():
         'status_text': 'Preparing download...'
     }
 
+    is_lofi = data.get('is_lofi', False) or ('lofi' in str(format_id).lower())
+    spotify_data = data.get('spotify_data')
+
     t = threading.Thread(
         target=run_download_thread,
-        args=(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title)
+        args=(job_id, url, target_format, merge_format, filepath_without_ext, media_type, format_id, ext, safe_title, is_lofi, spotify_data)
     )
     t.daemon = True
     t.start()
@@ -1540,4 +1645,7 @@ def edit_tags():
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
+
+
+
 
