@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         instagram: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
         facebook: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
         tiktok: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#00f2fe"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>`,
+        spotify: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#1db954"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.498 17.306c-.216.353-.674.464-1.027.248-2.812-1.718-6.351-2.107-10.52-1.155-.403.092-.803-.16-.895-.562-.092-.403.16-.803.562-.895 4.568-1.042 8.484-.598 11.633 1.337.353.216.464.674.247 1.027zm1.468-3.26c-.272.443-.85.584-1.293.312-3.22-1.979-8.128-2.55-11.936-1.393-.497.151-1.026-.134-1.177-.63-.151-.497.134-1.026.63-1.177 4.356-1.322 9.775-.685 13.464 1.583.443.272.584.85.312 1.293zm.126-3.41c-3.861-2.293-10.228-2.505-13.918-1.385-.593.18-1.22-.164-1.4-.757-.18-.593.164-1.22.757-1.4 4.24-1.288 11.272-1.043 15.698 1.583.533.316.707 1.01.39 1.543-.316.533-1.01.707-1.543.39z"/></svg>`,
         pinterest: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#e60023"><path d="M12 0a12 12 0 0 0-4.37 23.18c-.05-.98-.1-2.48.02-3.55.11-.96.72-6.14.72-6.14s-.18-.37-.18-.92c0-.86.5-1.5 1.13-1.5.53 0 .79.4.79.88 0 .54-.34 1.34-.52 2.08-.15.62.31 1.12.92 1.12 1.1 0 1.95-1.16 1.95-2.84 0-1.48-1.07-2.52-2.59-2.52-1.77 0-2.8 1.33-2.8 2.7 0 .54.2.1.13.48.05.2.06.33.02.5-.06.26-.2.83-.23.95-.04.16-.13.2-.3.12-.9-.42-1.46-1.74-1.46-2.8 0-2.28 1.66-4.38 4.78-4.38 2.51 0 4.46 1.79 4.46 4.18 0 2.5-1.57 4.51-3.76 4.51-.73 0-1.43-.38-1.66-.83l-.45 1.73c-.16.63-.6 1.42-.9 1.89A12 12 0 1 0 12 0z"/></svg>`
     };
 
@@ -314,6 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (lower.includes('tiktok.com') || lower.includes('douyin.com')) {
             detected = 'tiktok';
             statusText = 'AI PARSER STATE: MATCHED // TIKTOK WATERMARK-FREE EXTRACTOR ONLINE';
+        } else if (lower.includes('spotify.com') || lower.includes('spotify.link') || lower.startsWith('spotify:')) {
+            detected = 'spotify';
+            statusText = 'AI PARSER STATE: MATCHED // SPOTIFY STUDIO AUDIO ENGINE ONLINE';
         } else if (lower.includes('pinterest.com') || lower.includes('pin.it')) {
             detected = 'pinterest';
             statusText = 'AI PARSER STATE: MATCHED // PINTEREST HD ASSET ENGINE ONLINE';
@@ -824,6 +828,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const videoCol = videoContainer.closest('.format-column');
+        if (videoCol) {
+            videoCol.style.display = (!data.formats || !data.formats.video || data.formats.video.length === 0) ? 'none' : '';
+        }
         if (videoContainer.children.length === 0) {
             videoContainer.innerHTML = '<p class="text-muted">No video formats available.</p>';
         }
@@ -917,11 +925,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const playlistItems = document.getElementById('playlistItems');
         playlistItems.innerHTML = '';
 
+        const isSpotifyPlaylist = Boolean(data.is_spotify);
+
         data.entries.forEach((entry, index) => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'playlist-item';
             
-            const optionsHTML = `
+            const optionsHTML = isSpotifyPlaylist ? `
+                <option value="spotify_320k" selected>🎵 320kbps MP3 (Studio Master)</option>
+                <option value="spotify_256k">🎵 256kbps MP3 (HQ Audio)</option>
+                <option value="spotify_flac">✨ Lossless FLAC (Studio Master)</option>
+                <option value="spotify_192k">🎵 192kbps MP3 (Standard)</option>
+            ` : `
                 <option value="bestvideo[height<=2160]+bestaudio[ext=m4a]/bestvideo[height<=2160]+bestaudio/best">4K Ultra HD (2160p)</option>
                 <option value="bestvideo[height<=1440]+bestaudio[ext=m4a]/bestvideo[height<=1440]+bestaudio/best">2K Quad HD (1440p)</option>
                 <option value="bestvideo[height<=1080]+bestaudio[ext=m4a]/bestvideo[height<=1080]+bestaudio/best" selected>1080p Full HD</option>
@@ -955,8 +970,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const title = btn.getAttribute('data-title');
                 const index = btn.getAttribute('data-index');
                 const format_id = document.getElementById(`quality-${index}`).value;
-                const type = format_id.includes('video') ? 'video' : 'audio';
-                const ext = (type === 'video') ? 'mp4' : 'mp3';
+                const isSpotifyEntry = (typeof isSpotifyPlaylist !== 'undefined' && isSpotifyPlaylist) || (url && url.includes('spotify.com'));
+                const type = isSpotifyEntry ? 'audio' : (format_id.includes('video') ? 'video' : 'audio');
+                const ext = isSpotifyEntry ? (format_id === 'spotify_flac' ? 'flac' : 'mp3') : ((type === 'video') ? 'mp4' : 'mp3');
                 
                 try {
                     await initiateDownload(url, format_id, ext, title, type, null, null, index);
@@ -1009,9 +1025,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const url = btn.getAttribute('data-url');
                     const title = btn.getAttribute('data-title');
                     const index = btn.getAttribute('data-index');
-                    const format_id = document.getElementById(`quality-${index}`).value;
-                    const type = format_id.includes('video') ? 'video' : 'audio';
-                    const ext = (type === 'video') ? 'mp4' : 'mp3';
+                const format_id = document.getElementById(`quality-${index}`).value;
+                const isSpotifyEntry = (typeof isSpotifyPlaylist !== 'undefined' && isSpotifyPlaylist) || (url && url.includes('spotify.com'));
+                const type = isSpotifyEntry ? 'audio' : (format_id.includes('video') ? 'video' : 'audio');
+                const ext = isSpotifyEntry ? (format_id === 'spotify_flac' ? 'flac' : 'mp3') : ((type === 'video') ? 'mp4' : 'mp3');
                     
                     let success = false;
                     let retries = 2; // Auto-retry up to 2 times
@@ -1208,14 +1225,27 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Play success chime
                             SoundFX.playSuccess();
 
-                            // Trigger client-side download by creating a temporary link (concurrency safe)
-                            const downloadLink = document.createElement('a');
-                            downloadLink.href = fileDownloadUrl;
-                            downloadLink.setAttribute('download', job.filename || '');
-                            downloadLink.style.display = 'none';
-                            document.body.appendChild(downloadLink);
-                            downloadLink.click();
-                            document.body.removeChild(downloadLink);
+                            // Trigger client-side download using fetch+Blob (cross-origin safe)
+                            try {
+                                const dlResp = await fetch(fileDownloadUrl);
+                                if (dlResp.ok) {
+                                    const blob = await dlResp.blob();
+                                    const blobUrl = URL.createObjectURL(blob);
+                                    const downloadLink = document.createElement('a');
+                                    downloadLink.href = blobUrl;
+                                    downloadLink.setAttribute('download', job.filename || (title + '.' + ext) || 'download');
+                                    downloadLink.style.display = 'none';
+                                    document.body.appendChild(downloadLink);
+                                    downloadLink.click();
+                                    document.body.removeChild(downloadLink);
+                                    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+                                    statusText.innerHTML = `✅ <strong>Download complete!</strong> File saved. <a href="${fileDownloadUrl}" style="color:#ff7a00;text-decoration:underline;margin-left:8px;font-weight:600;">Manual Download</a>`;
+                                } else {
+                                    window.open(fileDownloadUrl, '_blank');
+                                }
+                            } catch (blobErr) {
+                                window.open(fileDownloadUrl, '_blank');
+                            }
 
                             setTimeout(() => {
                                 if (itemProgress) itemProgress.classList.add('hidden');
@@ -1348,8 +1378,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkUrlTheme() {
         const url = urlInput.value.trim().toLowerCase();
         const isInstagram = url.includes('instagram.com');
+        const isSpotify = url.includes('spotify.com') || url.includes('spotify.link') || url.startsWith('spotify:');
         
         document.body.classList.toggle('theme-instagram', isInstagram);
+        document.body.classList.toggle('theme-spotify', isSpotify);
 
         const logoText = document.querySelector('.navbar .logo .logo-text');
         const subtitle = document.querySelector('.hero-subtitle');
@@ -1374,6 +1406,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // FACEBOOK VIDEO PARSER LOADED';
             } else if (url.includes('tiktok.com')) {
                 telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // TIKTOK MEDIA EXTRACTOR ENGAGED';
+            } else if (isSpotify) {
+                telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // SPOTIFY 320K AUDIO & PLAYLIST ENGINE READY';
             } else if (url.includes('pinterest.com') || url.includes('pin.it')) {
                 telemetryStatus.textContent = 'AI PARSER STATE: MATCHED // PINTEREST MEDIA EXTRACTOR READY';
             } else if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('www.')) {
